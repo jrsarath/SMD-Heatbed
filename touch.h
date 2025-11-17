@@ -66,140 +66,154 @@ XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
 #endif
 
 #if defined(TOUCH_FT6X36)
+/**
+ * @brief Handles touch events for the FT6X36 touch controller
+ * 
+ * @param p The point of touch
+ * @param e The type of touch event
+ */
 void touch(TPoint p, TEvent e) {
   if (e != TEvent::Tap && e != TEvent::DragStart && e != TEvent::DragMove && e != TEvent::DragEnd) {
     return;
   }
+
   // translation logic depends on screen rotation
-#if defined(TOUCH_SWAP_XY)
-  touch_last_x = map(p.y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth);
-  touch_last_y = map(p.x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight);
-#else
-  touch_last_x = map(p.x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth);
-  touch_last_y = map(p.y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight);
-#endif
-  switch (e)
-  {
-  case TEvent::Tap:
-    Serial.println("Tap");
-    touch_touched_flag = true;
-    touch_released_flag = true;
-    break;
-  case TEvent::DragStart:
-    Serial.println("DragStart");
-    touch_touched_flag = true;
-    break;
-  case TEvent::DragMove:
-    Serial.println("DragMove");
-    touch_touched_flag = true;
-    break;
-  case TEvent::DragEnd:
-    Serial.println("DragEnd");
-    touch_released_flag = true;
-    break;
-  default:
-    Serial.println("UNKNOWN");
-    break;
+  #if defined(TOUCH_SWAP_XY)
+    touch_last_x = map(p.y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth);
+    touch_last_y = map(p.x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight);
+  #else
+    touch_last_x = map(p.x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth);
+    touch_last_y = map(p.y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight);
+  #endif
+
+  switch (e) {
+    case TEvent::Tap:
+      Serial.println("Tap");
+      touch_touched_flag = true;
+      touch_released_flag = true;
+      break;
+    case TEvent::DragStart:
+      Serial.println("DragStart");
+      touch_touched_flag = true;
+      break;
+    case TEvent::DragMove:
+      Serial.println("DragMove");
+      touch_touched_flag = true;
+      break;
+    case TEvent::DragEnd:
+      Serial.println("DragEnd");
+      touch_released_flag = true;
+      break;
+    default:
+      Serial.println("UNKNOWN");
+      break;
   }
 }
 #endif
 
-void touch_init(uint16_t width, uint16_t height)
-{
+/**
+ * @brief Initializes the touch controller with the given screen dimensions
+ * 
+ * @param width The width of the touch screen
+ * @param height The height of the touch screen
+ */
+void touch_init(uint16_t width, uint16_t height) {
   touchWidth = width;
   touchHeight = height;
-#if defined(TOUCH_FT6X36)
-  Wire.setSDA(TOUCH_FT6X36_SDA);
-  Wire.setSCL(TOUCH_FT6X36_SCL);
-  Wire.begin();
-  // Wire.begin(TOUCH_FT6X36_SDA, TOUCH_FT6X36_SCL);
-  ts.begin();
-  ts.registerTouchHandler(touch);
+  #if defined(TOUCH_FT6X36)
+    Wire.setSDA(TOUCH_FT6X36_SDA);
+    Wire.setSCL(TOUCH_FT6X36_SCL);
+    Wire.begin();
+    // Wire.begin(TOUCH_FT6X36_SDA, TOUCH_FT6X36_SCL);
+    ts.begin();
+    ts.registerTouchHandler(touch);
 
-#elif defined(TOUCH_GT911)
-  // Wire1.setSDA(TOUCH_GT911_SDA);
-  // Wire1.setSCL(TOUCH_GT911_SCL);
-  // Wire1.begin();
+  #elif defined(TOUCH_GT911)
+    // Wire1.setSDA(TOUCH_GT911_SDA);
+    // Wire1.setSCL(TOUCH_GT911_SCL);
+    // Wire1.begin();
 
-  ts.begin();
-  ts.setRotation(TOUCH_GT911_ROTATION);
+    ts.begin();
+    ts.setRotation(TOUCH_GT911_ROTATION);
 
-#elif defined(TOUCH_XPT2046)
-  SPI.begin(TOUCH_XPT2046_SCK, TOUCH_XPT2046_MISO, TOUCH_XPT2046_MOSI, TOUCH_XPT2046_CS);
-  ts.begin();
-  ts.setRotation(TOUCH_XPT2046_ROTATION);
+  #elif defined(TOUCH_XPT2046)
+    SPI.begin(TOUCH_XPT2046_SCK, TOUCH_XPT2046_MISO, TOUCH_XPT2046_MOSI, TOUCH_XPT2046_CS);
+    ts.begin();
+    ts.setRotation(TOUCH_XPT2046_ROTATION);
 
-#endif
+  #endif
 }
 
-bool touch_has_signal()
-{
-#if defined(TOUCH_FT6X36)
-  ts.loop();
-  return touch_touched_flag || touch_released_flag;
+/**
+ * @brief Checks if the touch controller has detected any touch signal
+ * 
+ * @return true 
+ * @return false 
+ */
+bool touch_has_signal() {
+  #if defined(TOUCH_FT6X36)
+    ts.loop();
+    return touch_touched_flag || touch_released_flag;
 
-#elif defined(TOUCH_GT911)
-  return true;
+  #elif defined(TOUCH_GT911)
+    return true;
 
-#elif defined(TOUCH_XPT2046)
-  return ts.tirqTouched();
+  #elif defined(TOUCH_XPT2046)
+    return ts.tirqTouched();
 
-#else
-  return false;
-#endif
+  #else
+    return false;
+  #endif
 }
 
+/**
+ * @brief Checks if the touch controller has detected a touch event
+ * 
+ * @return true 
+ * @return false 
+ */
 bool touch_touched() {
-#if defined(TOUCH_FT6X36)
-  if (touch_touched_flag)
-  {
-    touch_touched_flag = false;
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  #if defined(TOUCH_FT6X36)
+    if (touch_touched_flag) {
+      touch_touched_flag = false;
+      return true;
+    } else {
+      return false;
+    }
 
-#elif defined(TOUCH_GT911)
-  ts.read();
-  if (ts.isTouched)
-  {
-#if defined(TOUCH_SWAP_XY)
-    touch_last_x = map(ts.points[0].y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
-    touch_last_y = map(ts.points[0].x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
-#else
-    touch_last_x = map(ts.points[0].x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
-    touch_last_y = map(ts.points[0].y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
-#endif
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  #elif defined(TOUCH_GT911)
+    ts.read();
+    if (ts.isTouched) {
+      #if defined(TOUCH_SWAP_XY)
+          touch_last_x = map(ts.points[0].y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
+          touch_last_y = map(ts.points[0].x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
+      #else
+          touch_last_x = map(ts.points[0].x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
+          touch_last_y = map(ts.points[0].y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
+      #endif
+      return true;
+    } else {
+      return false;
+    }
 
-#elif defined(TOUCH_XPT2046)
-  if (ts.touched())
-  {
-    TS_Point p = ts.getPoint();
-#if defined(TOUCH_SWAP_XY)
-    touch_last_x = map(p.y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
-    touch_last_y = map(p.x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
-#else
-    touch_last_x = map(p.x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
-    touch_last_y = map(p.y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
-#endif
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  #elif defined(TOUCH_XPT2046)
+    if (ts.touched()) {
+      TS_Point p = ts.getPoint();
+      #if defined(TOUCH_SWAP_XY)
+          touch_last_x = map(p.y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
+          touch_last_y = map(p.x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
+      #else
+          touch_last_x = map(p.x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth - 1);
+          touch_last_y = map(p.y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
+      #endif
+      return true;
+    } else {
+      return false;
+    }
 
-#else
-  return false;
-#endif
+  #else
+    return false;
+  #endif
 }
 
 /**
