@@ -83,14 +83,9 @@ This project is intended to be open-source. If you want a permissive license, co
 
 **Contact / Author**
 - Project: SMD-Heatbed
-- Owner: `jrsarath`
+- Owner: `@jrsarath`
 
 ---
-
-If you'd like, I can:
-- Add an example `LICENSE` file (MIT) and `CONTRIBUTING.md`.
-- Create a simple ASCII wiring diagram in the README.
-- Change the increment/decrement step to use `REF_STEP` or a separate `STEP` macro (you previously asked about 10° steps). Let me know which next step you'd like.
 
 **Credits**
 
