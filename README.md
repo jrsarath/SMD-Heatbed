@@ -81,10 +81,6 @@ This project is intended to be open-source. If you want a permissive license, co
 - LVGL for the GUI stack
 - Elecrow and the PicoDVI community examples
 
-**Contact / Author**
-- Project: SMD-Heatbed
-- Owner: `@jrsarath`
-
 ---
 
 **Credits**
