@@ -10,7 +10,7 @@
 #define PIN_ENA 2
 #define PIN_ENB 3
 #define PIN_EBT 27
-#define PIN_SSR 16
+#define PIN_SSR 22
 #define PIN_NTC 28
 
 // PARAMETERS
@@ -27,6 +27,7 @@
 #define REF_STEP          0.05    // [C]
 #define MAX_DUTY          40      // [%]
 #define MIN_DUTY          0       // [%]
+#define LCD_PERIOD        1000    // [ms]
 #define SAFETY_PERIOD     18000   // [ms]
 #define SAFETY_THRESHOLD  2       // [C]
 
@@ -78,11 +79,8 @@ volatile int enc_count = 0;
 volatile int last_enc = 0;
 
 // LCD Variables
-int red, green, blue;
-bool updateLCD = false;
+bool init_done = false;
 bool updateLCDmeasure = false;
-bool lcd_cleared = false;
-String status_msg = "";
 volatile int last_update = 0;
 
 // Temperature Variables
@@ -112,12 +110,56 @@ void toggleHeater() {
     Serial1.println("Heater turned ON");
     heater_turned_on = millis();
     last_safety_check = millis();
+    lv_obj_add_state(ui_Switch1, LV_STATE_CHECKED);
     heater = true;
   } else {
     Serial1.println("Heater turned OFF");
+    lv_obj_clear_state(ui_Switch1, LV_STATE_CHECKED);
     heater = false;
   }
   return;
+}
+
+/**
+ * @brief Set the desired temperature directly (degrees C)
+ *
+ * This updates the global `set_temp` and `enc_count`, clamps to
+ * `MIN_TEMP`/`MAX_TEMP`, and updates the UI label if initialized.
+ * 
+ * @param temp Desired temperature in degrees Celsius
+ */
+void setDesiredTemp(int temp) {
+  if (temp < MIN_TEMP) temp = MIN_TEMP;
+  if (temp > MAX_TEMP) temp = MAX_TEMP;
+
+  set_temp = temp;
+  enc_count = temp;
+
+  if (init_done) {
+    lv_label_set_text(ui_Label1, String(set_temp).c_str());
+  }
+}
+
+/**
+ * @brief Change desired temperature by delta (can be negative)
+ */
+static void changeDesiredTempBy(int delta) {
+  int newTemp = set_temp + delta;
+  setDesiredTemp(newTemp);
+}
+
+/**
+ * @brief Increase desired temperature by 1
+ */
+void incDesiredTemp() {
+  changeDesiredTempBy(1);
+}
+
+/**
+ * @brief Decrease desired temperature by 1
+ */
+void decDesiredTemp() {
+  changeDesiredTempBy(-1);
 }
 
 /**
@@ -160,7 +202,14 @@ bool regulatorHandler(struct repeating_timer *t) {
   
   if (heater == true && error_state == false) {
     // Updating the status message
-    status_msg = "HEATING";
+    if (init_done) {
+      lv_label_set_text(ui_Label9, "Heating");
+      lv_img_set_src(ui_Image1, &ui_img_heating_png);
+
+      ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_danger);
+      ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_danger);
+    }
+
 
     // Updating the reference temperature
     if (set_temp > reference_temp) reference_temp += REF_STEP;
@@ -200,6 +249,14 @@ bool regulatorHandler(struct repeating_timer *t) {
       if (measured_temp - last_safety_temp < SAFETY_THRESHOLD) {
         // This is the case where the temperature hasn't increased, and we need to go into the error state
         error_state = true;
+        if (init_done) {
+          lv_label_set_text(ui_Label9, "NTC Error");
+          lv_img_set_src(ui_Image1, &ui_img_alert_png);
+
+          ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_danger);
+          ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_danger);
+        }
+
         // Reset the duty to 0% 
         duty = 0.00;
         acc = 0;
@@ -211,8 +268,14 @@ bool regulatorHandler(struct repeating_timer *t) {
     PWM_Instance[0]->setPWM(PIN_SSR, PWM_FREQUENCY, duty);
     
   } else if (error_state == false) {
-    // Update the status message
-    status_msg = "IDLE";
+    // Updating the status message
+    if (init_done) {
+      lv_label_set_text(ui_Label9, "Idle");
+      lv_img_set_src(ui_Image1, &ui_img_sleeping_png);
+
+      ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_info);
+      ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_info);
+    }
     // Reset the accumulator for the PI controller
     acc = 0;
     // Reset the duty cycle
@@ -232,26 +295,28 @@ bool regulatorHandler(struct repeating_timer *t) {
  */
 bool printHandler(struct repeating_timer *t) {
   (void) t;
-  Serial.print("ReferenceTemp:");
-  Serial.print(reference_temp);
-  Serial.print(",MeasuredTemp:");
-  Serial.print(measured_temp);
-  Serial.print(",");
-  Serial.print("Duty:");
-  Serial.print(duty);
-  Serial.println("");
+  // Serial1.print("ReferenceTemp:");
+  // Serial1.print(reference_temp);
+  // Serial1.print(",MeasuredTemp:");
+  // Serial1.print(measured_temp);
+  // Serial1.print(",");
+  // Serial1.print("Duty:");
+  // Serial1.print(duty);
+  // Serial1.println("");
   if (last_measured_temp != temp_reading && millis() - last_update > LCD_PERIOD) {
     last_measured_temp = temp_reading;
     last_update = millis();
-    updateLCD = true;
+
+    if (init_done) {
+      lv_arc_set_value(ui_Arc2, temp_reading);
+      lv_label_set_text(ui_Label6, String(temp_reading).c_str());
+    }
   }
   return true;
 }
 
 /**
  * @brief 
- * 
- */
  * 
  * @param t 
  * @return true 
@@ -296,13 +361,13 @@ bool acquisitionHandler(struct repeating_timer *t) {
 
   if (btn_short == true) {
     btn_short = false;
-    updateLCD = true;
     toggleHeater();
   }
 
   // Encoder rotation
   enca = digitalRead(PIN_ENA);
   encb = digitalRead(PIN_ENB);
+  
   if (enca == 1 && lasta == 0 && encb == 0) enc_count++;
   if (encb == 1 && lastb == 0 && enca == 0) enc_count--;
   lasta = enca;
@@ -314,7 +379,10 @@ bool acquisitionHandler(struct repeating_timer *t) {
     set_temp = enc_count;
     if (set_temp < MIN_TEMP) set_temp = MIN_TEMP;
     if (set_temp > MAX_TEMP) set_temp = MAX_TEMP;
-    updateLCD = true;
+
+    if (init_done) {
+      lv_label_set_text(ui_Label1, String(set_temp).c_str());
+    }
   }
   
   return true;
@@ -349,10 +417,10 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
       // Set the coordinates
       data->point.x = touch_last_x;
       data->point.y = touch_last_y;
-      Serial11.print( "Data x " );
-      Serial11.println( data->point.x );
-      Serial11.print( "Data y " );
-      Serial11.println( data->point.y );
+      Serial1.print( "Data x " );
+      Serial1.println( data->point.x );
+      Serial1.print( "Data y " );
+      Serial1.println( data->point.y );
     } else if (touch_released()) {
       data->state = LV_INDEV_STATE_RELEASED;
     }
@@ -366,10 +434,10 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
  * 
  */
 void setup() {
-  Serial11.setRX(1);
-  Serial11.setTX(0);
-  Serial11.begin(115200);
-  Serial11.println("Beginning setup");
+  Serial1.setRX(1);
+  Serial1.setTX(0);
+  Serial1.begin(115200);
+  Serial1.println("Beginning setup");
 
   // PINS Setup
   pinMode(24, OUTPUT);
@@ -386,34 +454,34 @@ void setup() {
 
   // LED Timer - Frequency set in the Parameters section
   if (TimerMain.attachInterruptInterval(2000, regulatorHandler)) {
-    Serial.print("Starting LED Timer OK, millis() = ");
-    Serial.println(String(millis()));
+    Serial1.print("Starting LED Timer OK, millis() = ");
+    Serial1.println(String(millis()));
   } else {
-    Serial.println("Can't set LED Timer. Select another freq. or timer");
+    Serial1.println("Can't set LED Timer. Select another freq. or timer");
   }
 
   // LED Timer - Frequency set in the Parameters section
   if (TimerLED.attachInterruptInterval(10000, printHandler)) {
-    Serial.print("Starting LED Timer OK, millis() = ");
-    Serial.println(String(millis()));
+    Serial1.print("Starting LED Timer OK, millis() = ");
+    Serial1.println(String(millis()));
   } else {
-    Serial.println("Can't set LED Timer. Select another freq. or timer");
+    Serial1.println("Can't set LED Timer. Select another freq. or timer");
   }
 
   // Acquisition Timer - Frequency set in the Parameters section
   if (TimerAcqusition.attachInterruptInterval(200, acquisitionHandler)) {
-    Serial.print("Starting Acquisition Timer OK, millis() = ");
-    Serial.println(String(millis()));
+    Serial1.print("Starting Acquisition Timer OK, millis() = ");
+    Serial1.println(String(millis()));
   } else {
-    Serial.println("Can't set LED Timer. Select another freq. or timer");
+    Serial1.println("Can't set LED Timer. Select another freq. or timer");
   }
 
   // LED Timer - Frequency set in the Parameters section
   if (TimerLCD.attachInterruptInterval(300000, LCDHandler)) {
-    Serial.print("Starting LED Timer OK, millis() = ");
-    Serial.println(String(millis()));
+    Serial1.print("Starting LED Timer OK, millis() = ");
+    Serial1.println(String(millis()));
   } else {
-    Serial.println("Can't set LED Timer. Select another freq. or timer");
+    Serial1.println("Can't set LED Timer. Select another freq. or timer");
   }
 
   analogReadResolution(12);
@@ -423,18 +491,22 @@ void setup() {
   PWM_Instance[0]->setPWM();
 
 
-  // LCD init
+  // LCD Init
   display.begin();
-  Serial11.println("Display setup");
-  // touch_init(320, 240);
-  // Serial11.println("Touch setup");
+  Serial1.println("Display setup");
+
+  // Touch Init
+  touch_init(320, 240);
+  Serial1.println("Touch setup");
+  
   // Takes effect on next drawing command
   display.setRotation(0);  
   display.fillScreen(0xFFFF);
   delay(2000);
 
+  // LVGL Init
   lv_init();
-  Serial11.println("LVGL setup");
+  Serial1.println("LVGL setup");
   lv_disp_draw_buf_init(&draw_buf, disp_draw_buf1, NULL, screenWidth * screenHeight / 10 );
   
   // Initialize the display
@@ -449,17 +521,18 @@ void setup() {
   lv_disp_drv_register(&disp_drv);
 
   // Initialize the (dummy) input device driver
-  // static lv_indev_drv_t indev_drv;
-  // lv_indev_drv_init(&indev_drv);
-  // indev_drv.type = LV_INDEV_TYPE_POINTER;
-  // indev_drv.read_cb = my_touchpad_read;
-  // lv_indev_drv_register(&indev_drv);
+  static lv_indev_drv_t indev_drv;
+  lv_indev_drv_init(&indev_drv);
+  indev_drv.type = LV_INDEV_TYPE_POINTER;
+  indev_drv.read_cb = my_touchpad_read;
+  lv_indev_drv_register(&indev_drv);
 
   // lv_demo_widgets();
   ui_init();
-  Serial11.println("UI setup");
+  Serial1.println("UI setup");
 
-  Serial11.println( "Setup done" );
+  init_done = true;
+  Serial1.println( "Setup finished" );
 }
 
 /**
