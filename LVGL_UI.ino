@@ -428,6 +428,43 @@ void setup() {
   Serial1.begin(115200);
   Serial1.println("Beginning setup");
 
+  // LCD Init
+  display.begin();
+  Serial1.println("Display setup");
+  // Takes effect on next drawing command
+  display.setRotation(0);
+
+  // LVGL Init
+  lv_init();
+  Serial1.println("LVGL setup");
+  lv_disp_draw_buf_init(&draw_buf, disp_draw_buf1, NULL, screenWidth * screenHeight / 10 );
+  
+  // Initialize the display
+  lv_disp_drv_init(&disp_drv);
+
+  // Change the following line to your display resolution
+  disp_drv.hor_res = screenWidth;
+  disp_drv.ver_res = screenHeight;
+  disp_drv.flush_cb = my_disp_flush;
+  disp_drv.full_refresh = 0;
+  disp_drv.draw_buf = &draw_buf;
+  lv_disp_drv_register(&disp_drv);
+
+  // UI 
+  ui_init();
+  Serial1.println("UI setup");
+
+  lv_timer_t * splash_timer = lv_timer_create([](lv_timer_t * t) {
+    lv_scr_load_anim(
+        ui_Screen1,                // new screen
+        LV_SCR_LOAD_ANIM_FADE_ON,  // animation type
+        300,                       // animation time (ms)
+        0,                         // delay before starting anim (ms)
+        false                      // auto_delete = false (keep old screen object)
+    );
+    lv_timer_del(t);               // run only once
+  }, 5000, NULL);
+
   // PINS Setup
   pinMode(24, OUTPUT);
   pinMode(PIN_ENA, INPUT);
@@ -479,44 +516,16 @@ void setup() {
   PWM_Instance[0] = new RP2040_PWM(PIN_SSR, PWM_FREQUENCY, 0.00f);
   PWM_Instance[0]->setPWM();
 
-
-  // LCD Init
-  display.begin();
-  Serial1.println("Display setup");
-
   // Touch Init
   touch_init(320, 240);
   Serial1.println("Touch setup");
-  
-  // Takes effect on next drawing command
-  display.setRotation(0);
 
-  // LVGL Init
-  lv_init();
-  Serial1.println("LVGL setup");
-  lv_disp_draw_buf_init(&draw_buf, disp_draw_buf1, NULL, screenWidth * screenHeight / 10 );
-  
-  // Initialize the display
-  lv_disp_drv_init(&disp_drv);
-
-  // Change the following line to your display resolution
-  disp_drv.hor_res = screenWidth;
-  disp_drv.ver_res = screenHeight;
-  disp_drv.flush_cb = my_disp_flush;
-  disp_drv.full_refresh = 0;
-  disp_drv.draw_buf = &draw_buf;
-  lv_disp_drv_register(&disp_drv);
-
-  // Initialize the (dummy) input device driver
+  // Initialize the input device driver
   static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = my_touchpad_read;
   lv_indev_drv_register(&indev_drv);
-
-  // lv_demo_widgets();
-  ui_init();
-  Serial1.println("UI setup");
 
   init_done = true;
   Serial1.println( "Setup finished" );
