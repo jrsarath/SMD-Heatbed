@@ -101,6 +101,12 @@ float last_safety_temp  = 0.00;
 int last_safety_check = 0;
 bool error_state = false;
 
+// UI update flags/values (set from ISRs, consumed in main loop)
+volatile int ui_status_state = 0; // 0=idle, 1=heating, 2=ntc_error
+volatile int ui_temp_to_display = 0; // arc / measured temp
+volatile int ui_set_temp_to_display = 0; // desired temp label
+volatile bool ui_needs_update = false;
+
 /**
  * @brief Toggles the heater state
  * 
@@ -202,13 +208,9 @@ bool regulatorHandler(struct repeating_timer *t) {
   
   if (heater == true && error_state == false) {
     // Updating the status message
-    if (init_done) {
-      lv_label_set_text(ui_Label9, "Heating");
-      lv_img_set_src(ui_Image1, &ui_img_heating_png);
-
-      ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_danger);
-      ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_danger);
-    }
+    // Request UI update (do UI operations in main loop, not in ISR)
+    ui_status_state = 1; // heating
+    ui_needs_update = true;
 
 
     // Updating the reference temperature
@@ -249,13 +251,9 @@ bool regulatorHandler(struct repeating_timer *t) {
       if (measured_temp - last_safety_temp < SAFETY_THRESHOLD) {
         // This is the case where the temperature hasn't increased, and we need to go into the error state
         error_state = true;
-        if (init_done) {
-          lv_label_set_text(ui_Label9, "NTC Error");
-          lv_img_set_src(ui_Image1, &ui_img_alert_png);
-
-          ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_danger);
-          ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_danger);
-        }
+        // Request UI update (do UI operations in main loop, not in ISR)
+        ui_status_state = 2; // ntc error
+        ui_needs_update = true;
 
         // Reset the duty to 0% 
         duty = 0.00;
@@ -269,13 +267,9 @@ bool regulatorHandler(struct repeating_timer *t) {
     
   } else if (error_state == false) {
     // Updating the status message
-    if (init_done) {
-      lv_label_set_text(ui_Label9, "Idle");
-      lv_img_set_src(ui_Image1, &ui_img_sleeping_png);
-
-      ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_info);
-      ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_info);
-    }
+    // Request UI update (do UI operations in main loop, not in ISR)
+    ui_status_state = 0; // idle
+    ui_needs_update = true;
     // Reset the accumulator for the PI controller
     acc = 0;
     // Reset the duty cycle
@@ -306,11 +300,9 @@ bool printHandler(struct repeating_timer *t) {
   if (last_measured_temp != temp_reading && millis() - last_update > LCD_PERIOD) {
     last_measured_temp = temp_reading;
     last_update = millis();
-
-    if (init_done) {
-      lv_arc_set_value(ui_Arc2, temp_reading);
-      lv_label_set_text(ui_Label6, String(temp_reading).c_str());
-    }
+    // Request UI update instead of calling LVGL from ISR
+    ui_temp_to_display = temp_reading;
+    ui_needs_update = true;
   }
   return true;
 }
@@ -380,9 +372,9 @@ bool acquisitionHandler(struct repeating_timer *t) {
     if (set_temp < MIN_TEMP) set_temp = MIN_TEMP;
     if (set_temp > MAX_TEMP) set_temp = MAX_TEMP;
 
-    if (init_done) {
-      lv_label_set_text(ui_Label1, String(set_temp).c_str());
-    }
+    // Request UI update instead of calling LVGL from ISR
+    ui_set_temp_to_display = set_temp;
+    ui_needs_update = true;
   }
   
   return true;
@@ -417,10 +409,7 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
       // Set the coordinates
       data->point.x = touch_last_x;
       data->point.y = touch_last_y;
-      Serial1.print( "Data x " );
-      Serial1.println( data->point.x );
-      Serial1.print( "Data y " );
-      Serial1.println( data->point.y );
+      // avoid heavy serial printing here (called from LVGL polling)
     } else if (touch_released()) {
       data->state = LV_INDEV_STATE_RELEASED;
     }
@@ -500,9 +489,7 @@ void setup() {
   Serial1.println("Touch setup");
   
   // Takes effect on next drawing command
-  display.setRotation(0);  
-  display.fillScreen(0xFFFF);
-  delay(2000);
+  display.setRotation(0);
 
   // LVGL Init
   lv_init();
@@ -541,6 +528,56 @@ void setup() {
  */
 void loop() {
   lv_timer_handler();
+
+  // Perform UI updates here (safe, non-ISR context)
+  if (init_done && ui_needs_update) {
+    // copy volatile values to locals
+    int status = ui_status_state;
+    int disp_temp = ui_temp_to_display;
+    int disp_set = ui_set_temp_to_display;
+
+    // clear flag early to avoid missing new requests while updating
+    ui_needs_update = false;
+
+    static int last_displayed_temp = -32768;
+    static int last_displayed_set = -32768;
+    static int last_status = -1;
+
+    // Update measured temperature (arc + label6) only if changed
+    if (disp_temp != last_displayed_temp) {
+      lv_arc_set_value(ui_Arc2, disp_temp);
+      lv_label_set_text(ui_Label6, String(disp_temp).c_str());
+      last_displayed_temp = disp_temp;
+    }
+
+    // Update desired/set temperature label only if changed
+    if (disp_set != last_displayed_set) {
+      lv_label_set_text(ui_Label1, String(disp_set).c_str());
+      last_displayed_set = disp_set;
+    }
+
+    // Update status (Label9 / Image / styles) only if changed
+    if (status != last_status) {
+      if (status == 1) {
+        lv_label_set_text(ui_Label9, "Heating");
+        lv_img_set_src(ui_Image1, &ui_img_heating_png);
+        ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_danger);
+        ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_danger);
+      } else if (status == 2) {
+        lv_label_set_text(ui_Label9, "NTC Error");
+        lv_img_set_src(ui_Image1, &ui_img_alert_png);
+        ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_danger);
+        ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_danger);
+      } else {
+        lv_label_set_text(ui_Label9, "Idle");
+        lv_img_set_src(ui_Image1, &ui_img_sleeping_png);
+        ui_object_set_themeable_style_property(ui_Container9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR, _ui_theme_color_info);
+        ui_object_set_themeable_style_property(ui_Label9, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_info);
+      }
+      last_status = status;
+    }
+  }
+
   delay(5);
 }
 
