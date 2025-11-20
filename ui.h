@@ -27,7 +27,7 @@ extern "C" {
 extern lv_obj_t *ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE( ui_img_logo_png);   // assets/logo.png
+LV_IMG_DECLARE( ui_img_1113032066);   // assets/logo-landscape.png
 LV_IMG_DECLARE( ui_img_sleeping_png);   // assets/sleeping.png
 LV_IMG_DECLARE( ui_img_alert_png);   // assets/alert.png
 LV_IMG_DECLARE( ui_img_heating_png);   // assets/heating.png

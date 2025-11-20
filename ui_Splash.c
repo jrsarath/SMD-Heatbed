@@ -20,8 +20,8 @@ lv_obj_set_style_bg_color(ui_Splash, lv_color_hex(0xFF5041), LV_PART_MAIN | LV_S
 lv_obj_set_style_bg_opa(ui_Splash, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Image2 = lv_img_create(ui_Splash);
-lv_img_set_src(ui_Image2, &ui_img_logo_png);
-lv_obj_set_width( ui_Image2, 50);
+lv_img_set_src(ui_Image2, &ui_img_1113032066);
+lv_obj_set_width( ui_Image2, 221);
 lv_obj_set_height( ui_Image2, 50);
 lv_obj_set_align( ui_Image2, LV_ALIGN_CENTER );
 lv_obj_set_flex_flow(ui_Image2,LV_FLEX_FLOW_ROW);
