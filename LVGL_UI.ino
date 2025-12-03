@@ -155,17 +155,17 @@ static void changeDesiredTempBy(int delta) {
 }
 
 /**
- * @brief Increase desired temperature by 1
+ * @brief Increase desired temperature by 10
  */
 void incDesiredTemp() {
-  changeDesiredTempBy(1);
+  changeDesiredTempBy(10);
 }
 
 /**
- * @brief Decrease desired temperature by 1
+ * @brief Decrease desired temperature by 10
  */
 void decDesiredTemp() {
-  changeDesiredTempBy(-1);
+  changeDesiredTempBy(-10);
 }
 
 /**
