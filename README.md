@@ -63,6 +63,14 @@ cd LVGL_UI
 - The UI contains two presets: one maps to 160°C and the other to 250°C (these can be changed in `ui_events.c`).
 - Monitor the `Serial1` port at 115200 baud for debug output.
 
+**Hardware Images**
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d5a890de-ee33-468a-93fe-be0ccc0b9100" width="22%" />
+  <img src="https://github.com/user-attachments/assets/737ff81e-6d5e-4dd4-993b-8c37e55e7838" width="22%" />
+  <img src="https://github.com/user-attachments/assets/c5890b83-f41f-40c8-8c29-4748daec2249" width="22%" />
+  <img src="https://github.com/user-attachments/assets/2f4248e5-fe4d-4c8f-8441-4f3b47595c31" width="22%" />
+</p>
+
 **Configuration**
 - `REF_STEP` controls how fast `reference_temp` ramps toward `set_temp` — lower values = slower, gentler ramp; higher = faster.
 - `MIN_TEMP` / `MAX_TEMP` limit the allowed setpoint range.
