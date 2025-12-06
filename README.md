@@ -52,7 +52,7 @@ Adjust pins in `LVGL_UI.ino` if your wiring differs.
 Optional: clone the repo and open in your preferred editor:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/jrsarath/SMD-Heatbed
 cd LVGL_UI
 # Open LVGL_UI.ino in Arduino IDE or import into PlatformIO
 ``` 
