@@ -82,9 +82,6 @@ Contributions welcome! Please open issues for feature requests or bugs, and subm
 - Make the ramping time-based instead of per-timer-step
 - Add temperature logging and profile save/load
 
-**License**
-This project is intended to be open-source. If you want a permissive license, consider `MIT`. Add a `LICENSE` file when you pick the license.
-
 **Acknowledgements**
 - LVGL for the GUI stack
 - Elecrow and the PicoDVI community examples
