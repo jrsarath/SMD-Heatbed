@@ -1,6 +1,6 @@
-# SMD-Heatbed — Pico LVGL Heatbed Controller
+# SMD Heatbed — Pico LVGL Heatbed Controller
 
-**SMD-Heatbed** is an open-source heatplate controller for reflow/SMT work, built around the Raspberry Pi Pico with a small LVGL touchscreen UI. It implements a PID/PI-style regulator, encoder controls, presets and safety checks suitable for controlling a high-power PTC heatplate via an SSR.
+**SMD Heatbed** is an open-source heatplate controller for reflow/SMT work, built around the Raspberry Pi Pico with a small LVGL touchscreen UI. It implements a PID/PI-style regulator, encoder controls, presets and safety checks suitable for controlling a high-power PTC heatplate via an SSR.
 
 **Hardware (BOM)**
 - **3V SSR, 10A** — mains switching for the heatplate (use an SSR whose input is compatible with 3.3V logic).
