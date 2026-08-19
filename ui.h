@@ -10,16 +10,16 @@
 extern "C" {
 #endif
 
-    #include "lvgl.h"
+#include "lvgl.h"
 
-#include "ui_helpers.h"
 #include "ui_events.h"
+#include "ui_helpers.h"
 #include "ui_theme_manager.h"
 #include "ui_themes.h"
 
 ///////////////////// SCREENS ////////////////////
-#include "ui_Splash.h"
 #include "ui_Screen1.h"
+#include "ui_Splash.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -27,11 +27,11 @@ extern "C" {
 extern lv_obj_t *ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE( ui_img_1113032066);   // assets/logo-landscape.png
-LV_IMG_DECLARE( ui_img_sleeping_png);   // assets/sleeping.png
-LV_IMG_DECLARE( ui_img_alert_png);   // assets/alert.png
-LV_IMG_DECLARE( ui_img_heating_png);   // assets/heating.png
-LV_IMG_DECLARE( ui_img_info_png);   // assets/info.png
+LV_IMG_DECLARE(ui_img_1113032066);   // assets/logo-landscape.png
+LV_IMG_DECLARE(ui_img_sleeping_png); // assets/sleeping.png
+LV_IMG_DECLARE(ui_img_alert_png);    // assets/alert.png
+LV_IMG_DECLARE(ui_img_heating_png);  // assets/heating.png
+LV_IMG_DECLARE(ui_img_info_png);     // assets/info.png
 
 // UI INIT
 void ui_init(void);

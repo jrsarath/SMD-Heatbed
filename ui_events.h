@@ -10,11 +10,11 @@
 extern "C" {
 #endif
 
-void increase_temp(lv_event_t * e);
-void set_preset_one(lv_event_t * e);
-void decrease_temp(lv_event_t * e);
-void set_preset_two(lv_event_t * e);
-void toggle_pwr(lv_event_t * e);
+void increase_temp(lv_event_t *e);
+void set_preset_one(lv_event_t *e);
+void decrease_temp(lv_event_t *e);
+void set_preset_two(lv_event_t *e);
+void toggle_pwr(lv_event_t *e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

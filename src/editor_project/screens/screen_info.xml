@@ -1,0 +1,92 @@
+<screen permanent="true">
+	<view extends="lv_obj" width="240" height="320">
+		<style name="style_screen_dark" />
+
+		<!-- Main Column Layout -->
+		<column pad="0" gap="2">
+			
+			<!-- Header -->
+			<header title="SYSTEM DIAGNOSTICS" time="12:45" icon="icon_info" />
+
+			<!-- Content Area Container -->
+			<lv_obj width="100%" flex_flow="column" style_pad_hor="#space_sm" style_pad_ver="2" style_pad_row="4">
+				
+				<list width="100%" style_bg_color="#color_dark_panel" style_border_color="#color_border" style_radius="#radius_card">
+					<list_section text="HARDWARE SPECIFICATIONS" />
+					
+					<list_item title="Microcontroller" subtitle="Raspberry Pi Pico (RP2040)" icon="icon_info">
+						<list_item-trailing>
+							<lv_label text="133 MHz" style_text_color="#color_accent" style_text_font="font_body" />
+						</list_item-trailing>
+					</list_item>
+
+					<list_item title="Display Target" subtitle="4.3 inch PicoDVI RGB Display" icon="icon_settings">
+						<list_item-trailing>
+							<lv_label text="240x320" style_text_color="#color_text_primary" style_text_font="font_body" />
+						</list_item-trailing>
+					</list_item>
+
+					<list_item title="Touch Controller" subtitle="Capacitive GT911 Driver" icon="icon_check">
+						<list_item-trailing>
+							<lv_label text="I2C 0x5D" style_text_color="#color_text_primary" style_text_font="font_body" />
+						</list_item-trailing>
+					</list_item>
+
+					<list_separator />
+					<list_section text="FIRMWARE &amp; TELEMETRY" />
+
+					<list_item title="LVGL Engine" subtitle="LVGL Pro Editor XML v9.5.0" icon="icon_layers">
+						<list_item-trailing>
+							<lv_label text="v9.5.0" style_text_color="#color_success" style_text_font="font_body" />
+						</list_item-trailing>
+					</list_item>
+
+					<list_item title="Heater Control" subtitle="GPIO 22 SSR PWM @ 1000 Hz" icon="icon_flame">
+						<list_item-trailing>
+							<lv_label text="40% MAX" style_text_color="#color_warning" style_text_font="font_body" />
+						</list_item-trailing>
+					</list_item>
+				</list>
+
+			</lv_obj>
+
+			<!-- Bottom Navigation (Tab 4: INFO Active) -->
+			<lv_obj width="100%" height="40" flex_flow="row" style_flex_cross_place="center" style_flex_main_place="space_around" style_pad_hor="2" style_bg_color="#color_dark_panel" style_border_color="#color_border" style_border_width="1" style_border_side="top">
+				<!-- Tab 0: HOME -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_home" trigger="clicked" />
+					<lv_image src="icon_home" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="HOME" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 1: PROFILES -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_profiles" trigger="clicked" />
+					<lv_image src="icon_layers" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="PROF" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 2: MANUAL -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_manual" trigger="clicked" />
+					<lv_image src="icon_sliders" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="MAN" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 3: SETTINGS -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_settings" trigger="clicked" />
+					<lv_image src="icon_settings" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="SETT" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 4: INFO -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" style_bg_color="#color_surface_elevated" style_border_color="#color_accent" style_border_width="1" clickable="true">
+					<lv_image src="icon_info" style_image_recolor="#color_accent" style_image_recolor_opa="100%" />
+					<lv_label text="INFO" style_text_color="#color_accent" style_text_font="font_body" />
+				</lv_obj>
+			</lv_obj>
+
+		</column>
+	</view>
+</screen>

@@ -6,27 +6,27 @@
 #include "ui.h"
 #include "ui_events_wrapper.h"
 
-void increase_temp(lv_event_t * e) {
-	(void)e;
-	call_inc_desired_temp();
+void increase_temp(lv_event_t *e) {
+  (void)e;
+  call_inc_desired_temp();
 }
 
-void set_preset_one(lv_event_t * e) {
-	(void)e;
-	call_set_desired_temp(160);
+void set_preset_one(lv_event_t *e) {
+  (void)e;
+  call_set_desired_temp(160);
 }
 
-void decrease_temp(lv_event_t * e) {
-	(void)e;
-	call_dec_desired_temp();
+void decrease_temp(lv_event_t *e) {
+  (void)e;
+  call_dec_desired_temp();
 }
 
-void set_preset_two(lv_event_t * e) {
-	(void)e;
-	call_set_desired_temp(250);
+void set_preset_two(lv_event_t *e) {
+  (void)e;
+  call_set_desired_temp(250);
 }
 
-void toggle_pwr(lv_event_t * e) {
-	(void)e;
-	call_toggle_heater();
+void toggle_pwr(lv_event_t *e) {
+  (void)e;
+  call_toggle_heater();
 }

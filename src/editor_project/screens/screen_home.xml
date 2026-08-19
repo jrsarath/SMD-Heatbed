@@ -1,0 +1,115 @@
+<screen permanent="true">
+	<view extends="lv_obj" width="240" height="320">
+		<style name="style_screen_dark" />
+
+		<!-- Main Vertical Layout Column -->
+		<column pad="0" gap="3">
+			
+			<!-- 1. Header Bar -->
+			<header title="REFLOW OVEN" time="12:45" icon="icon_flame" />
+
+			<!-- Screen Content Area (Padded Container) -->
+			<lv_obj width="100%" flex_flow="column" style_pad_hor="#space_sm" style_pad_ver="2" style_pad_row="3">
+				
+				<!-- 2. Hero Temperature Display -->
+				<temp_display current_temp="183°C" target_temp="217°C" />
+
+				<!-- 3. Compact Stage & Heater Status Cards Row -->
+				<lv_obj width="100%" height="30" flex_flow="row" style_flex_main_place="space_between" style_flex_cross_place="center">
+					<!-- Stage Card -->
+					<lv_obj width="114" height="30" flex_flow="row" style_flex_main_place="space_between" style_flex_cross_place="center" style_pad_hor="#space_sm" style_bg_color="#color_dark_panel" style_border_color="#color_border" style_border_width="1" style_radius="#radius_card">
+						<lv_label text="STAGE" style_text_color="#color_text_muted" style_text_font="font_body" />
+						<lv_obj flex_flow="row" style_flex_cross_place="center" style_pad_hor="6" style_pad_ver="1" style_bg_color="#color_accent" style_radius="#radius_pill">
+							<lv_label text="REFLOW" style_text_color="#color_accent_text" style_text_font="font_h5" />
+						</lv_obj>
+					</lv_obj>
+
+					<!-- Heater Output Card -->
+					<lv_obj width="114" height="30" flex_flow="row" style_flex_main_place="space_between" style_flex_cross_place="center" style_pad_hor="#space_sm" style_bg_color="#color_dark_panel" style_border_color="#color_border" style_border_width="1" style_radius="#radius_card">
+						<lv_label text="HEATER" style_text_color="#color_text_muted" style_text_font="font_body" />
+						<lv_obj flex_flow="row" style_flex_cross_place="center" style_pad_column="4">
+							<bar subject="subject_heater_output" width="36" height="8" color="#color_accent" />
+							<lv_label bind_text="subject_heater_output" bind_text-fmt="%d%%" style_text_color="#color_accent" style_text_font="font_h5" />
+						</lv_obj>
+					</lv_obj>
+				</lv_obj>
+
+				<!-- 4. Reflow Temperature Profile Graph -->
+				<lv_obj width="100%" height="66" flex_flow="column" style_pad_all="4" style_pad_row="2" style_bg_color="#color_dark_panel" style_border_color="#color_border" style_border_width="1" style_radius="#radius_card">
+					<lv_obj width="100%" flex_flow="row" style_flex_main_place="space_between" style_flex_cross_place="center" style_pad_hor="2">
+						<lv_label text="PROFILE TEMP CURVE (°C)" style_text_color="#color_text_muted" style_text_font="font_body" />
+						<lv_label text="245°C PEAK" style_text_color="#color_accent" style_text_font="font_body" />
+					</lv_obj>
+
+					<!-- Reflow Curve Instrument Readout Graphic -->
+					<lv_chart width="100%" height="46" type="line" point_count="12" style_bg_color="#color_dark_bg" style_border_color="#color_border" style_border_width="1" style_radius="4" />
+				</lv_obj>
+
+				<!-- 5. Reflow Stage Timeline -->
+				<stage_timeline active_stage="2" />
+
+				<!-- 6. Interactive Profile Selector Card -->
+				<lv_obj width="100%" height="26" flex_flow="row" style_flex_main_place="space_between" style_flex_cross_place="center" style_pad_hor="#space_sm" style_bg_color="#color_surface_elevated" style_border_color="#color_border" style_border_width="1" style_radius="#radius_card" clickable="true">
+					<screen_load_event screen="screen_profiles" trigger="clicked" />
+					<lv_obj flex_flow="row" style_flex_cross_place="center" style_pad_column="#space_xs">
+						<lv_image src="icon_layers" style_image_recolor="#color_accent" style_image_recolor_opa="100%" />
+						<lv_label text="PROFILE:" style_text_color="#color_text_muted" style_text_font="font_body" />
+						<lv_label text="SAC305 Lead Free" style_text_color="#color_text_primary" style_text_font="font_h5" />
+					</lv_obj>
+					<lv_image src="icon_chevron_right" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+				</lv_obj>
+
+				<!-- 7. Operation Controls (PAUSE / STOP / GRAPH) -->
+				<lv_obj width="100%" height="32" flex_flow="row" style_flex_main_place="space_between" style_flex_cross_place="center" style_pad_column="#space_xs">
+					<!-- PAUSE Button -->
+					<button text="PAUSE" icon="icon_pause" bg_color="#color_dark_panel" text_color="#color_text_primary" radius="#radius_default" />
+
+					<!-- STOP Button (Prominent Red Safety Control) -->
+					<button text="STOP" icon="icon_close" bg_color="#color_danger" text_color="#color_accent_text" radius="#radius_default" />
+
+					<!-- GRAPH Button -->
+					<button text="GRAPH" icon="icon_chart" bg_color="#color_dark_panel" text_color="#color_text_primary" radius="#radius_default" />
+				</lv_obj>
+
+			</lv_obj>
+
+			<!-- 8. Bottom Navigation Bar -->
+			<lv_obj width="100%" height="40" flex_flow="row" style_flex_cross_place="center" style_flex_main_place="space_around" style_pad_hor="2" style_bg_color="#color_dark_panel" style_border_color="#color_border" style_border_width="1" style_border_side="top">
+				<!-- Tab 0: HOME -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" style_bg_color="#color_surface_elevated" style_border_color="#color_accent" style_border_width="1" clickable="true">
+					<lv_image src="icon_home" style_image_recolor="#color_accent" style_image_recolor_opa="100%" />
+					<lv_label text="HOME" style_text_color="#color_accent" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 1: PROFILES -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_profiles" trigger="clicked" />
+					<lv_image src="icon_layers" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="PROF" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 2: MANUAL -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_manual" trigger="clicked" />
+					<lv_image src="icon_sliders" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="MAN" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 3: SETTINGS -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_settings" trigger="clicked" />
+					<lv_image src="icon_settings" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="SETT" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+
+				<!-- Tab 4: INFO -->
+				<lv_obj width="44" height="34" flex_flow="column" style_flex_cross_place="center" style_flex_main_place="center" style_radius="#radius_default" clickable="true">
+					<screen_load_event screen="screen_info" trigger="clicked" />
+					<lv_image src="icon_info" style_image_recolor="#color_text_muted" style_image_recolor_opa="100%" />
+					<lv_label text="INFO" style_text_color="#color_text_muted" style_text_font="font_body" />
+				</lv_obj>
+			</lv_obj>
+
+		</column>
+	</view>
+</screen>
