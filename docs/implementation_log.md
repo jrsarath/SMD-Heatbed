@@ -221,6 +221,64 @@ This document serves as a persistent step-by-step implementation log to track co
   - Active loop components: `display_manager_update()`, `telemetry_update()`, touch signal polling.
 - **Checkpoint Status:** ACTIVE ISOLATION CHECKPOINT #8.
 
+---
+
+### Entry #013 — Cleaned CMake Build Artifacts (`src/lvgl_ui/build`, `preview-build`, `preview-bin`)
+- **Date & Time:** 2026-08-25 02:26:00 IST
+- **Error Diagnosed:** Arduino IDE linker error `multiple definition of lv_spangroup_...` / `objs.a(lv_span.c.o)`.
+- **Root Cause:**
+  - Arduino IDE recursively compiles all `.c`, `.o`, and `.a` files inside the sketch `src/` subfolder.
+  - Desktop simulator/CMake runs generated `src/lvgl_ui/build/` and `src/lvgl_ui/preview-build/` folders containing compiled LVGL library static archives (`objs.a`, `liblib-ui.a`).
+  - Arduino IDE linked both the system Arduino `lvgl` library AND the local `src/lvgl_ui` build artifacts, causing multiple definitions for every LVGL symbol.
+- **Action Taken:**
+  - Removed `src/lvgl_ui/build/`, `src/lvgl_ui/preview-build/`, and `src/lvgl_ui/preview-bin/`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #9 (Clean Source Build Tree).
+
+---
+
+### Entry #014 — Cleaned Display Manager & Integrated Single Screen LVGL Pro UI
+- **Date & Time:** 2026-08-25 02:32:21 IST
+- **Goal:** Clean up `display_manager.cpp` by removing temporary diagnostic print overhead and implementing clean single-screen UI loading (`home_create()`).
+- **Files Modified:**
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/display_manager.cpp)
+- **Code State Details:**
+  - Removed debug log spam inside `dvi_flush_cb` for maximum rendering performance.
+  - Kept high-speed row-by-row `memcpy` from `lvgl_buf` directly into `display.getBuffer()`.
+  - Initialized LVGL core, logger callback, display driver, and touch input driver.
+  - Initialized `lvgl_ui_init("")` and loaded single-screen UI `home_create()` ("Hi Dad").
+- **Checkpoint Status:** ACTIVE CHECKPOINT #10.
+
+---
+
+### Entry #015 — Victory Milestone: LVGL Pro UI Verified Rendering on Physical PicoDVI Hardware
+- **Date & Time:** 2026-08-25 02:35:59 IST
+- **User Feedback:** `"that renders like a charm"`
+- **Subsystems Fully Verified & Operational:**
+  - **PicoDVI Hardware Engine**: 320x240 @ 60 Hz RGB565 DVI signal generation.
+  - **LVGL Pro Editor Integration**: `lvgl_ui_init("")` and screen tree rendering (`home_create()`).
+  - **Zero-Copy Framebuffer Flush Bridge**: Partial 8-line buffer `memcpy` directly to `display.getBuffer()`.
+  - **Touch Subsystem**: GT911 touch reader callback (`touch_read_cb`).
+  - **Build Pipeline**: Clean Arduino build tree with zero duplicate symbol linker errors.
+- **Checkpoint Status:** VICTORY CHECKPOINT #11.
+
+---
+
+### Entry #016 — Cleaned Up Verbose Logging in Display Manager
+- **Date & Time:** 2026-08-25 02:36:23 IST
+- **Goal:** Remove verbose serial debug prints from `display_manager.cpp` for clean, professional boot output.
+- **Files Modified:**
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/display_manager.cpp)
+- **Changes Made:**
+  - Consolidated diagnostic boot steps into clean startup and completion notifications:
+    - `[Display] Initializing PicoDVI display & LVGL UI...`
+    - `[Display] LVGL UI initialized successfully.`
+  - Removed intermediate verbose log calls (`Free Heap before DVI init`, `display.begin() result: SUCCESS`, `Registering display driver`, etc.).
+- **Checkpoint Status:** CLEAN PRODUCTION BASELINE CHECKPOINT #12.
+
+
+
+
+
 
 
 
