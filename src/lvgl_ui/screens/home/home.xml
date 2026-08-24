@@ -1,6 +1,16 @@
 <screen>
-	<view extends="lv_obj">
-		<!-- Add your code here -->
-		<lv_label text="Hi Dad" />
+	<view extends="lv_obj" width="100%" height="100%" flex_flow="column" style_bg_color="#color_dark_bg">
+		<lv_obj
+			width="100%"
+			flex_grow="1"
+			style_bg_opa="0%"
+			style_border_width="0"
+			flex_flow="column"
+			style_flex_main_place="center"
+			style_flex_cross_place="center"
+		>
+			<lv_label text="SMD HEATBED CONTROLLER" style_text_color="#color_accent" />
+		</lv_obj>
+		<navigation_bar name="nav_bar" grow="0" />
 	</view>
 </screen>

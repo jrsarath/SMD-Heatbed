@@ -1,25 +1,35 @@
 <globals>
-    <api>
-        <!-- Add <enumdefs> here -->
-    </api>
+	<api>
+		<!-- Add <enumdefs> here -->
+	</api>
 
-    <consts>
-        <!-- Add <px>, <int>, <color> etc here -->
-    </consts>
+	<consts>
+		<color name="color_dark_bg" value="0x12151C" help="Dark screen background" />
+		<color name="color_nav_bg" value="0x1E232E" help="Navigation bar background" />
+		<color name="color_nav_border" value="0x2A303C" help="Navigation bar border" />
+		<color name="color_nav_text" value="0x8A92A6" help="Inactive nav text color" />
+		<color name="color_accent" value="0x00FFCC" help="Accent cyan color" />
+		<color name="color_accent_text" value="0x000000" help="Accent text color" />
+		<color name="color_accent_pressed" value="0x00B38F" help="Accent pressed color" />
+		<px name="space_xs" value="4" help="Extra small spacing" />
+	</consts>
 
-    <subjects>
-        <!-- Add <int>, <string>, or <float> subjects here -->
-    </subjects>
+	<subjects>
+		<!-- Add <int>, <string>, or <float> subjects here -->
+	</subjects>
 
-    <images>
-        <!-- Add <file> or <data> tags here -->
-    </images>
+	<images>
+		<!-- Add <file> or <data> tags here -->
+	</images>
 
-    <fonts>
-        <!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
-    </fonts>
+	<fonts>
+		<bin as_file="false" name="font_xs" src_path="fonts/OpenSans-Regular.ttf" size="8" bpp="8" />
+		<bin as_file="false" name="font_sm" src_path="fonts/OpenSans-Regular.ttf" size="10" bpp="8" />
+		<bin as_file="false" name="font_md" src_path="fonts/OpenSans-Regular.ttf" size="14" bpp="8" />
+		<bin as_file="false" name="font_lg" src_path="fonts/OpenSans-Regular.ttf" size="18" bpp="8" />
+	</fonts>
 
-    <styles>
-        <!-- Add <style> tags here -->
-    </styles>
+	<styles>
+		<!-- Add <style> tags here -->
+	</styles>
 </globals>

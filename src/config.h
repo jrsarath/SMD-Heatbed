@@ -18,10 +18,11 @@
 #define SERIAL_BAUD       115200
 
 /*******************************************************************************
- * Display Specifications
+ * Display Specifications (Portrait Mode: 240x320)
  ******************************************************************************/
-#define SCREEN_WIDTH      320   // Display horizontal resolution (pixels)
-#define SCREEN_HEIGHT     240   // Display vertical resolution (pixels)
+#define SCREEN_WIDTH      240   // Display horizontal resolution (pixels)
+#define SCREEN_HEIGHT     320   // Display vertical resolution (pixels)
+
 
 /*******************************************************************************
  * Temperature & Controller Parameters

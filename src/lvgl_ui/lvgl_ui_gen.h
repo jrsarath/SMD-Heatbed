@@ -52,6 +52,40 @@ bool lvgl_ui_check_target(uint32_t target);
 
 #define LVGL_UI_CHECK_COMPILE_TARGET(target) (LVGL_UI_COMPILE_TARGET & (target) ? 1 : 0)
 
+/**
+ * Dark screen background
+ */
+#define COLOR_DARK_BG lv_color_hex(0x12151C)
+/**
+ * Navigation bar background
+ */
+#define COLOR_NAV_BG lv_color_hex(0x1E232E)
+/**
+ * Navigation bar border
+ */
+#define COLOR_NAV_BORDER lv_color_hex(0x2A303C)
+/**
+ * Inactive nav text color
+ */
+#define COLOR_NAV_TEXT lv_color_hex(0x8A92A6)
+/**
+ * Accent cyan color
+ */
+#define COLOR_ACCENT lv_color_hex(0x00FFCC)
+/**
+ * Accent text color
+ */
+#define COLOR_ACCENT_TEXT lv_color_hex(0x000000)
+/**
+ * Accent pressed color
+ */
+#define COLOR_ACCENT_PRESSED lv_color_hex(0x00B38F)
+/**
+ * Extra small spacing
+ */
+#define SPACE_XS 4
+
+
 #ifndef LV_XML_EVAL_STRING_BUF_SIZE
     #define LV_XML_EVAL_STRING_BUF_SIZE 256
 #endif
@@ -76,7 +110,11 @@ bool lvgl_ui_check_target(uint32_t target);
  * Fonts
  *----------------*/
 
-
+/* Targets: any */
+extern lv_font_t * font_xs;
+extern lv_font_t * font_sm;
+extern lv_font_t * font_md;
+extern lv_font_t * font_lg;
 
 
 /*----------------
@@ -112,6 +150,8 @@ void lvgl_ui_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widgets, components and screens of this library*/
+#include "components/navigation/navigation_bar/navigation_bar_gen.h"
+#include "components/navigation/navigation_button/navigation_button_gen.h"
 #include "screens/home/home_gen.h"
 
 #ifdef __cplusplus

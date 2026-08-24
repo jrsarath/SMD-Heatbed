@@ -275,6 +275,140 @@ This document serves as a persistent step-by-step implementation log to track co
   - Removed intermediate verbose log calls (`Free Heap before DVI init`, `display.begin() result: SUCCESS`, `Registering display driver`, etc.).
 - **Checkpoint Status:** CLEAN PRODUCTION BASELINE CHECKPOINT #12.
 
+---
+
+### Entry #017 — XML-Only Update: Lightweight Navigation Bar & Navigation Buttons
+- **Date & Time:** 2026-08-25 02:39:19 IST
+- **Directive Followed:** Strictly modified **only `.xml` files** under `src/lvgl_ui/`. Zero `.c` or `.h` files edited.
+- **XML Files Modified:**
+  - [`src/lvgl_ui/components/navigation/navigation_button/navigation_button.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/components/navigation/navigation_button/navigation_button.xml)
+  - [`src/lvgl_ui/components/navigation/navigation_bar/navigation_bar.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/components/navigation/navigation_bar/navigation_bar.xml)
+  - [`src/lvgl_ui/screens/home/home.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/screens/home/home.xml)
+- **Technical Adjustments:**
+  - Replaced undefined custom `container` base widget in `navigation_bar.xml` with standard built-in `lv_obj` (`extends="lv_obj"`).
+  - Replaced missing font & theme token dependencies (`#space_xs`, `#color_light_text`, `font_body`, etc.) with inline hex colors (`#1E232E`, `#00FFCC`, `#8A92A6`) and default widget styles.
+  - Composed 5 lightweight navigation buttons (Home, Profile, Manual, Settings, Info) inside `navigation_bar.xml` at screen bottom in `home.xml`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #13.
+
+---
+
+### Entry #018 — Fixed LVGL Pro XML Validation & Constant Definitions
+- **Date & Time:** 2026-08-25 02:40:14 IST
+- **Error Diagnosed:** LVGL Pro Editor CLI validation error: `#hex` raw color hex not allowed inline; must be declared in `<consts>` in `globals.xml` and referenced with `#name`; `pad_all` attribute renamed to `pad`.
+- **Files Modified (XML Only):**
+  - [`src/lvgl_ui/globals.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/globals.xml)
+  - [`src/lvgl_ui/components/navigation/navigation_button/navigation_button.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/components/navigation/navigation_button/navigation_button.xml)
+  - [`src/lvgl_ui/components/navigation/navigation_bar/navigation_bar.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/components/navigation/navigation_bar/navigation_bar.xml)
+  - [`src/lvgl_ui/screens/home/home.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/screens/home/home.xml)
+- **Fix Details:**
+  - Declared `color_dark_bg` (`0x12151C`), `color_nav_bg` (`0x1E232E`), `color_nav_border` (`0x2A303C`), `color_nav_text` (`0x8A92A6`), `color_accent` (`0x00FFCC`), `color_accent_text` (`0x000000`), `color_accent_pressed` (`0x00B38F`), and `space_xs` (`4`) under `<consts>` in `globals.xml`.
+  - Replaced inline `#hex` colors with `#color_*` constant references across all XML components.
+  - Replaced invalid `pad_all="0"` / `pad_all="4"` attributes with standard `pad="0"` / `pad="#space_xs"`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #14.
+
+---
+
+### Entry #019 — Schema Fixes: `pad_hor`/`pad_ver` & `style_` Local Style Attributes
+- **Date & Time:** 2026-08-25 02:41:13 IST
+- **LVGL Pro Validator Errors Fixed:**
+  - `Unknown attribute 'pad'`: Replaced `pad` / `pad_all` with `pad_hor="#space_xs"` and `pad_ver="#space_xs"`.
+  - `Unknown attribute 'bg_color'` / `'text_color'`: Added `style_` prefix for local style attributes on widget elements (`style_bg_color="#color_dark_bg"`, `style_text_color="#color_accent"`, `style_bg_opa="0%"`, `style_border_width="0"`).
+- **Files Modified (XML Only):**
+  - [`src/lvgl_ui/components/navigation/navigation_button/navigation_button.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/components/navigation/navigation_button/navigation_button.xml)
+  - [`src/lvgl_ui/components/navigation/navigation_bar/navigation_bar.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/components/navigation/navigation_bar/navigation_bar.xml)
+  - [`src/lvgl_ui/screens/home/home.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/screens/home/home.xml)
+- **Checkpoint Status:** ACTIVE CHECKPOINT #15.
+
+---
+
+### Entry #020 — Added Roboto Font Configuration (`font_xs`, `font_sm`, `font_md`, `font_lg`)
+- **Date & Time:** 2026-08-25 02:43:58 IST
+- **Font Source Added:** Downloaded [`src/lvgl_ui/fonts/Roboto-Regular.ttf`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/fonts/Roboto-Regular.ttf).
+- **Files Modified:**
+  - [`src/lvgl_ui/globals.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/globals.xml)
+- **Font Specifications Registered (`<bin as_file="false" ...>`):**
+  - `font_xs`: Size 12px (2-bpp anti-aliased bitmap, ASCII range `0x20-0x7F`)
+  - `font_sm`: Size 14px (2-bpp anti-aliased bitmap, ASCII range `0x20-0x7F`)
+  - `font_md`: Size 16px (2-bpp anti-aliased bitmap, ASCII range `0x20-0x7F`)
+  - `font_lg`: Size 20px (2-bpp anti-aliased bitmap, ASCII range `0x20-0x7F`)
+- **Memory Optimization Details:**
+  - `bpp="2"` (2 bits-per-pixel) compresses bitmap glyph size, saving RP2040 SRAM while delivering anti-aliased typography.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #16.
+
+---
+
+### Entry #021 — Configured 240x320 Portrait Mode Orientation
+- **Date & Time:** 2026-08-25 02:49:52 IST
+- **Goal:** Reorient the display and UI layout to 240x320 Portrait Mode.
+- **Files Modified:**
+  - [`src/config.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/config.h)
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/display_manager.cpp)
+- **Technical Adjustments:**
+  - Updated `SCREEN_WIDTH` to `240` and `SCREEN_HEIGHT` to `320` in `src/config.h`.
+  - Set `display.setRotation(1)` (90° portrait hardware rotation) in `display_manager_init()`.
+  - Configured `dvi_flush_cb` with `display.drawRGBBitmap` to translate portrait coordinates `(240, 320)` to DVI hardware framebuffer.
+  - Updated `lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT)` to `240x320`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #17.
+
+---
+
+### Entry #022 — Portrait Mode 180° Orientation Flip (`setRotation(3)`)
+- **Date & Time:** 2026-08-25 02:51:51 IST
+- **Observation:** Physical display output in rotation mode 1 was upside down.
+- **Files Modified:**
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/display_manager.cpp)
+- **Adjustment Made:**
+  - Changed hardware display rotation from `display.setRotation(1)` (90°) to `display.setRotation(3)` (270°), flipping the 240x320 portrait output 180° right-side up.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #18.
+
+---
+
+### Entry #023 — Switched to Built-in Montserrat Fonts (`8px`, `10px`, `14px`, `18px`)
+- **Date & Time:** 2026-08-25 03:00:33 IST
+- **Goal:** Switch from external Roboto TTF to built-in LVGL Montserrat fonts with sizes `8px` (`font_xs`), `10px` (`font_sm`), `14px` (`font_md`), and `18px` (`font_lg`).
+- **Files Modified:**
+  - [`src/lvgl_ui/globals.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/globals.xml)
+- **Configuration Details:**
+  ```xml
+  <fonts>
+      <bin as_file="false" name="font_xs" size="8" />
+      <bin as_file="false" name="font_sm" size="10" />
+      <bin as_file="false" name="font_md" size="14" />
+      <bin as_file="false" name="font_lg" size="18" />
+  </fonts>
+  ```
+- **Cleanup:** Removed unused `src/lvgl_ui/fonts/Roboto-Regular.ttf`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #19.
+
+---
+
+### Entry #024 — Fixed Montserrat Font XML Schema (`src_path`, `bpp`)
+- **Date & Time:** 2026-08-25 03:01:33 IST
+- **LVGL Pro Validator Errors Fixed:**
+  - `Missing required property 'bpp' for element 'bin'`.
+  - `Missing required property 'src_path' for element 'bin'`.
+- **Files Modified:**
+  - Downloaded [`src/lvgl_ui/fonts/Montserrat-Regular.ttf`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/fonts/Montserrat-Regular.ttf).
+  - Updated [`src/lvgl_ui/globals.xml`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/lvgl_ui/globals.xml).
+- **Configuration Details:**
+  ```xml
+  <fonts>
+      <bin as_file="false" name="font_xs" src_path="fonts/Montserrat-Regular.ttf" size="8" bpp="2" range="0x20-0x7F" />
+      <bin as_file="false" name="font_sm" src_path="fonts/Montserrat-Regular.ttf" size="10" bpp="2" range="0x20-0x7F" />
+      <bin as_file="false" name="font_md" src_path="fonts/Montserrat-Regular.ttf" size="14" bpp="2" range="0x20-0x7F" />
+      <bin as_file="false" name="font_lg" src_path="fonts/Montserrat-Regular.ttf" size="18" bpp="2" range="0x20-0x7F" />
+  </fonts>
+  ```
+- **Checkpoint Status:** ACTIVE CHECKPOINT #20 (Montserrat Font Suite Fully Validated).
+
+
+
+
+
+
+
+
+
 
 
 

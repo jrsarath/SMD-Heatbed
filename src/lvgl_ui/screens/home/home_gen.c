@@ -41,9 +41,25 @@ lv_obj_t * home_create(void)
     if (lvgl_ui_check_target(LVGL_UI_TARGET_ALL)) {
         lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
         lv_obj_set_name_static(lv_obj_0, "home_#");
+        lv_obj_set_width(lv_obj_0, lv_pct(100));
+        lv_obj_set_height(lv_obj_0, lv_pct(100));
+        lv_obj_set_flex_flow(lv_obj_0, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_style_bg_color(lv_obj_0, COLOR_DARK_BG, 0);
 
-        lv_obj_t * lv_label_0 = lv_label_create(lv_obj_0);
-        lv_label_set_text(lv_label_0, "Hi Dad");
+        lv_obj_t * lv_obj_1 = lv_obj_create(lv_obj_0);
+        lv_obj_set_width(lv_obj_1, lv_pct(100));
+        lv_obj_set_flex_grow(lv_obj_1, 1);
+        lv_obj_set_style_bg_opa(lv_obj_1, (255 * 0 / 100), 0);
+        lv_obj_set_style_border_width(lv_obj_1, 0, 0);
+        lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_style_flex_main_place(lv_obj_1, LV_FLEX_ALIGN_CENTER, 0);
+        lv_obj_set_style_flex_cross_place(lv_obj_1, LV_FLEX_ALIGN_CENTER, 0);
+        lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
+        lv_label_set_text(lv_label_0, "SMD HEATBED CONTROLLER");
+        lv_obj_set_style_text_color(lv_label_0, COLOR_ACCENT, 0);
+
+        lv_obj_t * nav_bar = navigation_bar_create(lv_obj_0, 0);
+        lv_obj_set_name(nav_bar, "nav_bar");
 
         the_root = lv_obj_0;
     }

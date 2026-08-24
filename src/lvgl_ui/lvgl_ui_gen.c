@@ -57,7 +57,14 @@ static uint32_t lvgl_ui_target = LVGL_UI_TARGET_ALL;
  * Fonts
  *----------------*/
 
-
+lv_font_t * font_xs;
+extern lv_font_t font_xs_data;
+lv_font_t * font_sm;
+extern lv_font_t font_sm_data;
+lv_font_t * font_md;
+extern lv_font_t font_md_data;
+lv_font_t * font_lg;
+extern lv_font_t font_lg_data;
 
 /*----------------
  * Images
@@ -88,8 +95,36 @@ void lvgl_ui_init_gen(const char * asset_path)
      * Fonts
      *----------------*/
 
+    /* Targets: any */
 
+    #if LVGL_UI_CHECK_COMPILE_TARGET(LVGL_UI_TARGET_ALL)
+    if (lvgl_ui_check_target(LVGL_UI_TARGET_ALL)) {
+        if (!font_xs) {
+            /* font_xs */
+            /* get font 'font_xs' from a C array */
+            font_xs = &font_xs_data;
 
+        }
+        if (!font_sm) {
+            /* font_sm */
+            /* get font 'font_sm' from a C array */
+            font_sm = &font_sm_data;
+
+        }
+        if (!font_md) {
+            /* font_md */
+            /* get font 'font_md' from a C array */
+            font_md = &font_md_data;
+
+        }
+        if (!font_lg) {
+            /* font_lg */
+            /* get font 'font_lg' from a C array */
+            font_lg = &font_lg_data;
+
+        }
+    }
+    #endif
 
     /*----------------
      * Images
@@ -116,8 +151,18 @@ void lvgl_ui_init_gen(const char * asset_path)
 #if defined(LV_USE_XML) && LV_USE_XML
     /* Register widgets */
 
+    /* Check all fonts / default if needed. This prevents fonts that are used in one target but
+       defined in another from causing assertion failures during rendering of the Preview. */
+    check_font(&font_xs, "font_xs");
+    check_font(&font_sm, "font_sm");
+    check_font(&font_md, "font_md");
+    check_font(&font_lg, "font_lg");
 
     /* Register fonts */
+    lv_xml_register_font(NULL, "font_xs", font_xs);
+    lv_xml_register_font(NULL, "font_sm", font_sm);
+    lv_xml_register_font(NULL, "font_md", font_md);
+    lv_xml_register_font(NULL, "font_lg", font_lg);
 
     /* Register subjects */
 

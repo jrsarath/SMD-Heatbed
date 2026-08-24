@@ -37,7 +37,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * navigation_button_create(lv_obj_t * parent, const char * label, const void * icon, bool active, int32_t grow);
+lv_obj_t * navigation_button_create(lv_obj_t * parent, const char * label, bool active, int32_t grow);
 
 /**********************
  *      MACROS

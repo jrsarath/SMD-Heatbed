@@ -37,19 +37,7 @@ static void dvi_flush_cb(lv_display_t *disp, const lv_area_t *area,
                          uint8_t *px_map) {
   uint32_t w = (area->x2 - area->x1 + 1);
   uint32_t h = (area->y2 - area->y1 + 1);
-  uint16_t *fb = display.getBuffer();
-  const uint16_t *src = (const uint16_t *)px_map;
-
-  if (fb != NULL) {
-    for (int32_t y = area->y1; y <= area->y2; y++) {
-      uint16_t *dst = fb + y * SCREEN_WIDTH + area->x1;
-      memcpy(dst, src, w * sizeof(uint16_t));
-      src += w;
-    }
-  } else {
-    display.drawRGBBitmap(area->x1, area->y1, (const uint16_t *)px_map, w, h);
-  }
-
+  display.drawRGBBitmap(area->x1, area->y1, (const uint16_t *)px_map, w, h);
   lv_display_flush_ready(disp);
 }
 
@@ -68,7 +56,8 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data) {
 }
 
 void display_manager_init() {
-  Serial1.println("[Display] Initializing PicoDVI display & LVGL UI...");
+  Serial1.println(
+      "[Display] Initializing PicoDVI display & LVGL UI (Portrait 240x320)...");
 
   // 1. Setup backlight pin (Active LOW)
   pinMode(PIN_BACKLIGHT, OUTPUT);
@@ -78,7 +67,8 @@ void display_manager_init() {
   if (!display.begin()) {
     Serial1.println("[Display] ERROR: display.begin() failed!");
   }
-  display.setRotation(0);
+  display.setRotation(
+      3); // 270° rotation for Portrait mode (240x320, right-side up)
 
   // 3. Initialize LVGL core & register log print callback
   lv_init();
@@ -87,7 +77,7 @@ void display_manager_init() {
 #endif
   lv_tick_set_cb(my_tick_cb);
 
-  // 4. Register Display Driver with LVGL
+  // 4. Register Display Driver with LVGL (240x320)
   lv_disp = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
   lv_display_set_color_format(lv_disp, LV_COLOR_FORMAT_RGB565);
   lv_display_set_buffers(lv_disp, lvgl_buf, NULL, sizeof(lvgl_buf),
