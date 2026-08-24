@@ -1,9 +1,9 @@
 /**
- * @file navigation_bar_gen.h
+ * @file info_gen.h
  */
 
-#ifndef LVGL_PRO_NAVIGATION_BAR_GEN_H
-#define LVGL_PRO_NAVIGATION_BAR_GEN_H
+#ifndef LVGL_PRO_INFO_GEN_H
+#define LVGL_PRO_INFO_GEN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +37,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * navigation_bar_create(lv_obj_t * parent, int32_t grow, bool active_home, bool active_profiles, bool active_manual, bool active_info);
+
+
+lv_obj_t * info_create(void);
 
 /**********************
  *      MACROS
@@ -47,4 +49,4 @@ lv_obj_t * navigation_bar_create(lv_obj_t * parent, int32_t grow, bool active_ho
 } /*extern "C"*/
 #endif
 
-#endif /*LVGL_PRO_NAVIGATION_BAR_GEN_H*/
+#endif /*LVGL_PRO_INFO_GEN_H*/

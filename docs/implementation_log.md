@@ -500,7 +500,29 @@ This document serves as a persistent step-by-step implementation log to track co
 - **Fix Applied:**
   - Added `inline` qualifiers to `touch()`, `touch_init()`, `touch_has_signal()`, `touch_touched()`, `touch_released()`, `touch_last_x`, and `touch_last_y`.
   - Added `static` qualifier to global GT911 instance (`static TAMC_GT911 ts`).
-- **Checkpoint Status:** ACTIVE CHECKPOINT #27 (Linker Error Fixed & Header Linkage Resolved).
+- **Checkpoint Status:** ACTIVE CHECKPOINT #27.
+
+---
+
+### Entry #032 — Architectural Touch Refactoring & 270° Portrait Transformation (`touch.cpp`)
+- **Date & Time:** 2026-08-25 04:11:11 IST
+- **Refactoring & Architectural Improvements:**
+  - Created [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.cpp) to decouple implementation details from [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h), establishing clean C++ compilation units and eliminating header symbol collisions.
+  - Header [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h) now provides `#pragma once` interface declarations (`extern touch_last_x/y`, `touch_init()`, `touch_has_signal()`, `touch_touched()`, `touch_released()`).
+- **Coordinate Transformation & Rotation Math:**
+  1. Maps GT911 raw touch sensor axes (`raw_x` `0..800`, `raw_y` `0..480`) to physical panel landscape space (`320x240`):
+     ```cpp
+     int physical_x = map(800 - raw_x, 0, 800, 0, DISPLAY_WIDTH - 1);
+     int physical_y = map(480 - raw_y, 0, 480, 0, DISPLAY_HEIGHT - 1);
+     ```
+  2. Applies 270° rotation transformation (`setRotation(3)`) to map physical landscape coordinates to LVGL portrait space (`240x320`):
+     ```cpp
+     touch_last_x = (DISPLAY_HEIGHT - 1) - physical_y;
+     touch_last_y = physical_x;
+     ```
+  3. Constrains touch points strictly within `[0..SCREEN_WIDTH-1, 0..SCREEN_HEIGHT-1]` (`240x320`), delivering precise touch interaction across all LVGL UI components.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #28 (GT911 Touch Architecture & Portrait Math Verified & Logged).
+
 
 
 

@@ -9,4 +9,7 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/fonts/font_xs_data.c
   ${CMAKE_CURRENT_LIST_DIR}/lvgl_ui_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/lvgl_ui.c
-  ${CMAKE_CURRENT_LIST_DIR}/screens/home/home_gen.c)
+  ${CMAKE_CURRENT_LIST_DIR}/screens/home/home_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/info/info_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/manual/manual_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/profiles/profiles_gen.c)

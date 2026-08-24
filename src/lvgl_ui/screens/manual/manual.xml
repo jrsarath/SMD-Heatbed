@@ -1,0 +1,100 @@
+<screen>
+	<view extends="lv_obj" width="100%" height="100%" flex_flow="column" style_bg_color="#color_dark_bg" style_pad_all="0">
+		<!-- Header Banner -->
+		<lv_obj
+			width="100%"
+			height="40"
+			flex_flow="row"
+			style_bg_color="#color_nav_bg"
+			style_border_width="1"
+			style_border_color="#color_nav_border"
+			style_pad_hor="#space_md"
+			style_flex_main_place="space_between"
+			style_flex_cross_place="center"
+		>
+			<lv_label text="MANUAL CONTROL" style_text_color="#color_accent" style_text_font="font_md" />
+			<lv_label text="READY" style_text_color="#color_success" style_text_font="font_xs" />
+		</lv_obj>
+
+		<!-- Content Area -->
+		<lv_obj
+			width="100%"
+			flex_grow="1"
+			flex_flow="column"
+			style_bg_opa="0%"
+			style_border_width="0"
+			style_pad_all="#space_sm"
+			style_pad_gap="#space_sm"
+		>
+			<!-- Target Temperature Adjust Panel -->
+			<lv_obj
+				width="100%"
+				flex_flow="column"
+				style_bg_color="#color_card_bg"
+				style_border_width="1"
+				style_border_color="#color_card_border"
+				style_radius="#radius_md"
+				style_pad_all="#space_md"
+				style_pad_gap="#space_sm"
+				style_flex_cross_place="center"
+			>
+				<lv_label text="SET TARGET TEMP" style_text_color="#color_text_muted" style_text_font="font_xs" />
+				<lv_label text="150 °C" style_text_color="#color_accent" style_text_font="font_lg" />
+
+				<!-- Adjustment Buttons Row -->
+				<lv_obj
+					width="100%"
+					flex_flow="row"
+					style_bg_opa="0%"
+					style_border_width="0"
+					style_pad_gap="#space_xs"
+					style_flex_main_place="space_evenly"
+				>
+					<lv_button width="45" height="30" style_bg_color="#color_nav_bg" style_radius="#radius_sm">
+						<lv_label text="-10" style_text_color="#color_text_primary" style_text_font="font_sm" align="center" />
+					</lv_button>
+					<lv_button width="45" height="30" style_bg_color="#color_nav_bg" style_radius="#radius_sm">
+						<lv_label text="-1" style_text_color="#color_text_primary" style_text_font="font_sm" align="center" />
+					</lv_button>
+					<lv_button width="45" height="30" style_bg_color="#color_nav_bg" style_radius="#radius_sm">
+						<lv_label text="+1" style_text_color="#color_text_primary" style_text_font="font_sm" align="center" />
+					</lv_button>
+					<lv_button width="45" height="30" style_bg_color="#color_nav_bg" style_radius="#radius_sm">
+						<lv_label text="+10" style_text_color="#color_text_primary" style_text_font="font_sm" align="center" />
+					</lv_button>
+				</lv_obj>
+			</lv_obj>
+
+			<!-- Heater Control Button -->
+			<lv_button
+				width="100%"
+				height="40"
+				style_bg_color="#color_accent"
+				style_radius="#radius_md"
+				style_flex_main_place="center"
+				style_flex_cross_place="center"
+			>
+				<lv_label text="START HEATING" style_text_color="#color_accent_text" style_text_font="font_md" align="center" />
+			</lv_button>
+
+			<!-- SSR & Power Limit Status Card -->
+			<lv_obj
+				width="100%"
+				flex_flow="column"
+				style_bg_color="#color_card_bg"
+				style_border_width="1"
+				style_border_color="#color_card_border"
+				style_radius="#radius_md"
+				style_pad_all="#space_sm"
+				style_pad_gap="#space_xs"
+			>
+				<lv_label text="SAFETY PARAMETERS" style_text_color="#color_text_muted" style_text_font="font_xs" />
+				<lv_label text="SSR PWM Output: 0% Duty" style_text_color="#color_text_primary" style_text_font="font_xs" />
+				<lv_label text="Duty Limit: 40% Max (400W PTC Safe)" style_text_color="#color_warning" style_text_font="font_xs" />
+			</lv_obj>
+		</lv_obj>
+
+		<!-- Bottom Navigation Bar -->
+		<navigation_bar name="nav_bar" active_manual="true" grow="0" />
+	</view>
+</screen>

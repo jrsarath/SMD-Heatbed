@@ -1,0 +1,96 @@
+<screen>
+	<view extends="lv_obj" width="100%" height="100%" flex_flow="column" style_bg_color="#color_dark_bg" style_pad_all="0">
+		<!-- Header Banner -->
+		<lv_obj
+			width="100%"
+			height="40"
+			flex_flow="row"
+			style_bg_color="#color_nav_bg"
+			style_border_width="1"
+			style_border_color="#color_nav_border"
+			style_pad_hor="#space_md"
+			style_flex_main_place="space_between"
+			style_flex_cross_place="center"
+		>
+			<lv_label text="REFLOW PROFILES" style_text_color="#color_accent" style_text_font="font_md" />
+			<lv_label text="4 PRESETS" style_text_color="#color_text_muted" style_text_font="font_xs" />
+		</lv_obj>
+
+		<!-- Content List Area -->
+		<lv_obj
+			width="100%"
+			flex_grow="1"
+			flex_flow="column"
+			style_bg_opa="0%"
+			style_border_width="0"
+			style_pad_all="#space_sm"
+			style_pad_gap="#space_sm"
+		>
+			<!-- Profile Item 1: SAC305 -->
+			<lv_obj
+				width="100%"
+				flex_flow="column"
+				style_bg_color="#color_card_bg"
+				style_border_width="1"
+				style_border_color="#color_accent"
+				style_radius="#radius_md"
+				style_pad_all="#space_sm"
+				style_pad_gap="#space_xs"
+			>
+				<lv_obj width="100%" flex_flow="row" style_bg_opa="0%" style_border_width="0" style_flex_main_place="space_between" style_flex_cross_place="center">
+					<lv_label text="SAC305 (Lead-Free)" style_text_color="#color_text_primary" style_text_font="font_md" />
+					<lv_label text="SELECTED" style_text_color="#color_accent" style_text_font="font_xs" />
+				</lv_obj>
+				<lv_label text="Preheat: 150°C | Soak: 180°C | Peak: 245°C" style_text_color="#color_text_muted" style_text_font="font_xs" />
+			</lv_obj>
+
+			<!-- Profile Item 2: Sn63/Pb37 -->
+			<lv_obj
+				width="100%"
+				flex_flow="column"
+				style_bg_color="#color_card_bg"
+				style_border_width="1"
+				style_border_color="#color_card_border"
+				style_radius="#radius_md"
+				style_pad_all="#space_sm"
+				style_pad_gap="#space_xs"
+			>
+				<lv_label text="Sn63 / Pb37 (Leaded)" style_text_color="#color_text_primary" style_text_font="font_md" />
+				<lv_label text="Preheat: 140°C | Soak: 165°C | Peak: 215°C" style_text_color="#color_text_muted" style_text_font="font_xs" />
+			</lv_obj>
+
+			<!-- Profile Item 3: Sn42/Bi58 -->
+			<lv_obj
+				width="100%"
+				flex_flow="column"
+				style_bg_color="#color_card_bg"
+				style_border_width="1"
+				style_border_color="#color_card_border"
+				style_radius="#radius_md"
+				style_pad_all="#space_sm"
+				style_pad_gap="#space_xs"
+			>
+				<lv_label text="Sn42 / Bi58 (Low-Temp)" style_text_color="#color_text_primary" style_text_font="font_md" />
+				<lv_label text="Preheat: 90°C | Soak: 130°C | Peak: 165°C" style_text_color="#color_text_muted" style_text_font="font_xs" />
+			</lv_obj>
+
+			<!-- Profile Item 4: Constant Preheat -->
+			<lv_obj
+				width="100%"
+				flex_flow="column"
+				style_bg_color="#color_card_bg"
+				style_border_width="1"
+				style_border_color="#color_card_border"
+				style_radius="#radius_md"
+				style_pad_all="#space_sm"
+				style_pad_gap="#space_xs"
+			>
+				<lv_label text="Constant Preheat Mode" style_text_color="#color_text_primary" style_text_font="font_md" />
+				<lv_label text="Constant Hold: 150°C (Indefinite)" style_text_color="#color_text_muted" style_text_font="font_xs" />
+			</lv_obj>
+		</lv_obj>
+
+		<!-- Bottom Navigation Bar -->
+		<navigation_bar name="nav_bar" active_profiles="true" grow="0" />
+	</view>
+</screen>

@@ -30,7 +30,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * navigation_bar_create(lv_obj_t * parent, int32_t grow)
+lv_obj_t * navigation_bar_create(lv_obj_t * parent, int32_t grow, bool active_home, bool active_profiles, bool active_manual, bool active_info)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -73,17 +73,21 @@ lv_obj_t * navigation_bar_create(lv_obj_t * parent, int32_t grow)
         lv_obj_set_flex_grow(lv_obj_0, grow);
 
         lv_obj_add_style(lv_obj_0, &style_nav_bar, 0);
-        lv_obj_t * nav_btn_home = navigation_button_create(lv_obj_0, "Home", true, 1);
+        lv_obj_t * nav_btn_home = navigation_button_create(lv_obj_0, "Home", active_home, 1);
         lv_obj_set_name(nav_btn_home, "nav_btn_home");
+        lv_obj_add_screen_create_event(nav_btn_home, LV_EVENT_CLICKED, home_create, LV_SCREEN_LOAD_ANIM_NONE, 0, 0);
 
-        lv_obj_t * nav_btn_profile = navigation_button_create(lv_obj_0, "Profile", false, 1);
-        lv_obj_set_name(nav_btn_profile, "nav_btn_profile");
+        lv_obj_t * nav_btn_profiles = navigation_button_create(lv_obj_0, "Profiles", active_profiles, 1);
+        lv_obj_set_name(nav_btn_profiles, "nav_btn_profiles");
+        lv_obj_add_screen_create_event(nav_btn_profiles, LV_EVENT_CLICKED, profiles_create, LV_SCREEN_LOAD_ANIM_NONE, 0, 0);
 
-        lv_obj_t * nav_btn_manual = navigation_button_create(lv_obj_0, "Manual", false, 1);
+        lv_obj_t * nav_btn_manual = navigation_button_create(lv_obj_0, "Manual", active_manual, 1);
         lv_obj_set_name(nav_btn_manual, "nav_btn_manual");
+        lv_obj_add_screen_create_event(nav_btn_manual, LV_EVENT_CLICKED, manual_create, LV_SCREEN_LOAD_ANIM_NONE, 0, 0);
 
-        lv_obj_t * nav_btn_info = navigation_button_create(lv_obj_0, "Info", false, 1);
+        lv_obj_t * nav_btn_info = navigation_button_create(lv_obj_0, "Info", active_info, 1);
         lv_obj_set_name(nav_btn_info, "nav_btn_info");
+        lv_obj_add_screen_create_event(nav_btn_info, LV_EVENT_CLICKED, info_create, LV_SCREEN_LOAD_ANIM_NONE, 0, 0);
 
         the_root = lv_obj_0;
     }
