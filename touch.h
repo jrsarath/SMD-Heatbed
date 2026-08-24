@@ -1,83 +1,54 @@
+#ifndef TOUCH_H_
+#define TOUCH_H_
+
+#include <Arduino.h>
+
 /*******************************************************************************
- * Touch libraries:
- * FT6X36: https://github.com/strange-v/FT6X36.git
- * GT911: https://github.com/TAMCTec/gt911-arduino.git
- * XPT2046: https://github.com/PaulStoffregen/XPT2046_Touchscreen.git
+ * Touch Controller Abstraction (GT911 / FT6X36 / XPT2046)
  ******************************************************************************/
 
-/* uncomment for FT6X36 */
-// #define TOUCH_FT6X36
-// #define TOUCH_FT6X36_SCL 21
-// #define TOUCH_FT6X36_SDA 20
-// #define TOUCH_FT6X36_INT -1
-// #define TOUCH_SWAP_XY
-// #define TOUCH_MAP_X1 400
-// #define TOUCH_MAP_X2 0
-// #define TOUCH_MAP_Y1 0
-// #define TOUCH_MAP_Y2 240
-
-/* uncomment for GT911 */
+/* Driver Selection: default GT911 for Elecrow 4.3" Pico Display */
 #define TOUCH_GT911
-#define TOUCH_GT911_SCL 21 // 20
-#define TOUCH_GT911_SDA 20 // 19
-#define TOUCH_GT911_INT 25 //-1
-#define TOUCH_GT911_RST 29 // 38
-// #define TOUCH_GT911_EN 25 //-1
+#define TOUCH_GT911_SCL 21
+#define TOUCH_GT911_SDA 20
+#define TOUCH_GT911_INT 25
+#define TOUCH_GT911_RST 29
 #define TOUCH_GT911_ROTATION ROTATION_NORMAL
-#define TOUCH_MAP_X1 800// 800 // 480
+#define TOUCH_MAP_X1 800
 #define TOUCH_MAP_X2 0
-#define TOUCH_MAP_Y1 480// 480 // 272
+#define TOUCH_MAP_Y1 480
 #define TOUCH_MAP_Y2 0
 
-/* uncomment for XPT2046 */
-// #define TOUCH_XPT2046
-// #define TOUCH_XPT2046_SCK 12
-// #define TOUCH_XPT2046_MISO 13
-// #define TOUCH_XPT2046_MOSI 11
-// #define TOUCH_XPT2046_CS 38
-// #define TOUCH_XPT2046_INT 18
-// #define TOUCH_XPT2046_ROTATION 0
-// #define TOUCH_MAP_X1 4000//4000
-// #define TOUCH_MAP_X2 100 //100
-// #define TOUCH_MAP_Y1 100//100
-// #define TOUCH_MAP_Y2 4000//4000
-
-static uint16_t touchWidth = 400;
+static uint16_t touchWidth = 320;
 static uint16_t touchHeight = 240;
 
-int touch_last_x = 0, touch_last_y = 0;
+inline int touch_last_x = 0;
+inline int touch_last_y = 0;
 
 #if defined(TOUCH_FT6X36)
 #include <Wire.h>
 #include <FT6X36.h>
-FT6X36 ts(&Wire, TOUCH_FT6X36_INT);
-bool touch_touched_flag = true, touch_released_flag = true;
+static FT6X36 ts(&Wire, TOUCH_FT6X36_INT);
+static bool touch_touched_flag = true;
+static bool touch_released_flag = true;
 
 #elif defined(TOUCH_GT911)
 #include <Wire.h>
 #include <TAMC_GT911.h>
-TAMC_GT911 ts = TAMC_GT911(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST, max(TOUCH_MAP_X1, TOUCH_MAP_X2), max(TOUCH_MAP_Y1, TOUCH_MAP_Y2));
+static TAMC_GT911 ts = TAMC_GT911(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST, max(TOUCH_MAP_X1, TOUCH_MAP_X2), max(TOUCH_MAP_Y1, TOUCH_MAP_Y2));
 
 #elif defined(TOUCH_XPT2046)
 #include <XPT2046_Touchscreen.h>
 #include <SPI.h>
-XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
-// T2046_Touchscreen ts(TOUCH_XPT2046_CS);  // Param 2 - NULL - No interrupts
+static XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
 #endif
 
 #if defined(TOUCH_FT6X36)
-/**
- * @brief Handles touch events for the FT6X36 touch controller
- * 
- * @param p The point of touch
- * @param e The type of touch event
- */
-void touch(TPoint p, TEvent e) {
+inline void touch_callback(TPoint p, TEvent e) {
   if (e != TEvent::Tap && e != TEvent::DragStart && e != TEvent::DragMove && e != TEvent::DragEnd) {
     return;
   }
 
-  // translation logic depends on screen rotation
   #if defined(TOUCH_SWAP_XY)
     touch_last_x = map(p.y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, touchWidth);
     touch_last_y = map(p.x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight);
@@ -88,51 +59,33 @@ void touch(TPoint p, TEvent e) {
 
   switch (e) {
     case TEvent::Tap:
-      Serial1.println("Tap");
-      touch_touched_flag = true;
-      touch_released_flag = true;
-      break;
     case TEvent::DragStart:
-      Serial1.println("DragStart");
-      touch_touched_flag = true;
-      break;
     case TEvent::DragMove:
-      Serial1.println("DragMove");
       touch_touched_flag = true;
       break;
     case TEvent::DragEnd:
-      Serial1.println("DragEnd");
       touch_released_flag = true;
       break;
     default:
-      Serial1.println("UNKNOWN");
       break;
   }
 }
 #endif
 
 /**
- * @brief Initializes the touch controller with the given screen dimensions
- * 
- * @param width The width of the touch screen
- * @param height The height of the touch screen
+ * @brief Initializes the touch controller with screen dimensions.
  */
-void touch_init(uint16_t width, uint16_t height) {
+inline void touch_init(uint16_t width, uint16_t height) {
   touchWidth = width;
   touchHeight = height;
   #if defined(TOUCH_FT6X36)
     Wire.setSDA(TOUCH_FT6X36_SDA);
     Wire.setSCL(TOUCH_FT6X36_SCL);
     Wire.begin();
-    // Wire.begin(TOUCH_FT6X36_SDA, TOUCH_FT6X36_SCL);
     ts.begin();
-    ts.registerTouchHandler(touch);
+    ts.registerTouchHandler(touch_callback);
 
   #elif defined(TOUCH_GT911)
-    // Wire1.setSDA(TOUCH_GT911_SDA);
-    // Wire1.setSCL(TOUCH_GT911_SCL);
-    // Wire1.begin();
-
     ts.begin();
     ts.setRotation(TOUCH_GT911_ROTATION);
 
@@ -140,46 +93,35 @@ void touch_init(uint16_t width, uint16_t height) {
     SPI.begin(TOUCH_XPT2046_SCK, TOUCH_XPT2046_MISO, TOUCH_XPT2046_MOSI, TOUCH_XPT2046_CS);
     ts.begin();
     ts.setRotation(TOUCH_XPT2046_ROTATION);
-
   #endif
 }
 
 /**
- * @brief Checks if the touch controller has detected any touch signal
- * 
- * @return true 
- * @return false 
+ * @brief Checks if touch hardware signal is available.
  */
-bool touch_has_signal() {
+inline bool touch_has_signal() {
   #if defined(TOUCH_FT6X36)
     ts.loop();
     return touch_touched_flag || touch_released_flag;
-
   #elif defined(TOUCH_GT911)
     return true;
-
   #elif defined(TOUCH_XPT2046)
     return ts.tirqTouched();
-
   #else
     return false;
   #endif
 }
 
 /**
- * @brief Checks if the touch controller has detected a touch event
- * 
- * @return true 
- * @return false 
+ * @brief Checks if screen is currently touched and updates touch_last_x / touch_last_y.
  */
-bool touch_touched() {
+inline bool touch_touched() {
   #if defined(TOUCH_FT6X36)
     if (touch_touched_flag) {
       touch_touched_flag = false;
       return true;
-    } else {
-      return false;
     }
+    return false;
 
   #elif defined(TOUCH_GT911)
     ts.read();
@@ -192,9 +134,8 @@ bool touch_touched() {
           touch_last_y = map(ts.points[0].y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
       #endif
       return true;
-    } else {
-      return false;
     }
+    return false;
 
   #elif defined(TOUCH_XPT2046)
     if (ts.touched()) {
@@ -207,9 +148,8 @@ bool touch_touched() {
           touch_last_y = map(p.y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, touchHeight - 1);
       #endif
       return true;
-    } else {
-      return false;
     }
+    return false;
 
   #else
     return false;
@@ -217,27 +157,18 @@ bool touch_touched() {
 }
 
 /**
- * @brief Checks if the touch has been released
- * 
- * @return true 
- * @return false 
+ * @brief Checks if touch release event occurred.
  */
-bool touch_released() {
+inline bool touch_released() {
   #if defined(TOUCH_FT6X36)
     if (touch_released_flag) {
       touch_released_flag = false;
       return true;
-    } else {
-      return false;
     }
-
-  #elif defined(TOUCH_GT911)
-    return true;
-
-  #elif defined(TOUCH_XPT2046)
-    return true;
-
-  #else
     return false;
+  #else
+    return true;
   #endif
 }
+
+#endif // TOUCH_H_

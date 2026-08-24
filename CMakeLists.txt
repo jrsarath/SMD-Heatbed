@@ -1,15 +1,10 @@
-SET(SOURCES ui_Splash.c
-    ui_Screen1.c
-    ui_theme_manager.c
-    ui_themes.c
-    ui.c
-    ui_comp_hook.c
-    ui_helpers.c
-    ui_events.c
-    ui_img_1113032066.c
-    ui_img_sleeping_png.c
-    ui_img_alert_png.c
-    ui_img_heating_png.c
-    ui_img_info_png.c)
+cmake_minimum_required(VERSION 3.13)
 
-add_library(ui ${SOURCES})
+set(SOURCES
+    thermal_control.cpp
+    input_handler.cpp
+    display_manager.cpp
+    telemetry.cpp
+)
+
+add_library(smd_heatbed ${SOURCES})
