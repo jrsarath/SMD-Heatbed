@@ -60,7 +60,7 @@
 		<style name="style_nav_btn_pressed" recolor="#color_track" recolor_opa="40%" />
 		<!-- Icon sizing / alignment -->
 		<style name="style_nav_btn_icon" image_recolor_opa="100%" align="center" />
-		<style name="style_nav_btn_label" text_font="font_lg" text_align="center" align="center" />
+		<style name="style_nav_btn_label" text_font="font_md" text_align="center" align="center" />
 	</styles>
 
 	<!-- Reusable navigation button item: [icon] label.

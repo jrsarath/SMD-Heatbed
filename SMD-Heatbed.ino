@@ -48,17 +48,13 @@ void setup() {
   }
 
   Serial1.println("Setup completed successfully.");
-
-  // LVGL UI Initialization
-  lvgl_ui_init("");
-  lv_screen_load(home_create());
 }
 
 /**
  * @brief Main execution loop
  */
 void loop() {
-  // Update DVI Display Dashboard
+  // Update DVI Display Dashboard & LVGL UI tasks
   display_manager_update();
 
   // Log Telemetry Data to Serial Output
@@ -71,3 +67,4 @@ void loop() {
 
   delay(5);
 }
+
