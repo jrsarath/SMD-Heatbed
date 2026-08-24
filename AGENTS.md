@@ -112,6 +112,9 @@ SMD-Heatbed/
 4. **Reactive Data Binding:**
    - Bind dynamic state to subjects declared in `globals.xml` using `bind_text`, `bind_value`, or `bind_style`.
 
+5. **Ignore Auto-Generated Files:**
+   - All `*_gen.c` and `*_gen.h` files are auto-generated from XML by LVGL Pro. Never modify or track `*_gen.c` or `*_gen.h` files manually; focus exclusively on source XML files (`.xml`).
+
 ---
 
 ## 5. Software Architecture & Critical Rules
