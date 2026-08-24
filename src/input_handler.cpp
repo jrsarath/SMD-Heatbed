@@ -53,7 +53,6 @@ bool acquisition_isr(struct repeating_timer *t) {
 
   if (btn_long) {
     btn_long = false;
-    // Long press action (e.g. toggle presets or reset error state if in error)
     if (is_error_state()) {
       // Re-enable controller from error state if desired
     }
@@ -75,7 +74,6 @@ bool acquisition_isr(struct repeating_timer *t) {
     if (enc_count > MAX_TEMP) enc_count = MAX_TEMP;
     set_desired_temp(enc_count);
   } else {
-    // Keep enc_count in sync if setpoint was updated externally
     int desired = get_desired_temp();
     if (enc_count != desired) {
       enc_count = desired;

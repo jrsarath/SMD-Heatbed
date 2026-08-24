@@ -98,7 +98,6 @@ void display_manager_update(bool force_redraw) {
   if (abs(current_meas - last_meas_temp) >= 0.1f || force_redraw) {
     last_meas_temp = current_meas;
 
-    // Erase old value background
     display.fillRect(20, 70, 125, 45, COLOR_CARD_BG);
 
     display.setTextSize(3);
@@ -120,7 +119,6 @@ void display_manager_update(bool force_redraw) {
   if (current_set != last_set_temp || force_redraw) {
     last_set_temp = current_set;
 
-    // Erase old value background
     display.fillRect(175, 70, 125, 45, COLOR_CARD_BG);
 
     display.setTextSize(3);
@@ -164,17 +162,14 @@ void display_manager_update(bool force_redraw) {
 
     display.fillRect(180, 185, 120, 35, COLOR_CARD_BG);
 
-    // Duty text
     display.setTextSize(2);
     display.setTextColor(COLOR_TEXT_MAIN);
     display.setCursor(180, 185);
     display.print((int)current_duty);
     display.print("%");
 
-    // Progress bar frame
     display.drawRect(180, 208, 120, 12, COLOR_CARD_BORDER);
 
-    // Progress bar fill (0 .. MAX_DUTY mapped to 0 .. 118 px)
     int fill_width = map((int)current_duty, 0, (int)MAX_DUTY, 0, 116);
     if (fill_width > 116) fill_width = 116;
     if (fill_width < 0) fill_width = 0;

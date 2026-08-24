@@ -2,4 +2,7 @@
 .vscode
 .DS_Store
 /src/.cache
-/src/editor_project/.cache
+/src/lvgl_ui/.cache
+build/
+build_sim/
+

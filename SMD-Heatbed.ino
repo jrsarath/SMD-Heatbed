@@ -1,5 +1,5 @@
 /*******************************************************************************
- * SMD-Heatbed Firmware
+ * SMD Heatbed Firmware
  * Open-Source Heatplate Controller for SMT Reflow Soldering
  *
  * Board:   Raspberry Pi Pico (RP2040)
@@ -9,12 +9,13 @@
  * Input:   Rotary Encoder with Push-Button & Touchscreen (GT911)
  ******************************************************************************/
 
-#include "config.h"
-#include "thermal_control.h"
-#include "input_handler.h"
-#include "display_manager.h"
-#include "telemetry.h"
-#include "touch.h"
+#include "src/config.h"
+#include "src/display_manager.h"
+#include "src/input_handler.h"
+#include "src/telemetry.h"
+#include "src/thermal_control.h"
+#include "src/touch.h"
+#include "src/lvgl_ui/lvgl_ui.h"
 
 // Hardware Timers
 static RPI_PICO_Timer TimerRegulator(0);
@@ -47,6 +48,10 @@ void setup() {
   }
 
   Serial1.println("Setup completed successfully.");
+
+  // LVGL UI Initialization
+  lvgl_ui_init("");
+  lv_screen_load(home_create());
 }
 
 /**

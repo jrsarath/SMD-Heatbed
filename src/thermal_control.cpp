@@ -100,7 +100,8 @@ bool regulator_isr(struct repeating_timer *t) {
 
     // Update SSR PWM output
     if (pwm_ssr) {
-      pwm_ssr->setPWM(PIN_SSR, PWM_FREQUENCY, duty);
+      float current_duty = duty;
+      pwm_ssr->setPWM(PIN_SSR, (float)PWM_FREQUENCY, current_duty);
     }
 
   } else if (!error_state) {
