@@ -1,20 +1,14 @@
 <screen>
-	<view extends="lv_obj" width="100%" height="100%" flex_flow="column" style_bg_color="#color_dark_bg" style_pad_all="0">
+	<view
+		extends="lv_obj"
+		width="100%"
+		height="100%"
+		flex_flow="column"
+		style_bg_color="#color_dark_bg"
+		style_pad_all="0"
+	>
 		<!-- Header Banner -->
-		<lv_obj
-			width="100%"
-			height="40"
-			flex_flow="row"
-			style_bg_color="#color_nav_bg"
-			style_border_width="1"
-			style_border_color="#color_nav_border"
-			style_pad_hor="#space_md"
-			style_flex_main_place="space_between"
-			style_flex_cross_place="center"
-		>
-			<lv_label text="SMD HEATBED" style_text_color="#color_accent" style_text_font="font_md" />
-			<lv_label text="STANDBY" style_text_color="#color_warning" style_text_font="font_sm" />
-		</lv_obj>
+		<header title="SMD HEATBED" />
 
 		<!-- Content Scroll Area -->
 		<lv_obj
@@ -25,47 +19,7 @@
 			style_border_width="0"
 			style_pad_all="#space_md"
 			style_pad_gap="#space_md"
-		>
-			<!-- Temperature Card -->
-			<lv_obj
-				width="100%"
-				flex_flow="column"
-				style_bg_color="#color_card_bg"
-				style_border_width="1"
-				style_border_color="#color_card_border"
-				style_radius="#radius_md"
-				style_pad_all="#space_md"
-				style_pad_gap="#space_sm"
-			>
-				<lv_label text="TEMPERATURE" style_text_color="#color_text_muted" style_text_font="font_xs" />
-				<lv_obj width="100%" flex_flow="row" style_bg_opa="0%" style_border_width="0" style_flex_main_place="space_between" style_flex_cross_place="center">
-					<lv_obj flex_flow="column" style_bg_opa="0%" style_border_width="0">
-						<lv_label text="CURRENT" style_text_color="#color_text_muted" style_text_font="font_xs" />
-						<lv_label text="25 °C" style_text_color="#color_text_primary" style_text_font="font_lg" />
-					</lv_obj>
-					<lv_obj flex_flow="column" style_bg_opa="0%" style_border_width="0">
-						<lv_label text="TARGET" style_text_color="#color_text_muted" style_text_font="font_xs" />
-						<lv_label text="150 °C" style_text_color="#color_accent" style_text_font="font_lg" />
-					</lv_obj>
-				</lv_obj>
-			</lv_obj>
-
-			<!-- Profile Status Card -->
-			<lv_obj
-				width="100%"
-				flex_flow="column"
-				style_bg_color="#color_card_bg"
-				style_border_width="1"
-				style_border_color="#color_card_border"
-				style_radius="#radius_md"
-				style_pad_all="#space_md"
-				style_pad_gap="#space_xs"
-			>
-				<lv_label text="ACTIVE PROFILE" style_text_color="#color_text_muted" style_text_font="font_xs" />
-				<lv_label text="SAC305 Lead-Free" style_text_color="#color_text_primary" style_text_font="font_md" />
-				<lv_label text="Peak: 245°C | Soak: 180°C" style_text_color="#color_text_muted" style_text_font="font_sm" />
-			</lv_obj>
-		</lv_obj>
+		/>
 
 		<!-- Bottom Navigation Bar -->
 		<navigation_bar name="nav_bar" active_home="true" grow="0" />

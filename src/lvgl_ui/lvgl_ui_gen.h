@@ -198,6 +198,7 @@ void lvgl_ui_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widgets, components and screens of this library*/
+#include "components/navigation/header/header_gen.h"
 #include "components/navigation/navigation_bar/navigation_bar_gen.h"
 #include "components/navigation/navigation_button/navigation_button_gen.h"
 #include "screens/home/home_gen.h"
