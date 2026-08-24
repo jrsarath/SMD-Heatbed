@@ -1,5 +1,28 @@
-<screen>
+<screen permanent="true">
 	<view extends="lv_obj">
-		<!-- Add your code here -->
+		<style name="style_screen_light" />
+		<bind_style name="style_screen_dark" subject="subject_theme_dark" ref_value="1" />
+		<style name="style_scrollbar" selector="scrollbar" />
+
+		<column width="100%" height="100%" pad="0" gap="0" vertical_align="space_between">
+			<!-- Main content area -->
+			<container width="100%" grow="1" pad="#space_lg" gap="#space_md" flow="column">
+				<row width="100%" gap="#space_md" vertical_align="center">
+					<h4 text="Dashboard" />
+					<container grow="1" />
+					<switch subject="subject_theme_dark" />
+				</row>
+				<panel width="100%" gap="#space_md">
+					<h5 text="Welcome to SMD Heatbed" />
+					<text
+						text="Reflow &amp; SMT Soldering Controller UI with modular LVGL Pro XML navigation."
+						width="100%"
+					/>
+				</panel>
+			</container>
+
+			<!-- 40px Reusable Navigation Bar -->
+			<navigation_bar />
+		</column>
 	</view>
 </screen>

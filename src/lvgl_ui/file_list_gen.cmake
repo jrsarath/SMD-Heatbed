@@ -22,6 +22,8 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/components/list/list_section/list_section_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/list/list_separator/list_separator_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/list/list/list_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/navigation/navigation_bar/navigation_bar_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/navigation/navigation_button/navigation_button_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/typography/h1/h1_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/typography/h2/h2_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/typography/h3/h3_gen.c

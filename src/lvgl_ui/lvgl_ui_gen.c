@@ -55,6 +55,7 @@ static uint32_t lvgl_ui_target = LVGL_UI_TARGET_ALL;
  *  Permanent screens
  *-------------------*/
 
+lv_obj_t * home = NULL;
 lv_obj_t * screen_components = NULL;
 
 /*----------------
@@ -623,8 +624,10 @@ void lvgl_ui_init_gen(const char * asset_path)
     /* If XML is enabled it's assumed that the permanent screens are created
      * manually from XML using lv_xml_create() */
     /* To allow screens to reference each other, create them all before calling the sceen create functions */
+    home = lv_obj_create(NULL);
     screen_components = lv_obj_create(NULL);
 
+    home_create();
     screen_components_create();
 #endif
 }

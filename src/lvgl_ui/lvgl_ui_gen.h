@@ -146,6 +146,7 @@ bool lvgl_ui_check_target(uint32_t target);
  * Permanent screens
  *------------------*/
 
+extern lv_obj_t * home;
 extern lv_obj_t * screen_components;
 
 /*----------------
@@ -278,6 +279,8 @@ void lvgl_ui_init_gen(const char * asset_path);
 #include "components/list/list_section/list_section_gen.h"
 #include "components/list/list_separator/list_separator_gen.h"
 #include "components/list/list/list_gen.h"
+#include "components/navigation/navigation_bar/navigation_bar_gen.h"
+#include "components/navigation/navigation_button/navigation_button_gen.h"
 #include "components/typography/h1/h1_gen.h"
 #include "components/typography/h2/h2_gen.h"
 #include "components/typography/h3/h3_gen.h"
