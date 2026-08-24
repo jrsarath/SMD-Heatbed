@@ -16,6 +16,7 @@
 #include "src/telemetry.h"
 #include "src/thermal_control.h"
 #include "src/touch.h"
+#include <lvgl.h>
 
 // Hardware Timers
 static RPI_PICO_Timer TimerRegulator(0);
@@ -33,8 +34,8 @@ void setup() {
   // input_init();
 
   // 3. Initialize PicoDVI Display & Touch Subsystems
+  touch_init();
   display_manager_init();
-  touch_init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
   // 4. Attach Hardware Timer ISR Handlers (Temporarily commented for stack
   // collision testing)

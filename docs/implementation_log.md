@@ -463,7 +463,46 @@ This document serves as a persistent step-by-step implementation log to track co
   ```
   [Raw Touch] isTouched: 1 touches: ... rx: ... ry: ...
   ```
-- **Checkpoint Status:** ACTIVE CHECKPOINT #25 (Raw Touch Diagnostics Enabled).
+- **Checkpoint Status:** ACTIVE CHECKPOINT #25.
+
+---
+
+### Entry #030 — Updated LVGL 9 Touch Read Callback (`my_touchpad_read` logic)
+- **Date & Time:** 2026-08-25 03:33:05 IST
+- **Goal:** Update LVGL input device callback structure to mirror the user's working `my_touchpad_read` logic (`touch_has_signal()` -> `touch_touched()` -> `touch_released()`).
+- **Files Modified:**
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/display_manager.cpp)
+- **LVGL 9 Implementation:**
+  ```cpp
+  static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data) {
+    if (touch_has_signal()) {
+      if (touch_touched()) {
+        data->state = LV_INDEV_STATE_PRESSED;
+        data->point.x = touch_last_x;
+        data->point.y = touch_last_y;
+      } else if (touch_released()) {
+        data->state = LV_INDEV_STATE_RELEASED;
+      }
+    } else {
+      data->state = LV_INDEV_STATE_RELEASED;
+    }
+  }
+  ```
+- **Checkpoint Status:** ACTIVE CHECKPOINT #26.
+
+---
+
+### Entry #031 — Added `inline` and `static` Linkage Qualifiers to `touch.h`
+- **Date & Time:** 2026-08-25 03:34:51 IST
+- **Linker Error Diagnosed:** Arduino build failed with `multiple definition of touch_init`, `multiple definition of ts`, `multiple definition of touch_has_signal`, `multiple definition of touch_touched`, `multiple definition of touch_last_x`, `multiple definition of touch_last_y`, and `multiple definition of touch_released` because `touch.h` was included in multiple compilation units (`SMD-Heatbed.ino` and `display_manager.cpp`).
+- **Files Modified:**
+  - [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h)
+- **Fix Applied:**
+  - Added `inline` qualifiers to `touch()`, `touch_init()`, `touch_has_signal()`, `touch_touched()`, `touch_released()`, `touch_last_x`, and `touch_last_y`.
+  - Added `static` qualifier to global GT911 instance (`static TAMC_GT911 ts`).
+- **Checkpoint Status:** ACTIVE CHECKPOINT #27 (Linker Error Fixed & Header Linkage Resolved).
+
+
 
 
 
