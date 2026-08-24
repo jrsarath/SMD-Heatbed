@@ -3,9 +3,11 @@
 static uint32_t last_telemetry_time = 0;
 
 void telemetry_init() {
+  Serial.begin(SERIAL_BAUD);
   Serial1.setRX(SERIAL_RX);
   Serial1.setTX(SERIAL_TX);
   Serial1.begin(SERIAL_BAUD);
+  Serial.println("=== SMD Heatbed Firmware Initialized ===");
   Serial1.println("=== SMD Heatbed Firmware Initialized ===");
 }
 
@@ -22,18 +24,14 @@ void telemetry_update() {
   float duty = get_duty_cycle();
   HeatbedStatus status = get_system_status();
 
-  const char* status_str = "IDLE";
-  if (status == STATUS_HEATING) status_str = "HEATING";
-  else if (status == STATUS_NTC_ERROR) status_str = "NTC_ERROR";
+  const char *status_str = "IDLE";
+  if (status == STATUS_HEATING)
+    status_str = "HEATING";
+  else if (status == STATUS_NTC_ERROR)
+    status_str = "NTC_ERROR";
 
-  Serial1.print("ReferenceTemp:");
-  Serial1.print(ref, 2);
-  Serial1.print(",MeasuredTemp:");
-  Serial1.print(meas, 2);
-  Serial1.print(",TargetTemp:");
-  Serial1.print(set);
-  Serial1.print(",Duty:");
-  Serial1.print(duty, 2);
-  Serial1.print(",Status:");
-  Serial1.println(status_str);
+  String logLine = "Ref:" + String(ref, 1) + " C, Meas:" + String(meas, 1) + " C, Target:" + String(set) + " C, Duty:" + String(duty, 1) + "%, Status:" + String(status_str);
+  Serial.println(logLine);
+  Serial1.println(logLine);
 }
+

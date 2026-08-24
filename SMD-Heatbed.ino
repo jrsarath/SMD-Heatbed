@@ -61,10 +61,5 @@ void loop() {
   // Log Telemetry Data to Serial Output
   telemetry_update();
 
-  // Poll Touch Controller Signals
-  if (touch_has_signal() && touch_touched()) {
-    // Touch event recorded at touch_last_x, touch_last_y
-  }
-
   delay(5);
 }

@@ -399,7 +399,76 @@ This document serves as a persistent step-by-step implementation log to track co
       <bin as_file="false" name="font_lg" src_path="fonts/Montserrat-Regular.ttf" size="18" bpp="2" range="0x20-0x7F" />
   </fonts>
   ```
-- **Checkpoint Status:** ACTIVE CHECKPOINT #20 (Montserrat Font Suite Fully Validated).
+- **Checkpoint Status:** ACTIVE CHECKPOINT #20.
+
+---
+
+### Entry #025 — GT911 Hardware Touch Initialization & Coordinate Mapping
+- **Date & Time:** 2026-08-25 03:10:13 IST
+- **Hardware Integration Adjustments:**
+  - Configured GT911 hardware I2C bus pins (`Wire.setSDA(20)`, `Wire.setSCL(21)`, `Wire.begin()`) in `touch_init()`.
+  - Added `#define TOUCH_SWAP_XY` and range mapping (`0..800` -> `0..240`, `0..480` -> `0..320`) for 240x320 portrait touch screen alignment.
+  - Added coordinate clamping (`constrain(0..width/height)`) to prevent out-of-bounds LVGL input points.
+  - Added Serial1 telemetry logging in `loop()` (`[Touch] Press at X: ... Y: ...`) to diagnose real-time touch alignment on hardware.
+- **Files Modified:**
+  - [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h)
+  - [`SMD-Heatbed.ino`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/SMD-Heatbed.ino)
+- **Checkpoint Status:** ACTIVE CHECKPOINT #21.
+
+---
+
+### Entry #026 — Replaced `touch.h` with Working GT911 Touch Implementation
+- **Date & Time:** 2026-08-25 03:13:18 IST
+- **Root Cause of Crash:** Manual `Wire.setSDA()`/`Wire.begin()` calls conflicted with `TAMC_GT911` library's internal `Wire` setup. Additionally, polling touch + `Serial1.print` inside `loop()` flooded UART at hundreds of prints/sec (`touch_has_signal()` returns `true` continuously for GT911), causing buffer overflow hard faults.
+- **Adjustments Made:**
+  - Replaced [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h) with the user's verified working GT911 touch implementation (adding inline guard qualifiers for multi-file header inclusion safety).
+  - Removed redundant `Serial1.print` touch logging loop in [`SMD-Heatbed.ino`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/SMD-Heatbed.ino).
+  - LVGL's `touch_read_cb` inside `display_manager.cpp` smoothly samples touch points during `lv_timer_handler()`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #22.
+
+---
+
+### Entry #027 — Configured Dual USB Serial (`Serial`) & UART (`Serial1`) Telemetry
+- **Date & Time:** 2026-08-25 03:19:23 IST
+- **Goal:** Ensure serial logs (firmware startup, thermal telemetry, LVGL diagnostics, and rate-limited touch press events) output to **both USB CDC (`Serial`) and UART pins 0/1 (`Serial1`)**.
+- **Files Modified:**
+  - [`src/telemetry.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/telemetry.cpp)
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/display_manager.cpp)
+- **Technical Adjustments:**
+  - Initialized `Serial.begin(115200)` and `Serial1.begin(115200)` in `telemetry_init()`.
+  - Mirrored thermal telemetry outputs to both `Serial` and `Serial1` every `TELEMETRY_PERIOD`.
+  - Added rate-limited (200 ms throttle) touch press coordinate logging (`[Touch] Press X: ... Y: ...`) inside LVGL's `touch_read_cb` to both `Serial` and `Serial1`.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #23.
+
+---
+
+### Entry #028 — GT911 Phantom Touch Point Filtering (`-19339`, `-43234`)
+- **Date & Time:** 2026-08-25 03:20:56 IST
+- **Problem Diagnosed:** When the GT911 touchscreen was untouched, `ts.points[0].x` and `ts.points[0].y` contained uninitialized memory / garbage values outside hardware bounds (`0..800`, `0..480`). Passing these garbage values to `map()` produced out-of-bounds coordinates (`X: -19339`, `Y: -43234`) being logged continuously.
+- **Files Modified:**
+  - [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h)
+- **Fix Applied:**
+  - Added strict hardware bounds filtering (`rx >= 0 && rx <= 800 && ry >= 0 && ry <= 480`) and verified `ts.touches > 0` before processing touch points.
+  - Returns `false` when untouched, completely eliminating phantom touch logging and false LVGL click events.
+- **Checkpoint Status:** ACTIVE CHECKPOINT #24.
+
+---
+
+### Entry #029 — Added Raw GT911 Sensor Diagnostic Logging
+- **Date & Time:** 2026-08-25 03:22:29 IST
+- **Goal:** Diagnose exact hardware touch sensor outputs (`ts.isTouched`, `ts.touches`, `rx`, `ry`) directly from GT911 `ts.read()`.
+- **Files Modified:**
+  - [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h)
+- **Diagnostic Logging Output:**
+  ```
+  [Raw Touch] isTouched: 1 touches: ... rx: ... ry: ...
+  ```
+- **Checkpoint Status:** ACTIVE CHECKPOINT #25 (Raw Touch Diagnostics Enabled).
+
+
+
+
+
 
 
 

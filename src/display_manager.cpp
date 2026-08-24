@@ -17,11 +17,10 @@ static lv_indev_t *lv_indev_touch = NULL;
  */
 static void my_lv_log_cb(lv_log_level_t level, const char *buf) {
   (void)level;
-  Serial1.print("[LVGL ");
-  Serial1.print(level);
-  Serial1.print("] ");
+  Serial.print("[LVGL] ");
+  Serial.println(buf);
+  Serial1.print("[LVGL] ");
   Serial1.println(buf);
-  Serial1.flush();
 }
 
 /**
@@ -30,11 +29,9 @@ static void my_lv_log_cb(lv_log_level_t level, const char *buf) {
 static uint32_t my_tick_cb(void) { return millis(); }
 
 /**
- * @brief LVGL flush callback rendering drawn buffers to the PicoDVI
- * framebuffer.
+ * @brief LVGL flush callback rendering drawn buffers to the PicoDVI framebuffer.
  */
-static void dvi_flush_cb(lv_display_t *disp, const lv_area_t *area,
-                         uint8_t *px_map) {
+static void dvi_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map) {
   uint32_t w = (area->x2 - area->x1 + 1);
   uint32_t h = (area->y2 - area->y1 + 1);
   display.drawRGBBitmap(area->x1, area->y1, (const uint16_t *)px_map, w, h);
@@ -42,22 +39,29 @@ static void dvi_flush_cb(lv_display_t *disp, const lv_area_t *area,
 }
 
 /**
- * @brief LVGL touch input device read callback bridging hardware touch
- * controller.
+ * @brief LVGL touch input device read callback bridging hardware touch controller.
  */
-static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data) {
+static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data) {
   if (touch_has_signal() && touch_touched()) {
     data->point.x = touch_last_x;
     data->point.y = touch_last_y;
     data->state = LV_INDEV_STATE_PRESSED;
+
+    static uint32_t last_touch_log = 0;
+    if (millis() - last_touch_log > 200) {
+      last_touch_log = millis();
+      String touchMsg = "[Touch] Press X: " + String(touch_last_x) + " Y: " + String(touch_last_y);
+      Serial.println(touchMsg);
+      Serial1.println(touchMsg);
+    }
   } else {
     data->state = LV_INDEV_STATE_RELEASED;
   }
 }
 
 void display_manager_init() {
-  Serial1.println(
-      "[Display] Initializing PicoDVI display & LVGL UI (Portrait 240x320)...");
+  Serial.println("[Display] Initializing PicoDVI display & LVGL UI (Portrait 240x320)...");
+  Serial1.println("[Display] Initializing PicoDVI display & LVGL UI (Portrait 240x320)...");
 
   // 1. Setup backlight pin (Active LOW)
   pinMode(PIN_BACKLIGHT, OUTPUT);
@@ -65,10 +69,10 @@ void display_manager_init() {
 
   // 2. Initialize PicoDVI hardware display
   if (!display.begin()) {
+    Serial.println("[Display] ERROR: display.begin() failed!");
     Serial1.println("[Display] ERROR: display.begin() failed!");
   }
-  display.setRotation(
-      3); // 270° rotation for Portrait mode (240x320, right-side up)
+  display.setRotation(3); // 270° rotation for Portrait mode (240x320, right-side up)
 
   // 3. Initialize LVGL core & register log print callback
   lv_init();
@@ -80,8 +84,7 @@ void display_manager_init() {
   // 4. Register Display Driver with LVGL (240x320)
   lv_disp = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
   lv_display_set_color_format(lv_disp, LV_COLOR_FORMAT_RGB565);
-  lv_display_set_buffers(lv_disp, lvgl_buf, NULL, sizeof(lvgl_buf),
-                         LV_DISPLAY_RENDER_MODE_PARTIAL);
+  lv_display_set_buffers(lv_disp, lvgl_buf, NULL, sizeof(lvgl_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
   lv_display_set_flush_cb(lv_disp, dvi_flush_cb);
 
   // 5. Register Touch Controller with LVGL
@@ -91,10 +94,11 @@ void display_manager_init() {
 
   // 6. Initialize LVGL Pro project & load home screen
   lvgl_ui_init("");
-  lv_obj_t *home_scr = home_create();
+  lv_obj_t * home_scr = home_create();
   lv_screen_load(home_scr);
   lv_obj_invalidate(lv_screen_active());
 
+  Serial.println("[Display] LVGL UI initialized successfully.");
   Serial1.println("[Display] LVGL UI initialized successfully.");
 }
 
@@ -102,3 +106,4 @@ void display_manager_update(bool force_redraw) {
   (void)force_redraw;
   lv_timer_handler();
 }
+
