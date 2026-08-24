@@ -1,182 +1,159 @@
 #include "display_manager.h"
+#include "lvgl_ui/lvgl_ui.h"
+#include "touch.h"
 
-// DVI Display Instance
+// Hardware DVI Display Instance
 static DVIGFX16 display(DVI_RES_320x240p60, picodvi_dvi_cfg);
 
-// Color definitions (RGB 565 format)
-#define COLOR_BG            0x0842 // Dark slate blue background
-#define COLOR_HEADER_BG     0x18C3 // Header bar background
-#define COLOR_CARD_BG       0x18E5 // Card background
-#define COLOR_CARD_BORDER   0x31A6 // Card border line
-#define COLOR_TEXT_MAIN     0xFFFF // White
-#define COLOR_TEXT_SUB      0xBDF7 // Light grey
-#define COLOR_CYAN          0x07FF // Cyan
-#define COLOR_YELLOW        0xFFE0 // Yellow
-#define COLOR_GREEN         0x07E0 // Bright Green
-#define COLOR_ORANGE        0xFA20 // Orange / Heating
-#define COLOR_RED           0xF800 // Bright Red / Error
+// LVGL Display Buffer (8 lines partial buffer = 320 * 8 * 2 = 5120 bytes)
+#define LVGL_BUF_LINES 8
+static uint16_t lvgl_buf[SCREEN_WIDTH * LVGL_BUF_LINES];
 
-static uint32_t last_display_update = 0;
+static lv_display_t *lv_disp = NULL;
+static lv_indev_t *lv_indev_touch = NULL;
+static uint32_t flush_count = 0;
 
-static float last_meas_temp = -999.0f;
-static int last_set_temp = -999;
-static float last_duty = -1.0f;
-static HeatbedStatus last_status = (HeatbedStatus)-1;
+/**
+ * @brief Custom LVGL UART log callback for serial diagnostics.
+ */
+static void my_lv_log_cb(lv_log_level_t level, const char *buf) {
+  (void)level;
+  Serial1.print("[LVGL ");
+  Serial1.print(level);
+  Serial1.print("] ");
+  Serial1.println(buf);
+  Serial1.flush();
+}
 
-static void draw_static_ui() {
-  display.fillScreen(COLOR_BG);
+/**
+ * @brief LVGL tick source callback returning system milliseconds.
+ */
+static uint32_t my_tick_cb(void) { return millis(); }
 
-  // Header Bar
-  display.fillRect(0, 0, SCREEN_WIDTH, 28, COLOR_HEADER_BG);
-  display.drawFastHLine(0, 28, SCREEN_WIDTH, COLOR_CARD_BORDER);
+/**
+ * @brief LVGL flush callback rendering drawn buffers to the PicoDVI
+ * framebuffer.
+ */
+static void dvi_flush_cb(lv_display_t *disp, const lv_area_t *area,
+                         uint8_t *px_map) {
+  flush_count++;
+  if (flush_count <= 35) {
+    Serial1.print("[Display] dvi_flush_cb #");
+    Serial1.print(flush_count);
+    Serial1.print(" area: ");
+    Serial1.print(area->x1);
+    Serial1.print(",");
+    Serial1.print(area->y1);
+    Serial1.print(" to ");
+    Serial1.print(area->x2);
+    Serial1.print(",");
+    Serial1.println(area->y2);
+    Serial1.flush();
+  }
 
-  display.setTextSize(1);
-  display.setTextColor(COLOR_TEXT_MAIN);
-  display.setCursor(10, 10);
-  display.print("SMD HEATBED CONTROLLER");
+  uint32_t w = (area->x2 - area->x1 + 1);
+  uint32_t h = (area->y2 - area->y1 + 1);
+  uint16_t *fb = display.getBuffer();
+  const uint16_t *src = (const uint16_t *)px_map;
 
-  display.setTextColor(COLOR_TEXT_SUB);
-  display.setCursor(220, 10);
-  display.print("RP2040 Pico");
+  if (fb != NULL) {
+    for (int32_t y = area->y1; y <= area->y2; y++) {
+      uint16_t *dst = fb + y * SCREEN_WIDTH + area->x1;
+      memcpy(dst, src, w * sizeof(uint16_t));
+      src += w;
+    }
+  } else {
+    display.drawRGBBitmap(area->x1, area->y1, (const uint16_t *)px_map, w, h);
+  }
 
-  // Measured Temperature Card (Left)
-  display.fillRoundRect(10, 36, 145, 110, 6, COLOR_CARD_BG);
-  display.drawRoundRect(10, 36, 145, 110, 6, COLOR_CARD_BORDER);
-  display.setCursor(20, 46);
-  display.setTextColor(COLOR_TEXT_SUB);
-  display.print("MEASURED TEMP");
+  lv_display_flush_ready(disp);
+}
 
-  // Target Temperature Card (Right)
-  display.fillRoundRect(165, 36, 145, 110, 6, COLOR_CARD_BG);
-  display.drawRoundRect(165, 36, 145, 110, 6, COLOR_CARD_BORDER);
-  display.setCursor(175, 46);
-  display.setTextColor(COLOR_TEXT_SUB);
-  display.print("TARGET SETPOINT");
-
-  // Status & Duty Cycle Card (Bottom)
-  display.fillRoundRect(10, 154, 300, 76, 6, COLOR_CARD_BG);
-  display.drawRoundRect(10, 154, 300, 76, 6, COLOR_CARD_BORDER);
-  display.setCursor(20, 164);
-  display.setTextColor(COLOR_TEXT_SUB);
-  display.print("HEATER STATUS");
-
-  display.setCursor(180, 164);
-  display.print("SSR DUTY CYCLE");
+/**
+ * @brief LVGL touch input device read callback bridging hardware touch
+ * controller.
+ */
+static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data) {
+  if (touch_has_signal() && touch_touched()) {
+    data->point.x = touch_last_x;
+    data->point.y = touch_last_y;
+    data->state = LV_INDEV_STATE_PRESSED;
+  } else {
+    data->state = LV_INDEV_STATE_RELEASED;
+  }
 }
 
 void display_manager_init() {
-  // Setup backlight pin
-  pinMode(PIN_BACKLIGHT, OUTPUT);
-  digitalWrite(PIN_BACKLIGHT, LOW); // Active LOW to turn on display backlight
+  Serial1.println("[Display] Initializing backlight & PicoDVI hardware...");
+  Serial1.flush();
 
-  display.begin();
+  // 1. Setup backlight pin (Active LOW)
+  pinMode(PIN_BACKLIGHT, OUTPUT);
+  digitalWrite(PIN_BACKLIGHT, LOW);
+
+  // 2. Log Free RAM
+  Serial1.print("[Display] Free Heap before DVI init: ");
+  Serial1.print(rp2040.getFreeHeap());
+  Serial1.println(" bytes");
+  Serial1.flush();
+
+  // 3. Initialize PicoDVI hardware display
+  Serial1.println("[Display] Calling display.begin()...");
+  Serial1.flush();
+
+  bool dvi_ok = display.begin();
+
+  Serial1.print("[Display] display.begin() result: ");
+  Serial1.println(dvi_ok ? "SUCCESS" : "FAILED");
+  Serial1.flush();
+
   display.setRotation(0);
-  draw_static_ui();
+
+  Serial1.println(
+      "[Display] Initializing LVGL core & registering log callback...");
+  Serial1.flush();
+
+  // 4. Initialize LVGL core & register native log print callback
+  lv_init();
+#if LV_USE_LOG
+  lv_log_register_print_cb(my_lv_log_cb);
+#endif
+  lv_tick_set_cb(my_tick_cb);
+
+  // 5. Register Display Driver with LVGL
+  Serial1.println("[Display] Registering display driver with LVGL...");
+  Serial1.flush();
+  lv_disp = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
+  lv_display_set_color_format(lv_disp, LV_COLOR_FORMAT_RGB565);
+  lv_display_set_buffers(lv_disp, lvgl_buf, NULL, sizeof(lvgl_buf),
+                         LV_DISPLAY_RENDER_MODE_PARTIAL);
+  lv_display_set_flush_cb(lv_disp, dvi_flush_cb);
+
+  // 6. Register Touch Controller with LVGL
+  Serial1.println("[Display] Registering touch indev with LVGL...");
+  Serial1.flush();
+  lv_indev_touch = lv_indev_create();
+  lv_indev_set_type(lv_indev_touch, LV_INDEV_TYPE_POINTER);
+  lv_indev_set_read_cb(lv_indev_touch, touch_read_cb);
+
+  Serial1.println("[Display] Initializing LVGL Pro project (lvgl_ui)...");
+  Serial1.flush();
+
+  // 7. Initialize LVGL Pro project & load home screen
+  lvgl_ui_init("");
+  Serial1.println("[Display] lvgl_ui_init done. Loading home screen...");
+  Serial1.flush();
+
+  lv_obj_t * home_scr = home_create();
+  lv_screen_load(home_scr);
+  lv_obj_invalidate(lv_screen_active());
+
+  Serial1.println("[Display] LVGL Pro UI registered & loaded successfully.");
+  Serial1.flush();
 }
 
+
 void display_manager_update(bool force_redraw) {
-  uint32_t now = millis();
-  if (!force_redraw && (now - last_display_update < DISPLAY_PERIOD)) {
-    return;
-  }
-  last_display_update = now;
-
-  if (force_redraw) {
-    draw_static_ui();
-    last_meas_temp = -999.0f;
-    last_set_temp = -999;
-    last_duty = -1.0f;
-    last_status = (HeatbedStatus)-1;
-  }
-
-  float current_meas = get_measured_temp();
-  int current_set = get_desired_temp();
-  float current_duty = get_duty_cycle();
-  HeatbedStatus current_status = get_system_status();
-
-  // 1. Update Measured Temperature Display
-  if (abs(current_meas - last_meas_temp) >= 0.1f || force_redraw) {
-    last_meas_temp = current_meas;
-
-    display.fillRect(20, 70, 125, 45, COLOR_CARD_BG);
-
-    display.setTextSize(3);
-    if (current_status == STATUS_HEATING) {
-      display.setTextColor(COLOR_ORANGE);
-    } else if (current_status == STATUS_NTC_ERROR) {
-      display.setTextColor(COLOR_RED);
-    } else {
-      display.setTextColor(COLOR_CYAN);
-    }
-
-    display.setCursor(20, 80);
-    display.print((int)current_meas);
-    display.setTextSize(2);
-    display.print(" C");
-  }
-
-  // 2. Update Target Setpoint Display
-  if (current_set != last_set_temp || force_redraw) {
-    last_set_temp = current_set;
-
-    display.fillRect(175, 70, 125, 45, COLOR_CARD_BG);
-
-    display.setTextSize(3);
-    display.setTextColor(COLOR_YELLOW);
-    display.setCursor(175, 80);
-    display.print(current_set);
-    display.setTextSize(2);
-    display.print(" C");
-  }
-
-  // 3. Update Status Indicator
-  if (current_status != last_status || force_redraw) {
-    last_status = current_status;
-
-    display.fillRect(20, 185, 140, 30, COLOR_CARD_BG);
-    display.setTextSize(2);
-
-    switch (current_status) {
-      case STATUS_HEATING:
-        display.setTextColor(COLOR_ORANGE);
-        display.setCursor(20, 190);
-        display.print("HEATING");
-        break;
-      case STATUS_NTC_ERROR:
-        display.setTextColor(COLOR_RED);
-        display.setCursor(20, 190);
-        display.print("NTC ERROR");
-        break;
-      case STATUS_IDLE:
-      default:
-        display.setTextColor(COLOR_GREEN);
-        display.setCursor(20, 190);
-        display.print("IDLE");
-        break;
-    }
-  }
-
-  // 4. Update Duty Cycle Bar & Text
-  if (abs(current_duty - last_duty) >= 0.5f || force_redraw) {
-    last_duty = current_duty;
-
-    display.fillRect(180, 185, 120, 35, COLOR_CARD_BG);
-
-    display.setTextSize(2);
-    display.setTextColor(COLOR_TEXT_MAIN);
-    display.setCursor(180, 185);
-    display.print((int)current_duty);
-    display.print("%");
-
-    display.drawRect(180, 208, 120, 12, COLOR_CARD_BORDER);
-
-    int fill_width = map((int)current_duty, 0, (int)MAX_DUTY, 0, 116);
-    if (fill_width > 116) fill_width = 116;
-    if (fill_width < 0) fill_width = 0;
-
-    display.fillRect(182, 210, fill_width, 8, COLOR_ORANGE);
-    if (fill_width < 116) {
-      display.fillRect(182 + fill_width, 210, 116 - fill_width, 8, COLOR_BG);
-    }
-  }
+  (void)force_redraw;
+  lv_timer_handler();
 }

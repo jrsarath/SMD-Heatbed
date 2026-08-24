@@ -12,10 +12,10 @@
 #include "src/config.h"
 #include "src/display_manager.h"
 #include "src/input_handler.h"
+#include "src/lvgl_ui/lvgl_ui.h"
 #include "src/telemetry.h"
 #include "src/thermal_control.h"
 #include "src/touch.h"
-#include "src/lvgl_ui/lvgl_ui.h"
 
 // Hardware Timers
 static RPI_PICO_Timer TimerRegulator(0);
@@ -36,19 +36,20 @@ void setup() {
   display_manager_init();
   touch_init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  // 4. Attach Hardware Timer ISR Handlers
-  // Regulator Loop: 500 Hz (2000 µs interval)
+  // 4. Attach Hardware Timer ISR Handlers (Temporarily commented for stack collision testing)
+  /*
   if (!TimerRegulator.attachInterruptInterval(2000, regulator_isr)) {
     Serial1.println("ERROR: Failed to attach Regulator Timer ISR!");
   }
 
-  // Acquisition Loop: 5000 Hz (200 µs interval)
   if (!TimerAcquisition.attachInterruptInterval(200, acquisition_isr)) {
     Serial1.println("ERROR: Failed to attach Acquisition Timer ISR!");
   }
+  */
 
   Serial1.println("Setup completed successfully.");
 }
+
 
 /**
  * @brief Main execution loop
@@ -67,4 +68,3 @@ void loop() {
 
   delay(5);
 }
-

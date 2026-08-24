@@ -5,15 +5,16 @@
 #include <PicoDVI.h>
 #include "config.h"
 #include "thermal_control.h"
+#include "lvgl_ui/lvgl_ui.h"
 
 /**
- * @brief Initializes the PicoDVI display hardware, backlight, and dashboard layout.
+ * @brief Initializes the PicoDVI display hardware, backlight, and LVGL UI subsystem.
  */
 void display_manager_init();
 
 /**
- * @brief Updates the DVI display dashboard with current thermal readings and system status.
- * @param force_redraw Force a complete redraw of static UI elements.
+ * @brief Updates the LVGL display manager task handler.
+ * @param force_redraw Unused parameter.
  */
 void display_manager_update(bool force_redraw = false);
 
