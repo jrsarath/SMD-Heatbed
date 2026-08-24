@@ -1,6 +1,7 @@
 #include "display_manager.h"
-#include "lvgl_ui/lvgl_ui.h"
+// #include "lvgl_ui/lvgl_ui.h"
 #include "touch.h"
+#include "ui/GUI.h"
 
 // Hardware DVI Display Instance
 static DVIGFX16 display(DVI_RES_320x240p60, picodvi_dvi_cfg);
@@ -144,14 +145,13 @@ void display_manager_init() {
   Serial1.println("[Display] lvgl_ui_init done. Loading home screen...");
   Serial1.flush();
 
-  lv_obj_t * home_scr = home_create();
+  lv_obj_t *home_scr = home_create();
   lv_screen_load(home_scr);
   lv_obj_invalidate(lv_screen_active());
 
   Serial1.println("[Display] LVGL Pro UI registered & loaded successfully.");
   Serial1.flush();
 }
-
 
 void display_manager_update(bool force_redraw) {
   (void)force_redraw;

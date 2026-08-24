@@ -28,15 +28,16 @@ void setup() {
   // 1. Initialize Telemetry UART (Serial1 @ 115200 baud)
   telemetry_init();
 
-  // 2. Initialize Thermal Control Hardware & Input Pins
-  thermal_control_init();
-  input_init();
+  // 2. Initialize Thermal Control & Input (Commented out for isolation)
+  // thermal_control_init();
+  // input_init();
 
   // 3. Initialize PicoDVI Display & Touch Subsystems
   display_manager_init();
   touch_init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  // 4. Attach Hardware Timer ISR Handlers (Temporarily commented for stack collision testing)
+  // 4. Attach Hardware Timer ISR Handlers (Temporarily commented for stack
+  // collision testing)
   /*
   if (!TimerRegulator.attachInterruptInterval(2000, regulator_isr)) {
     Serial1.println("ERROR: Failed to attach Regulator Timer ISR!");
@@ -49,7 +50,6 @@ void setup() {
 
   Serial1.println("Setup completed successfully.");
 }
-
 
 /**
  * @brief Main execution loop

@@ -207,6 +207,21 @@ This document serves as a persistent step-by-step implementation log to track co
   - Temporarily disable 5 kHz hardware timer ISRs during display setup/render verification to isolate ISR stack collision.
 - **Checkpoint Status:** ACTIVE DIAGNOSTIC CHECKPOINT #7.
 
+---
+
+### Entry #012 — Hardware Subsystem Bypass (Display, Touch, Telemetry & LVGL UI Only)
+- **Date & Time:** 2026-08-25 02:07:36 IST
+- **Goal:** Isolate execution to exclusively telemetry logging, PicoDVI display, touchscreen input, and LVGL UI rendering.
+- **Files Modified:**
+  - [`SMD-Heatbed.ino`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/SMD-Heatbed.ino)
+- **Changes Made:**
+  - Commented out `thermal_control_init()` and `input_init()`.
+  - Commented out hardware timer ISRs (`TimerRegulator` and `TimerAcquisition`).
+  - Active setup components: `telemetry_init()`, `display_manager_init()`, `touch_init()`.
+  - Active loop components: `display_manager_update()`, `telemetry_update()`, touch signal polling.
+- **Checkpoint Status:** ACTIVE ISOLATION CHECKPOINT #8.
+
+
 
 
 
