@@ -49,6 +49,47 @@
 		     right, OK, close, backspace, new-line, keyboard) plus up/down.
 		     lv_fallback=font_body so Latin keys still render from one font. -->
 		<bin
+			name="font_xs"
+			size="6"
+			src_path="fonts/Montserrat-Regular.ttf"
+			bpp="4"
+			range="0x20-0x7F"
+			symbols="°—•"
+			as_file="false"
+			lv_fallback="font_body_symbols_data"
+		/>
+		<bin
+			name="font_sm"
+			size="8"
+			src_path="fonts/Montserrat-Regular.ttf"
+			bpp="4"
+			range="0x20-0x7F"
+			symbols="°—•"
+			as_file="false"
+			lv_fallback="font_body_symbols_data"
+		/>
+		<bin
+			name="font_md"
+			size="10"
+			src_path="fonts/Montserrat-Regular.ttf"
+			bpp="4"
+			range="0x20-0x7F"
+			symbols="°—•"
+			as_file="false"
+			lv_fallback="font_body_symbols_data"
+		/>
+		<bin
+			name="font_lg"
+			size="12"
+			src_path="fonts/Montserrat-Regular.ttf"
+			bpp="4"
+			range="0x20-0x7F"
+			symbols="°—•"
+			as_file="false"
+			lv_fallback="font_body_symbols_data"
+		/>
+
+		<bin
 			name="font_body_symbols"
 			size="16"
 			src_path="fonts/FontAwesome5.ttf"

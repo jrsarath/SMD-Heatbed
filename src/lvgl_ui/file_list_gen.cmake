@@ -37,6 +37,10 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/fonts/font_h3_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/font_h4_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/font_h5_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/font_lg_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/font_md_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/font_sm_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/font_xs_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/icon_arrow_down_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/icon_arrow_left_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/icon_arrow_right_data.c

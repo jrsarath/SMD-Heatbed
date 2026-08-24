@@ -17,6 +17,7 @@
 		<!-- Inactive navigation button base -->
 		<style
 			name="style_nav_btn"
+			flex_flow="column"
 			bg_opa="0%"
 			border_width="0"
 			shadow_width="0"
@@ -58,12 +59,23 @@
 		<!-- Pressed feedback -->
 		<style name="style_nav_btn_pressed" recolor="#color_track" recolor_opa="40%" />
 		<!-- Icon sizing / alignment -->
-		<style name="style_nav_btn_icon" image_recolor_opa="100%" />
+		<style name="style_nav_btn_icon" image_recolor_opa="100%" align="center" />
+		<style name="style_nav_btn_label" text_font="font_lg" text_align="center" align="center" />
 	</styles>
 
 	<!-- Reusable navigation button item: [icon] label.
 	     Supports configurable icon, configurable label, active/selected and inactive visual states. -->
-	<view extends="lv_button" flex_flow="column" flex_grow="$grow" height="100%" checkable="true" checked="$active">
+	<view
+		extends="lv_button"
+		flex_flow="column"
+		flex_grow="$grow"
+		width="100%"
+		height="100%"
+		checkable="true"
+		checked="$active"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+	>
 		<style name="style_nav_btn" />
 		<style name="style_nav_btn_light" />
 		<bind_style name="style_nav_btn_dark" subject="subject_theme_dark" ref_value="1" />
@@ -73,6 +85,8 @@
 		<lv_image src="$icon" hidden="{!icon}">
 			<style name="style_nav_btn_icon" />
 		</lv_image>
-		<lv_label text="$label" hidden="{!label}" align="center" />
+		<lv_label text="$label" hidden="{!label}" width="100%">
+			<style name="style_nav_btn_label" />
+		</lv_label>
 	</view>
 </component>

@@ -166,6 +166,10 @@ extern lv_style_t style_scrollbar;
  *----------------*/
 
 /* Targets: any */
+extern lv_font_t * font_xs;
+extern lv_font_t * font_sm;
+extern lv_font_t * font_md;
+extern lv_font_t * font_lg;
 extern lv_font_t * font_body_symbols;
 extern lv_font_t * font_body;
 extern lv_font_t * font_h5;
