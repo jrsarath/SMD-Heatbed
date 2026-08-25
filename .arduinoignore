@@ -1,9 +1,5 @@
-# Ignore build artifacts, desktop simulator, and tests when compiling Arduino firmware
-src/lvgl_ui/build/
-src/lvgl_ui/build/*
-src/lvgl_ui/preview-build/
-src/lvgl_ui/preview-build/*
-src/lvgl_ui/sim/
-src/lvgl_ui/sim/*
-src/lvgl_ui/tests/
-src/lvgl_ui/tests/*
+# Ignore build artifacts, docs, and temporary files when compiling Arduino firmware
+docs/
+docs/*
+.vscode/
+.vscode/*

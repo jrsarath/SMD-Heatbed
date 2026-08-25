@@ -30,7 +30,10 @@ void telemetry_update() {
   else if (status == STATUS_NTC_ERROR)
     status_str = "NTC_ERROR";
 
-  String logLine = "Ref:" + String(ref, 1) + " C, Meas:" + String(meas, 1) + " C, Target:" + String(set) + " C, Duty:" + String(duty, 1) + "%, Status:" + String(status_str);
+  String logLine = "Ref:" + String(ref, 1) + " C, Meas:" + String(meas, 1) +
+                   " C, Target:" + String(set) + " C, Duty:" + String(duty, 1) +
+                   "%, Status:" + String(status_str) +
+                   ", Heap:" + String(rp2040.getFreeHeap()) + "B";
   Serial.println(logLine);
   Serial1.println(logLine);
 }

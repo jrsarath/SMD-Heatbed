@@ -1,5 +1,4 @@
 #include "display_manager.h"
-#include "lvgl_ui/lvgl_ui.h"
 #include "touch.h"
 
 // Hardware DVI Display Instance
@@ -54,8 +53,9 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data) {
       static uint32_t last_touch_log = 0;
       if (millis() - last_touch_log > 200) {
         last_touch_log = millis();
-        String touchMsg = "[Touch] LVGL Press X: " + String(touch_last_x) +
-                          " Y: " + String(touch_last_y);
+        String touchMsg = "[Touch] Press X: " + String(touch_last_x) +
+                          " Y: " + String(touch_last_y) +
+                          " | Free Heap: " + String(rp2040.getFreeHeap()) + " B";
         Serial.println(touchMsg);
         Serial1.println(touchMsg);
       }
@@ -104,14 +104,17 @@ void display_manager_init() {
   lv_indev_set_type(lv_indev_touch, LV_INDEV_TYPE_POINTER);
   lv_indev_set_read_cb(lv_indev_touch, touch_read_cb);
 
-  // 6. Initialize LVGL Pro project & load home screen
-  lvgl_ui_init("");
-  lv_obj_t *home_scr = home_create();
-  lv_screen_load(home_scr);
-  lv_obj_invalidate(lv_screen_active());
+  // 6. Initialize default active screen
+  lv_obj_t *scr = lv_screen_active();
+  lv_obj_set_style_bg_color(scr, lv_color_hex(0x0F131A), 0);
+  lv_obj_invalidate(scr);
 
   Serial.println("[Display] LVGL UI initialized successfully.");
   Serial1.println("[Display] LVGL UI initialized successfully.");
+  Serial.printf("[Display] Free Heap after LVGL Init: %lu bytes (Total Heap: %lu bytes)\n",
+                rp2040.getFreeHeap(), rp2040.getTotalHeap());
+  Serial1.printf("[Display] Free Heap after LVGL Init: %lu bytes (Total Heap: %lu bytes)\n",
+                 rp2040.getFreeHeap(), rp2040.getTotalHeap());
 }
 
 void display_manager_update(bool force_redraw) {

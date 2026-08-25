@@ -12,7 +12,6 @@
 #include "src/config.h"
 #include "src/display_manager.h"
 #include "src/input_handler.h"
-#include "src/lvgl_ui/lvgl_ui.h"
 #include "src/telemetry.h"
 #include "src/thermal_control.h"
 #include "src/touch.h"

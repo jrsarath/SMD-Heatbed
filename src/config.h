@@ -82,4 +82,12 @@
 #define LV_MEM_SIZE (32 * 1024U)
 #endif
 
+#ifndef LV_USE_LOG
+#define LV_USE_LOG 1
+#endif
+
+#ifndef LV_LOG_LEVEL
+#define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
+#endif
+
 #endif // CONFIG_H_

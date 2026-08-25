@@ -5,7 +5,6 @@
 #include <PicoDVI.h>
 #include "config.h"
 #include "thermal_control.h"
-#include "lvgl_ui/lvgl_ui.h"
 
 /**
  * @brief Initializes the PicoDVI display hardware, backlight, and LVGL UI subsystem.
