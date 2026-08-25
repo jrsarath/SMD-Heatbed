@@ -6,6 +6,7 @@
  */
 
 /* Built only by sim/CMakeLists.txt; lets a glob-based embedded build skip it. */
+#include "screens/home/home_gen.h"
 #ifdef LVGL_PRO_SIMULATOR_BUILD
 
 #include "lvgl.h"
@@ -24,8 +25,8 @@ int main(void)
     hal_init(UI_WIDTH, UI_HEIGHT);
     UI_INIT("A:");      /* "A:" = file-system drive for file-based assets */
 
-    /* Load a screen from your project, e.g.:
-     * lv_screen_load(my_screen_create()); */
+    // Load a screen from your project, e.g.:
+    lv_screen_load(home_create());
 
     lv_unlock();
 
