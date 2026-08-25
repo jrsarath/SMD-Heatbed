@@ -1,6 +1,8 @@
 list(
   APPEND
   LV_EDITOR_PROJECT_SOURCES
+  ${CMAKE_CURRENT_LIST_DIR}/components/data/info_card_header/info_card_header_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/data/info_row/info_row_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/navigation/header/header_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/navigation/navigation_bar/navigation_bar_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/navigation/navigation_button/navigation_button_gen.c

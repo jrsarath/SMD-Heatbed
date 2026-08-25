@@ -57,6 +57,27 @@ lv_obj_t * info_create(void)
         lv_obj_set_style_border_width(lv_obj_1, 0, 0);
         lv_obj_set_style_pad_all(lv_obj_1, SPACE_SM, 0);
         lv_obj_set_style_pad_gap(lv_obj_1, SPACE_SM, 0);
+        lv_obj_t * lv_obj_2 = lv_obj_create(lv_obj_1);
+        lv_obj_set_width(lv_obj_2, lv_pct(100));
+        lv_obj_set_height(lv_obj_2, LV_SIZE_CONTENT);
+        lv_obj_set_flex_flow(lv_obj_2, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flag(lv_obj_2, LV_OBJ_FLAG_SCROLLABLE, false);
+        lv_obj_set_style_bg_color(lv_obj_2, COLOR_CARD_BG, 0);
+        lv_obj_set_style_bg_opa(lv_obj_2, (255 * 100 / 100), 0);
+        lv_obj_set_style_border_width(lv_obj_2, 1, 0);
+        lv_obj_set_style_border_color(lv_obj_2, COLOR_CARD_BORDER, 0);
+        lv_obj_set_style_border_opa(lv_obj_2, (255 * 100 / 100), 0);
+        lv_obj_set_style_radius(lv_obj_2, RADIUS_MD, 0);
+        lv_obj_set_style_pad_hor(lv_obj_2, SPACE_SM, 0);
+        lv_obj_set_style_pad_ver(lv_obj_2, SPACE_SM, 0);
+        lv_obj_set_style_pad_gap(lv_obj_2, SPACE_XS, 0);
+        info_row_create(lv_obj_2, "Device Name", "SMD Heatbed", true);
+
+        info_row_create(lv_obj_2, "Model", "HB-01", true);
+
+        info_row_create(lv_obj_2, "Firmware Version", "v1.0.3", true);
+
+        info_row_create(lv_obj_2, "UI Version", "v1.0.0", false);
 
         lv_obj_t * nav_bar = navigation_bar_create(lv_obj_0, 0, false, false, false, true);
         lv_obj_set_name(nav_bar, "nav_bar");
