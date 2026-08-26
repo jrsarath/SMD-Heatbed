@@ -1,13 +1,16 @@
 #ifndef DISPLAY_MANAGER_H_
 #define DISPLAY_MANAGER_H_
 
-#include <Arduino.h>
-#include <PicoDVI.h>
 #include "config.h"
 #include "thermal_control.h"
+#include "ui/src/ui/ui.h"
+#include "ui/src/ui/vars.h"
+#include <Arduino.h>
+#include <PicoDVI.h>
 
 /**
- * @brief Initializes the PicoDVI display hardware, backlight, and LVGL UI subsystem.
+ * @brief Initializes the PicoDVI display hardware, backlight, and LVGL UI
+ * subsystem.
  */
 void display_manager_init();
 

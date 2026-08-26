@@ -27,6 +27,14 @@
 #define DISPLAY_ROTATION 3 // Display Rotation 90 * 3
 
 /*******************************************************************************
+ * Enable aspect compensation for 4:3 displays
+ ******************************************************************************/
+#define DISPLAY_ASPECT_COMPENSATION 1
+#define DISPLAY_ASPECT_SCALE_NUM 3
+#define DISPLAY_ASPECT_SCALE_DEN 4
+#define DISPLAY_ASPECT_X_OFFSET 40
+
+/*******************************************************************************
  * Temperature & Controller Parameters
  ******************************************************************************/
 #define MIN_TEMP 0     // Minimum allowable setpoint (°C)
@@ -61,33 +69,5 @@
   2.0f // Minimum temperature rise required over safety period (°C)
 
 #define TELEMETRY_PERIOD 1000 // Telemetry output update interval (ms)
-/*******************************************************************************
- * LVGL Memory Management
- * Force LVGL to use system heap (malloc/free) or a reduced static pool
- * to preserve 153.6 KB RAM for PicoDVI framebuffer.
- ******************************************************************************/
-#ifndef LV_LVGL_H_INCLUDE_SIMPLE
-#define LV_LVGL_H_INCLUDE_SIMPLE 1
-#endif
-
-#ifndef LV_MEM_CUSTOM
-#define LV_MEM_CUSTOM 1
-#endif
-
-#ifndef LV_USE_STDLIB_MALLOC
-#define LV_USE_STDLIB_MALLOC 1
-#endif
-
-#ifndef LV_MEM_SIZE
-#define LV_MEM_SIZE (32 * 1024U)
-#endif
-
-#ifndef LV_USE_LOG
-#define LV_USE_LOG 1
-#endif
-
-#ifndef LV_LOG_LEVEL
-#define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
-#endif
 
 #endif // CONFIG_H_
