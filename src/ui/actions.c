@@ -14,14 +14,14 @@ void action_navigation(lv_event_t *e) {
     case SCREEN_ID_MAIN:
       set_var_nav_home(true);
       break;
-    case SCREEN_ID_PROFILES:
-      set_var_nav_profiles(true);
-      break;
-    case SCREEN_ID_MANUAL:
-      set_var_nav_manual(true);
-      break;
-    case SCREEN_ID_INFO:
-      set_var_nav_info(true);
+      // case SCREEN_ID_PROFILES:
+      //   set_var_nav_profiles(true);
+      //   break;
+      // case SCREEN_ID_MANUAL:
+      //   set_var_nav_manual(true);
+      //   break;
+      // case SCREEN_ID_INFO:
+      //   set_var_nav_info(true);
       break;
     default:
       break;

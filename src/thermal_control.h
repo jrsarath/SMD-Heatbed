@@ -57,6 +57,16 @@ void set_heater(bool state);
 float get_measured_temp();
 
 /**
+ * @brief Gets raw 12-bit ADC reading from NTC thermistor pin.
+ */
+int get_raw_adc();
+
+/**
+ * @brief Gets calculated thermistor resistance in Ohms.
+ */
+float get_measured_resistance();
+
+/**
  * @brief Gets current target temperature setpoint.
  */
 int get_desired_temp();

@@ -153,6 +153,14 @@ float get_measured_temp() {
   return measured_temp;
 }
 
+int get_raw_adc() {
+  return adc_raw;
+}
+
+float get_measured_resistance() {
+  return measured_resistance;
+}
+
 int get_desired_temp() {
   return set_temp;
 }

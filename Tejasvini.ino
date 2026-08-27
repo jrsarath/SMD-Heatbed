@@ -29,8 +29,8 @@ void setup() {
   telemetry_init();
 
   // 2. Initialize Thermal Control & Input (Commented out for isolation)
-  // thermal_control_init();
-  // input_init();
+  thermal_control_init();
+  input_init();
 
   // 3. Initialize PicoDVI Display & Touch Subsystems
   touch_init();

@@ -224,5 +224,85 @@ void set_var_current_temp(const char *value) {
   }
 }
 
+// Static buffers for UI telemetry and profile variables
+static char g_ui_heater_state[16] = "OFF";
+static char g_ui_heater_status[32] = "IDLE";
+static char g_ui_output_percentage[16] = "0%";
+static char g_ui_profile[32] = "Manual";
 
+/**
+ * @brief Native variable getter for EEZ Studio UI heater state label ("ON" /
+ * "OFF").
+ */
+const char *get_var_heater_state() { return is_heater_on() ? "ON" : "OFF"; }
 
+/**
+ * @brief Native variable setter for EEZ Studio UI heater state label.
+ */
+void set_var_heater_state(const char *value) {
+  if (value) {
+    strncpy(g_ui_heater_state, value, sizeof(g_ui_heater_state) - 1);
+    g_ui_heater_state[sizeof(g_ui_heater_state) - 1] = '\0';
+  }
+}
+
+/**
+ * @brief Native variable getter for EEZ Studio UI heater status label.
+ */
+const char *get_var_heater_status() {
+  HeatbedStatus st = get_system_status();
+  if (st == STATUS_NTC_ERROR) {
+    return "ERROR";
+  }
+  if (st == STATUS_HEATING) {
+    return "HEATING";
+  }
+  return "IDLE";
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI heater status label.
+ */
+void set_var_heater_status(const char *value) {
+  if (value) {
+    strncpy(g_ui_heater_status, value, sizeof(g_ui_heater_status) - 1);
+    g_ui_heater_status[sizeof(g_ui_heater_status) - 1] = '\0';
+  }
+}
+
+/**
+ * @brief Native variable getter for EEZ Studio UI output duty cycle percentage
+ * label.
+ */
+const char *get_var_output_percentage() {
+  float duty = get_duty_cycle();
+  snprintf(g_ui_output_percentage, sizeof(g_ui_output_percentage), "%d%%",
+           (int)(duty + 0.5f));
+  return g_ui_output_percentage;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI output duty cycle percentage
+ * label.
+ */
+void set_var_output_percentage(const char *value) {
+  if (value) {
+    strncpy(g_ui_output_percentage, value, sizeof(g_ui_output_percentage) - 1);
+    g_ui_output_percentage[sizeof(g_ui_output_percentage) - 1] = '\0';
+  }
+}
+
+/**
+ * @brief Native variable getter for EEZ Studio UI profile label.
+ */
+const char *get_var_profile() { return g_ui_profile; }
+
+/**
+ * @brief Native variable setter for EEZ Studio UI profile label.
+ */
+void set_var_profile(const char *value) {
+  if (value) {
+    strncpy(g_ui_profile, value, sizeof(g_ui_profile) - 1);
+    g_ui_profile[sizeof(g_ui_profile) - 1] = '\0';
+  }
+}

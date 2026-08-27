@@ -14,15 +14,13 @@ enum ScreensEnum {
   SCREEN_ID_MAIN = 1,
   SCREEN_ID_PROFILES = 2,
   SCREEN_ID_MANUAL = 3,
-  SCREEN_ID_INFO = 4,
-  _SCREEN_ID_LAST = 4
+  _SCREEN_ID_LAST = 3
 };
 
 typedef struct _objects_t {
   lv_obj_t *main;
   lv_obj_t *profiles;
   lv_obj_t *manual;
-  lv_obj_t *info;
   lv_obj_t *obj0;
   lv_obj_t *obj0__obj8;
   lv_obj_t *obj0__obj9;
@@ -37,57 +35,55 @@ typedef struct _objects_t {
   lv_obj_t *obj8;
   lv_obj_t *obj9;
   lv_obj_t *obj10;
-  lv_obj_t *obj10__obj0;
-  lv_obj_t *obj10__obj1;
-  lv_obj_t *obj10__obj2;
-  lv_obj_t *obj10__obj3;
-  lv_obj_t *obj10__obj4;
-  lv_obj_t *obj10__obj5;
-  lv_obj_t *obj10__obj6;
-  lv_obj_t *obj10__obj7;
   lv_obj_t *obj11;
-  lv_obj_t *obj11__obj8;
-  lv_obj_t *obj11__obj9;
-  lv_obj_t *obj11__obj10;
   lv_obj_t *obj12;
   lv_obj_t *obj13;
-  lv_obj_t *obj13__obj0;
-  lv_obj_t *obj13__obj1;
-  lv_obj_t *obj13__obj2;
-  lv_obj_t *obj13__obj3;
-  lv_obj_t *obj13__obj4;
-  lv_obj_t *obj13__obj5;
-  lv_obj_t *obj13__obj6;
-  lv_obj_t *obj13__obj7;
   lv_obj_t *obj14;
-  lv_obj_t *obj14__obj8;
-  lv_obj_t *obj14__obj9;
-  lv_obj_t *obj14__obj10;
   lv_obj_t *obj15;
   lv_obj_t *obj16;
-  lv_obj_t *obj16__obj0;
-  lv_obj_t *obj16__obj1;
-  lv_obj_t *obj16__obj2;
-  lv_obj_t *obj16__obj3;
-  lv_obj_t *obj16__obj4;
-  lv_obj_t *obj16__obj5;
-  lv_obj_t *obj16__obj6;
-  lv_obj_t *obj16__obj7;
   lv_obj_t *obj17;
-  lv_obj_t *obj17__obj8;
-  lv_obj_t *obj17__obj9;
-  lv_obj_t *obj17__obj10;
   lv_obj_t *obj18;
   lv_obj_t *obj19;
   lv_obj_t *obj20;
-  lv_obj_t *obj20__obj0;
-  lv_obj_t *obj20__obj1;
-  lv_obj_t *obj20__obj2;
-  lv_obj_t *obj20__obj3;
-  lv_obj_t *obj20__obj4;
-  lv_obj_t *obj20__obj5;
-  lv_obj_t *obj20__obj6;
-  lv_obj_t *obj20__obj7;
+  lv_obj_t *obj21;
+  lv_obj_t *obj22;
+  lv_obj_t *obj23;
+  lv_obj_t *obj23__obj0;
+  lv_obj_t *obj23__obj1;
+  lv_obj_t *obj23__obj2;
+  lv_obj_t *obj23__obj3;
+  lv_obj_t *obj23__obj4;
+  lv_obj_t *obj23__obj5;
+  lv_obj_t *obj23__obj6;
+  lv_obj_t *obj23__obj7;
+  lv_obj_t *obj24;
+  lv_obj_t *obj24__obj8;
+  lv_obj_t *obj24__obj9;
+  lv_obj_t *obj24__obj10;
+  lv_obj_t *obj25;
+  lv_obj_t *obj26;
+  lv_obj_t *obj26__obj0;
+  lv_obj_t *obj26__obj1;
+  lv_obj_t *obj26__obj2;
+  lv_obj_t *obj26__obj3;
+  lv_obj_t *obj26__obj4;
+  lv_obj_t *obj26__obj5;
+  lv_obj_t *obj26__obj6;
+  lv_obj_t *obj26__obj7;
+  lv_obj_t *obj27;
+  lv_obj_t *obj27__obj8;
+  lv_obj_t *obj27__obj9;
+  lv_obj_t *obj27__obj10;
+  lv_obj_t *obj28;
+  lv_obj_t *obj29;
+  lv_obj_t *obj29__obj0;
+  lv_obj_t *obj29__obj1;
+  lv_obj_t *obj29__obj2;
+  lv_obj_t *obj29__obj3;
+  lv_obj_t *obj29__obj4;
+  lv_obj_t *obj29__obj5;
+  lv_obj_t *obj29__obj6;
+  lv_obj_t *obj29__obj7;
 } objects_t;
 
 extern objects_t objects;
@@ -100,9 +96,6 @@ void tick_screen_profiles();
 
 void create_screen_manual();
 void tick_screen_manual();
-
-void create_screen_info();
-void tick_screen_info();
 
 void create_user_widget_navigation(lv_obj_t *parent_obj, int startWidgetIndex);
 void tick_user_widget_navigation(int startWidgetIndex);

@@ -18,7 +18,12 @@ void telemetry_update() {
   }
   last_telemetry_time = now;
 
+  // Sample NTC temperature (guarantees update even if timer ISR is inactive)
+  measure_temperature();
+
   float meas = get_measured_temp();
+  int raw_adc = get_raw_adc();
+  float res = get_measured_resistance();
   int set = get_desired_temp();
   float ref = get_reference_temp();
   float duty = get_duty_cycle();
@@ -30,10 +35,14 @@ void telemetry_update() {
   else if (status == STATUS_NTC_ERROR)
     status_str = "NTC_ERROR";
 
-  String logLine = "Ref:" + String(ref, 1) + " C, Meas:" + String(meas, 1) +
-                   " C, Target:" + String(set) + " C, Duty:" + String(duty, 1) +
-                   "%, Status:" + String(status_str) +
-                   ", Heap:" + String(rp2040.getFreeHeap()) + "B";
+  String logLine = "NTC ADC: " + String(raw_adc) +
+                   ", Res: " + String(res, 1) + " Ohm" +
+                   ", Temp: " + String(meas, 1) + " C" +
+                   ", Ref: " + String(ref, 1) + " C" +
+                   ", Target: " + String(set) + " C" +
+                   ", Duty: " + String(duty, 1) + "%" +
+                   ", Status: " + String(status_str) +
+                   ", Heap: " + String(rp2040.getFreeHeap()) + "B";
   Serial.println(logLine);
   Serial1.println(logLine);
 }
