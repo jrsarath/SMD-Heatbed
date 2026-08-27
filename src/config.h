@@ -18,21 +18,27 @@
 #define SERIAL_BAUD 115200
 
 /*******************************************************************************
- * Display Specifications (Portrait Mode: 240x320)
+ * Display Specifications (Elecrow CrowPanel RTD2281 4.3" DVI Display)
+ * Hardware DVI Resolution: 400x240 @ 60Hz (scaled 2x to 800x480 by RTD2281)
+ * Logical UI Resolution: 240x400 (Portrait Mode, 270° hardware rotation)
  ******************************************************************************/
-#define SCREEN_WIDTH 240  // Display horizontal resolution (pixels)
-#define SCREEN_HEIGHT 320 // Display vertical resolution (pixels)
-#define DISPLAY_WIDTH 320
-#define DISPLAY_HEIGHT 240
-#define DISPLAY_ROTATION 3 // Display Rotation 90 * 3
+#define SCREEN_WIDTH 240  // Logical UI horizontal resolution (pixels, portrait)
+#define SCREEN_HEIGHT 400 // Logical UI vertical resolution (pixels, portrait)
+#define DISPLAY_WIDTH                                                          \
+  400 // Hardware DVI horizontal resolution (pixels, landscape)
+#define DISPLAY_HEIGHT                                                         \
+  240 // Hardware DVI vertical resolution (pixels, landscape)
+#define DISPLAY_ROTATION 3 // Display Rotation 90 * 3 = 270° (Portrait)
 
 /*******************************************************************************
- * Enable aspect compensation for 4:3 displays
+ * Aspect Ratio Compensation
+ * 400x240 matches 800x480 panel with 1:1 pixel aspect ratio (2x integer scale).
+ * Set to 0 since no 4:3 anamorphic stretch compensation is needed.
  ******************************************************************************/
-#define DISPLAY_ASPECT_COMPENSATION 1
-#define DISPLAY_ASPECT_SCALE_NUM 3
-#define DISPLAY_ASPECT_SCALE_DEN 4
-#define DISPLAY_ASPECT_X_OFFSET 40
+#define DISPLAY_ASPECT_COMPENSATION 0
+#define DISPLAY_ASPECT_SCALE_NUM 1
+#define DISPLAY_ASPECT_SCALE_DEN 1
+#define DISPLAY_ASPECT_X_OFFSET 0
 
 /*******************************************************************************
  * Temperature & Controller Parameters

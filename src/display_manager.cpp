@@ -2,9 +2,9 @@
 #include "touch.h"
 
 // Hardware DVI Display Instance
-static DVIGFX16 display(DVI_RES_320x240p60, picodvi_dvi_cfg);
+static DVIGFX16 display(DVI_RES_400x240p60, picodvi_dvi_cfg, VREG_VOLTAGE_1_25);
 
-// LVGL Display Buffer (8 lines partial buffer = 320 * 8 * 2 = 5120 bytes)
+// LVGL Display Buffer (8 lines partial buffer = SCREEN_WIDTH * 8 * 2 = 240 * 8 * 2 = 3840 bytes)
 #define LVGL_BUF_LINES 8
 static lv_color_t lvgl_buf[SCREEN_WIDTH * LVGL_BUF_LINES];
 static lv_disp_draw_buf_t draw_buf;
@@ -53,9 +53,9 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 
 void display_manager_init() {
   Serial.println("[Display] Initializing PicoDVI display & LVGL v8.4.0 UI "
-                 "(Portrait 240x320)...");
+                 "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
   Serial1.println("[Display] Initializing PicoDVI display & LVGL v8.4.0 UI "
-                  "(Portrait 240x320)...");
+                  "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
 
   // 1. Setup backlight pin (Active LOW)
   pinMode(PIN_BACKLIGHT, OUTPUT);
@@ -67,12 +67,12 @@ void display_manager_init() {
     Serial1.println("[Display] ERROR: display.begin() failed!");
   }
   display.setRotation(DISPLAY_ROTATION); // 270° rotation for Portrait mode
-                                         // (240x320, right-side up)
+                                         // (240x400, right-side up)
 
   // 3. Initialize LVGL core
   lv_init();
 
-  // 4. Register Display Buffer & Driver with LVGL (240x320)
+  // 4. Register Display Buffer & Driver with LVGL (240x400)
   lv_disp_draw_buf_init(&draw_buf, lvgl_buf, NULL,
                         SCREEN_WIDTH * LVGL_BUF_LINES);
   lv_disp_drv_init(&disp_drv);

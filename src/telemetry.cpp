@@ -7,8 +7,8 @@ void telemetry_init() {
   Serial1.setRX(SERIAL_RX);
   Serial1.setTX(SERIAL_TX);
   Serial1.begin(SERIAL_BAUD);
-  Serial.println("=== SMD Heatbed Firmware Initialized ===");
-  Serial1.println("=== SMD Heatbed Firmware Initialized ===");
+  Serial.println("=== Tejasvini Firmware Initialized ===");
+  Serial1.println("=== Tejasvini Firmware Initialized ===");
 }
 
 void telemetry_update() {

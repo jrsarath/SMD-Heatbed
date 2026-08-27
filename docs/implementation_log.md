@@ -507,8 +507,8 @@ This document serves as a persistent step-by-step implementation log to track co
 ### Entry #032 — Architectural Touch Refactoring & 270° Portrait Transformation (`touch.cpp`)
 - **Date & Time:** 2026-08-25 04:11:11 IST
 - **Refactoring & Architectural Improvements:**
-  - Created [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.cpp) to decouple implementation details from [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h), establishing clean C++ compilation units and eliminating header symbol collisions.
-  - Header [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/SMD-Heatbed/src/touch.h) now provides `#pragma once` interface declarations (`extern touch_last_x/y`, `touch_init()`, `touch_has_signal()`, `touch_touched()`, `touch_released()`).
+  - Created [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.cpp) to decouple implementation details from [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.h), establishing clean C++ compilation units and eliminating header symbol collisions.
+  - Header [`src/touch.h`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.h) now provides `#pragma once` interface declarations (`extern touch_last_x/y`, `touch_init()`, `touch_has_signal()`, `touch_touched()`, `touch_released()`).
 - **Coordinate Transformation & Rotation Math:**
   1. Maps GT911 raw touch sensor axes (`raw_x` `0..800`, `raw_y` `0..480`) to physical panel landscape space (`320x240`):
      ```cpp
@@ -522,6 +522,26 @@ This document serves as a persistent step-by-step implementation log to track co
      ```
   3. Constrains touch points strictly within `[0..SCREEN_WIDTH-1, 0..SCREEN_HEIGHT-1]` (`240x320`), delivering precise touch interaction across all LVGL UI components.
 - **Checkpoint Status:** ACTIVE CHECKPOINT #28 (GT911 Touch Architecture & Portrait Math Verified & Logged).
+
+---
+
+### Entry #033 — Migrated PicoDVI Driver to 400×240 @ 60Hz (800×480 Scaled)
+- **Date & Time:** 2026-08-27 23:45:00 IST
+- **Target Hardware:** Elecrow CrowPanel RTD2281 4.3" Display driven by RP2040 PicoDVI.
+- **Verified Configuration:**
+  - Display Driver: `DVIGFX16 display(DVI_RES_400x240p60, picodvi_dvi_cfg, VREG_VOLTAGE_1_25);`
+  - Native Resolution: 400×240 @ 60 Hz RGB565 (scaled 2× integer to 800×480 on RTD2281).
+  - Pixel Aspect Ratio: 1:1 square pixels (5:3 aspect ratio perfectly matches 800×480).
+  - Logical UI Resolution: 240×400 (Portrait Mode, `setRotation(3)`).
+- **Files Modified:**
+  - [`src/config.h`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/config.h): `DISPLAY_WIDTH = 400`, `DISPLAY_HEIGHT = 240`, `SCREEN_WIDTH = 240`, `SCREEN_HEIGHT = 400`, `DISPLAY_ASPECT_COMPENSATION = 0`.
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/display_manager.cpp): Verified `DVIGFX16` declaration with `VREG_VOLTAGE_1_25`, updated buffer comments (`3840` bytes) and startup diagnostic logging to 240×400 (400×240 @ 60Hz).
+  - [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.cpp): Updated coordinate comments and mapping math to 400×240 physical / 240×400 LVGL portrait.
+  - [`src/ui/src/ui/screens.c`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/ui/src/ui/screens.c): Updated top-level screen containers to `240x400` across all screens.
+  - [`src/ui/ui.eez-project`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/ui/ui.eez-project): Updated project display width/height and screen dimensions to `240x400`.
+  - [`Tejasvini.ino`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/Tejasvini.ino), [`AGENTS.md`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/AGENTS.md), [`README.md`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/README.md).
+- **Checkpoint Status:** CHECKPOINT #29 (PicoDVI 400×240 Migration Completed & Logged).
+
 
 
 

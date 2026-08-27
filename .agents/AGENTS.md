@@ -1,19 +1,19 @@
-# AGENTS.md — Developer & AI Agent Guide for SMD-Heatbed
+# AGENTS.md — Developer & AI Agent Guide for Tejasvini
 
-This document provides developer guidelines, architectural rules, hardware specifications, and codebase navigation for AI agents and human developers working on **SMD-Heatbed**.
+This document provides developer guidelines, architectural rules, hardware specifications, and codebase navigation for AI agents and human developers working on **Tejasvini**.
 
 ---
 
 ## 1. Project Overview
 
-**SMD-Heatbed** is an open-source heatplate controller designed for reflow and SMT soldering work. It runs on a **Raspberry Pi Pico (RP2040)** paired with an **Elecrow 4.3" Pico DVI Display** running a declarative **LVGL Pro XML UI** (`src/lvgl_ui/`).
+**Tejasvini** is an open-source heatplate controller designed for reflow and SMT soldering work. It runs on a **Raspberry Pi Pico (RP2040)** paired with an **Elecrow 4.3" Pico DVI Display** running a declarative **LVGL UI** (`src/ui/`).
 
 ### Key Hardware Specifications
 * **MCU:** Raspberry Pi Pico (RP2040 microcontroller)
 * **Heater Element:** 400W PTC Heatplate driven via a 3.3V Logic Solid State Relay (SSR)
 * **Temperature Sensor:** 100K NTC Thermistor in a voltage divider ($R = 2.2\text{k}\Omega$, $R_0 = 100\text{k}\Omega$, $\beta = 3950$, $T_0 = 298.15\text{K}$)
 * **User Input:** DFRobot Rotary Encoder with integrated push-button & Capacitive Touchscreen (GT911 driver)
-* **Display:** 320x240 RGB display output driven via PicoDVI (`DVIGFX16`)
+* **Display:** 400x240 RGB display output driven via PicoDVI (`DVIGFX16`, 2x scaled to 800x480 on Elecrow CrowPanel RTD2281)
 * **Telemetry:** Serial1 UART (TX: GPIO 0, RX: GPIO 1) at 115200 baud
 
 ---
@@ -21,8 +21,8 @@ This document provides developer guidelines, architectural rules, hardware speci
 ## 2. Directory Structure & File Map
 
 ```
-SMD-Heatbed/
-├── SMD-Heatbed.ino           # Main Arduino firmware sketch (timer ISRs, setup & loop)
+Tejasvini/
+├── Tejasvini.ino             # Main Arduino firmware sketch (timer ISRs, setup & loop)
 ├── CMakeLists.txt            # Root CMake build definition
 ├── README.md                 # Project user documentation & hardware BOM
 ├── AGENTS.md                 # Developer & AI agent architectural guide (this file)
@@ -140,7 +140,7 @@ All configuration values, pin mappings, physical constants, timer parameters, an
    - `RPi_Pico_TimerInterrupt`
    - `RP2040_PWM`
    - `TAMC_GT911` (or corresponding touch library in `touch.h`)
-3. Open `SMD-Heatbed.ino` and upload to Raspberry Pi Pico.
+3. Open `Tejasvini.ino` and upload to Raspberry Pi Pico.
 
 ### UI Desktop Simulator & Testing
 1. Navigate to `src/lvgl_ui/` or root workspace.

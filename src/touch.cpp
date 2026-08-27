@@ -153,22 +153,22 @@ bool touch_touched() {
     /*
      * GT911 raw coordinate system:
      *
-     *     800 x 480
+     *     800 x 480 (capacitive touch panel)
      *
      * Physical display:
      *
-     *     320 x 240 landscape
+     *     400 x 240 landscape (scaled 2x to 800x480)
      *
      * PicoDVI:
      *
-     *     setRotation(3)
+     *     setRotation(3) (270° hardware rotation)
      *
      * LVGL:
      *
-     *     240 x 320 portrait
+     *     240 x 400 portrait
      *
      * First convert GT911 coordinates to the physical
-     * 320x240 display space, then apply the 270-degree
+     * 400x240 display space, then apply the 270-degree
      * rotation to produce LVGL coordinates.
      */
 
@@ -181,15 +181,15 @@ bool touch_touched() {
     int physical_y = map(480 - raw_y, 0, 480, 0, DISPLAY_HEIGHT - 1);
 
     /*
-     * Rotate physical 320x240 coordinates 270 degrees.
+     * Rotate physical 400x240 coordinates 270 degrees.
      *
      * Physical:
-     *   X = 0..319
-     *   Y = 0..239
+     *   X = 0..(DISPLAY_WIDTH - 1)  [0..399]
+     *   Y = 0..(DISPLAY_HEIGHT - 1) [0..239]
      *
      * LVGL:
-     *   X = 0..239
-     *   Y = 0..319
+     *   X = 0..(SCREEN_WIDTH - 1)   [0..239]
+     *   Y = 0..(SCREEN_HEIGHT - 1)  [0..399]
      */
     touch_last_x = (DISPLAY_HEIGHT - 1) - physical_y;
     touch_last_y = physical_x;

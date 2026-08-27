@@ -10,6 +10,7 @@ set(SOURCES
     src/ui/src/ui/screens.c
     src/ui/src/ui/images.c
     src/ui/src/ui/styles.c
+    src/ui/src/ui/actions.c
 )
 
-add_library(smd_heatbed ${SOURCES})
+add_library(tejasvini ${SOURCES})

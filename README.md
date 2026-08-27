@@ -1,6 +1,6 @@
-# SMD Heatbed — Open-Source Heatplate Controller Firmware
+# Tejasvini — Open-Source Heatplate Controller Firmware
 
-**SMD Heatbed** is an open-source heatplate controller designed for reflow and SMT soldering work. It runs on a **Raspberry Pi Pico (RP2040)** paired with an **Elecrow 4.3" Pico DVI Display** rendering a real-time native DVI status dashboard.
+**Tejasvini (तेजस्विनी)** is an open-source heatplate controller designed for reflow and SMT soldering work. It runs on a **Raspberry Pi Pico (RP2040)** paired with an **Elecrow 4.3" Pico DVI Display** rendering a real-time native DVI status dashboard.
 
 ---
 
@@ -9,7 +9,7 @@
 * **Heater Element:** 400W PTC Heatplate driven via a 3.3V Logic Solid State Relay (SSR)
 * **Temperature Sensor:** 100K NTC Thermistor in a voltage divider ($R = 2.2\text{k}\Omega$, $R_0 = 100\text{k}\Omega$, $\beta = 3950$, $T_0 = 298.15\text{K}$)
 * **User Input:** DFRobot Rotary Encoder with integrated push-button & Capacitive Touchscreen (GT911 driver)
-* **Display:** Elecrow 4.3" DVI display (320x240 RGB driven via PicoDVI)
+* **Display:** Elecrow CrowPanel RTD2281 4.3" DVI display (400x240 RGB driven via PicoDVI, scaled 2x to 800x480)
 * **Telemetry:** Serial1 UART (TX: GPIO 0, RX: GPIO 1) at 115200 baud
 
 ---
@@ -38,8 +38,8 @@
 The firmware is structured cleanly into modular C++ components with a minimal main sketch:
 
 ```
-SMD-Heatbed/
-├── SMD-Heatbed.ino           # Main Arduino sketch (minimal, standard setup & loop)
+Tejasvini/
+├── Tejasvini.ino             # Main Arduino sketch (minimal, standard setup & loop)
 ├── config.h                  # Hardware pinout, thermal constants, timer & safety parameters
 ├── touch.h                   # Touch controller abstraction & GT911 driver setup
 ├── thermal_control.h / .cpp  # Thermistor ADC math, PI controller, PWM, soft-start, safety checks
@@ -52,7 +52,7 @@ SMD-Heatbed/
 - **`config.h`**: Central header containing all `#define` hardware pin definitions, controller gains, safety thresholds, and screen specs.
 - **`thermal_control`**: Implements thermistor temperature reading (Steinhart-Hart equation), PI controller, soft-start reference ramping, SSR PWM control, and thermal runaway safety lockout.
 - **`input_handler`**: Handles rotary encoder quadrature decoding and debounced push-button logic for setpoint control and heater toggling.
-- **`display_manager`**: Renders a lightweight, native 320x240 dashboard directly on the PicoDVI display without library bloat.
+- **`display_manager`**: Renders the 240x400 portrait UI directly on the PicoDVI display (400x240 @ 60Hz scaled 2x to 800x480).
 - **`telemetry`**: Periodically logs formatted status data over `Serial1` for temperature curve tracking.
 
 ---
@@ -75,7 +75,10 @@ SMD-Heatbed/
    - `TAMC_GT911` (or corresponding touch library configured in `touch.h`)
 
 ### Upload Steps
-1. Open `SMD-Heatbed.ino` in the Arduino IDE.
+1. Open `Tejasvini.ino` in the Arduino IDE.
 2. Select **Raspberry Pi Pico** (or equivalent RP2040 board) and your USB serial port.
 3. Compile and upload to the board.
 4. Open Serial Monitor on `Serial1` (GPIO 0/1) at **115200 baud** to view real-time telemetry logs.
+
+---
+### Made with ❤️ in Kolkata, India
