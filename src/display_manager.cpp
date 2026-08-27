@@ -1,5 +1,7 @@
 #include "display_manager.h"
 #include "touch.h"
+#include "ui/ui.h"
+#include "ui/vars.h"
 #include <lvgl.h>
 
 // Hardware DVI Display Instance
@@ -12,35 +14,6 @@ static lv_color_t lvgl_buf[SCREEN_WIDTH * LVGL_BUF_LINES];
 static lv_disp_draw_buf_t draw_buf;
 static lv_disp_drv_t disp_drv;
 static lv_indev_drv_t indev_drv;
-
-// UI Demo Widgets
-static lv_obj_t *lbl_slider_val = NULL;
-static lv_obj_t *lbl_btn_cnt = NULL;
-static lv_obj_t *lbl_touch_info = NULL;
-static lv_obj_t *lbl_uptime = NULL;
-static lv_obj_t *demo_arc = NULL;
-static uint32_t btn_click_count = 0;
-
-static void slider_event_cb(lv_event_t *e) {
-  lv_obj_t *slider = lv_event_get_target(e);
-  int32_t val = lv_slider_get_value(slider);
-  if (lbl_slider_val) {
-    lv_label_set_text_fmt(lbl_slider_val, "Setpoint: %d °C", (int)val);
-  }
-  if (demo_arc) {
-    lv_arc_set_value(demo_arc, val);
-  }
-}
-
-static void btn_event_cb(lv_event_t *e) {
-  lv_event_code_t code = lv_event_get_code(e);
-  if (code == LV_EVENT_CLICKED) {
-    btn_click_count++;
-    if (lbl_btn_cnt) {
-      lv_label_set_text_fmt(lbl_btn_cnt, "Clicks: %d", (int)btn_click_count);
-    }
-  }
-}
 
 /**
  * @brief LVGL flush callback rendering drawn buffers to the PicoDVI
@@ -66,11 +39,6 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
       data->point.x = touch_last_x;
       data->point.y = touch_last_y;
 
-      if (lbl_touch_info) {
-        lv_label_set_text_fmt(lbl_touch_info, "Touch: X=%d Y=%d", touch_last_x,
-                              touch_last_y);
-      }
-
       static uint32_t last_touch_log = 0;
       if (millis() - last_touch_log > 200) {
         last_touch_log = millis();
@@ -87,101 +55,10 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
   }
 }
 
-static void create_test_ui() {
-  lv_obj_t *scr = lv_scr_act();
-  lv_obj_set_style_bg_color(scr, lv_color_hex(0x0E131A), 0);
-
-  // 1. Header Container
-  lv_obj_t *header = lv_obj_create(scr);
-  lv_obj_set_size(header, 220, 48);
-  lv_obj_align(header, LV_ALIGN_TOP_MID, 0, 8);
-  lv_obj_set_style_bg_color(header, lv_color_hex(0x18202C), 0);
-  lv_obj_set_style_border_color(header, lv_color_hex(0x00E5FF), 0);
-  lv_obj_set_style_border_width(header, 1, 0);
-  lv_obj_set_style_radius(header, 6, 0);
-  lv_obj_set_style_pad_all(header, 4, 0);
-
-  lv_obj_t *title = lv_label_create(header);
-  lv_label_set_text(title, "TEJASVINI");
-  lv_obj_set_style_text_color(title, lv_color_hex(0x00E5FF), 0);
-  lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 0);
-
-  lv_obj_t *subtitle = lv_label_create(header);
-  lv_label_set_text(subtitle, "240x400 Test UI");
-  lv_obj_set_style_text_color(subtitle, lv_color_hex(0x8A99AD), 0);
-  lv_obj_align(subtitle, LV_ALIGN_BOTTOM_MID, 0, 0);
-
-  // 2. Arc Gauge (Temperature / Setpoint display)
-  demo_arc = lv_arc_create(scr);
-  lv_obj_set_size(demo_arc, 116, 116);
-  lv_obj_align(demo_arc, LV_ALIGN_TOP_MID, 0, 64);
-  lv_arc_set_range(demo_arc, 0, 250);
-  lv_arc_set_value(demo_arc, 150);
-  lv_obj_set_style_arc_color(demo_arc, lv_color_hex(0x222C3A), LV_PART_MAIN);
-  lv_obj_set_style_arc_color(demo_arc, lv_color_hex(0xFF5722),
-                             LV_PART_INDICATOR);
-  lv_obj_set_style_arc_width(demo_arc, 8, LV_PART_MAIN);
-  lv_obj_set_style_arc_width(demo_arc, 8, LV_PART_INDICATOR);
-
-  lbl_slider_val = lv_label_create(scr);
-  lv_label_set_text(lbl_slider_val, "Setpoint: 150 °C");
-  lv_obj_set_style_text_color(lbl_slider_val, lv_color_hex(0xFFFFFF), 0);
-  lv_obj_align(lbl_slider_val, LV_ALIGN_TOP_MID, 0, 184);
-
-  // 3. Interactive Slider
-  lv_obj_t *slider = lv_slider_create(scr);
-  lv_obj_set_size(slider, 200, 16);
-  lv_obj_align(slider, LV_ALIGN_TOP_MID, 0, 208);
-  lv_slider_set_range(slider, 0, 250);
-  lv_slider_set_value(slider, 150, LV_ANIM_OFF);
-  lv_obj_set_style_bg_color(slider, lv_color_hex(0x222C3A), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(slider, lv_color_hex(0x00E5FF), LV_PART_INDICATOR);
-  lv_obj_set_style_bg_color(slider, lv_color_hex(0xFFFFFF), LV_PART_KNOB);
-  lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-
-  // 4. Interactive Button
-  lv_obj_t *btn = lv_btn_create(scr);
-  lv_obj_set_size(btn, 200, 42);
-  lv_obj_align(btn, LV_ALIGN_TOP_MID, 0, 238);
-  lv_obj_set_style_bg_color(btn, lv_color_hex(0x00B0FF), 0);
-  lv_obj_set_style_radius(btn, 8, 0);
-  lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL);
-
-  lbl_btn_cnt = lv_label_create(btn);
-  lv_label_set_text(lbl_btn_cnt, "Touch Test: 0");
-  lv_obj_set_style_text_color(lbl_btn_cnt, lv_color_hex(0xFFFFFF), 0);
-  lv_obj_center(lbl_btn_cnt);
-
-  // 5. Info & Touch Panel
-  lv_obj_t *info_panel = lv_obj_create(scr);
-  lv_obj_set_size(info_panel, 210, 95);
-  lv_obj_align(info_panel, LV_ALIGN_BOTTOM_MID, 0, -10);
-  lv_obj_set_style_bg_color(info_panel, lv_color_hex(0x141B24), 0);
-  lv_obj_set_style_border_color(info_panel, lv_color_hex(0x283548), 0);
-  lv_obj_set_style_border_width(info_panel, 1, 0);
-  lv_obj_set_style_radius(info_panel, 6, 0);
-  lv_obj_set_style_pad_all(info_panel, 6, 0);
-
-  lbl_touch_info = lv_label_create(info_panel);
-  lv_label_set_text(lbl_touch_info, "Touch: Untouched");
-  lv_obj_set_style_text_color(lbl_touch_info, lv_color_hex(0x00FF88), 0);
-  lv_obj_align(lbl_touch_info, LV_ALIGN_TOP_LEFT, 0, 0);
-
-  lbl_uptime = lv_label_create(info_panel);
-  lv_label_set_text(lbl_uptime, "Uptime: 0s");
-  lv_obj_set_style_text_color(lbl_uptime, lv_color_hex(0xCCD6E0), 0);
-  lv_obj_align(lbl_uptime, LV_ALIGN_TOP_LEFT, 0, 24);
-
-  lv_obj_t *lbl_res = lv_label_create(info_panel);
-  lv_label_set_text(lbl_res, "Res: 240x400 (400x240 DVI)");
-  lv_obj_set_style_text_color(lbl_res, lv_color_hex(0x7A889B), 0);
-  lv_obj_align(lbl_res, LV_ALIGN_TOP_LEFT, 0, 48);
-}
-
 void display_manager_init() {
-  Serial.println("[Display] Initializing PicoDVI display & Test LVGL UI "
+  Serial.println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
                  "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
-  Serial1.println("[Display] Initializing PicoDVI display & Test LVGL UI "
+  Serial1.println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
                   "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
 
   // 1. Setup backlight pin (Active LOW)
@@ -215,11 +92,11 @@ void display_manager_init() {
   indev_drv.read_cb = touch_read_cb;
   lv_indev_drv_register(&indev_drv);
 
-  // 6. Build Test LVGL UI
-  create_test_ui();
+  // 6. Initialize EEZ Studio UI & load main screen
+  ui_init();
 
-  Serial.println("[Display] Test LVGL 240x400 UI created successfully.");
-  Serial1.println("[Display] Test LVGL 240x400 UI created successfully.");
+  Serial.println("[Display] EEZ Studio UI initialized successfully.");
+  Serial1.println("[Display] EEZ Studio UI initialized successfully.");
 }
 
 void display_manager_update(bool force_redraw) {
@@ -234,15 +111,7 @@ void display_manager_update(bool force_redraw) {
   last_tick = now;
 #endif
 
-  static uint32_t last_ui_update = 0;
-  if (millis() - last_ui_update > 1000) {
-    last_ui_update = millis();
-    if (lbl_uptime) {
-      lv_label_set_text_fmt(lbl_uptime, "Uptime: %lus",
-                            (unsigned long)(millis() / 1000));
-    }
-  }
-
+  ui_tick();
   lv_timer_handler();
 }
 
@@ -253,7 +122,7 @@ static char g_ui_status[32] = "IDLE";
 static int32_t g_selected_tab = 0;
 
 /**
- * @brief Native variable getter for UI status label.
+ * @brief Native variable getter for EEZ Studio UI status label.
  */
 const char *get_var_status() {
   HeatbedStatus st = get_system_status();
@@ -267,7 +136,7 @@ const char *get_var_status() {
 }
 
 /**
- * @brief Native variable setter for UI status label.
+ * @brief Native variable setter for EEZ Studio UI status label.
  */
 void set_var_status(const char *value) {
   if (value) {

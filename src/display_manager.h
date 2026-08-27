@@ -3,8 +3,8 @@
 
 #include "config.h"
 #include "thermal_control.h"
-#include "ui/src/ui/ui.h"
-#include "ui/src/ui/vars.h"
+#include "ui/ui.h"
+#include "ui/vars.h"
 #include <Arduino.h>
 #include <PicoDVI.h>
 
