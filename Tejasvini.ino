@@ -3,10 +3,10 @@
  * Open-Source Heatplate Controller for SMT Reflow Soldering
  *
  * Board:   Raspberry Pi Pico (RP2040)
- * Display: Elecrow CrowPanel RTD2281 4.3" Pico DVI Display (400x240 / 800x480 Scaled)
- * Sensor:  100K NTC Thermistor (ADC2, GPIO 28)
- * Output:  3.3V Logic Solid State Relay PWM (GPIO 22)
- * Input:   Rotary Encoder with Push-Button & Touchscreen (GT911)
+ * Display: Elecrow CrowPanel RTD2281 4.3" Pico DVI Display (400x240 / 800x480
+ * Scaled) Sensor:  100K NTC Thermistor (ADC2, GPIO 28) Output:  3.3V Logic
+ * Solid State Relay PWM (GPIO 22) Input:   Rotary Encoder with Push-Button &
+ * Touchscreen (GT911)
  ******************************************************************************/
 
 #include "src/config.h"

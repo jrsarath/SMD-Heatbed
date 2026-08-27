@@ -172,3 +172,57 @@ void set_var_nav_info(bool value) {
   if (value)
     g_selected_tab = 3;
 }
+
+// Static target temperature string buffer for UI
+static char g_ui_target_temp[32] = "0";
+
+/**
+ * @brief Native variable getter for EEZ Studio UI target temperature label.
+ * Returns target temperature formatted as a string (e.g. "270").
+ */
+const char *get_var_target_temp() {
+  int target = get_desired_temp();
+  snprintf(g_ui_target_temp, sizeof(g_ui_target_temp), "%d", target);
+  return g_ui_target_temp;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI target temperature label.
+ */
+void set_var_target_temp(const char *value) {
+  if (value) {
+    strncpy(g_ui_target_temp, value, sizeof(g_ui_target_temp) - 1);
+    g_ui_target_temp[sizeof(g_ui_target_temp) - 1] = '\0';
+    int temp = atoi(value);
+    if (temp > 0) {
+      set_desired_temp(temp);
+    }
+  }
+}
+
+// Static current temperature string buffer for UI
+static char g_ui_current_temp[32] = "0";
+
+/**
+ * @brief Native variable getter for EEZ Studio UI current temperature label.
+ * Returns measured temperature formatted as a string (e.g. "25").
+ */
+const char *get_var_current_temp() {
+  float current = get_measured_temp();
+  int temp_int = (int)(current >= 0 ? (current + 0.5f) : (current - 0.5f));
+  snprintf(g_ui_current_temp, sizeof(g_ui_current_temp), "%d", temp_int);
+  return g_ui_current_temp;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI current temperature label.
+ */
+void set_var_current_temp(const char *value) {
+  if (value) {
+    strncpy(g_ui_current_temp, value, sizeof(g_ui_current_temp) - 1);
+    g_ui_current_temp[sizeof(g_ui_current_temp) - 1] = '\0';
+  }
+}
+
+
+

@@ -16,7 +16,9 @@ enum FlowGlobalVariables {
     FLOW_GLOBAL_VARIABLE_NAV_HOME = 0,
     FLOW_GLOBAL_VARIABLE_NAV_PROFILES = 1,
     FLOW_GLOBAL_VARIABLE_NAV_MANUAL = 2,
-    FLOW_GLOBAL_VARIABLE_NAV_INFO = 3
+    FLOW_GLOBAL_VARIABLE_NAV_INFO = 3,
+    FLOW_GLOBAL_VARIABLE_TARGET_TEMP = 4,
+    FLOW_GLOBAL_VARIABLE_CURRENT_TEMP = 5
 };
 
 // Native global variables
@@ -31,6 +33,10 @@ extern bool get_var_nav_manual();
 extern void set_var_nav_manual(bool value);
 extern bool get_var_nav_info();
 extern void set_var_nav_info(bool value);
+extern const char *get_var_target_temp();
+extern void set_var_target_temp(const char *value);
+extern const char *get_var_current_temp();
+extern void set_var_current_temp(const char *value);
 
 #ifdef __cplusplus
 }
