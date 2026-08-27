@@ -537,10 +537,21 @@ This document serves as a persistent step-by-step implementation log to track co
   - [`src/config.h`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/config.h): `DISPLAY_WIDTH = 400`, `DISPLAY_HEIGHT = 240`, `SCREEN_WIDTH = 240`, `SCREEN_HEIGHT = 400`, `DISPLAY_ASPECT_COMPENSATION = 0`.
   - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/display_manager.cpp): Verified `DVIGFX16` declaration with `VREG_VOLTAGE_1_25`, updated buffer comments (`3840` bytes) and startup diagnostic logging to 240×400 (400×240 @ 60Hz).
   - [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.cpp): Updated coordinate comments and mapping math to 400×240 physical / 240×400 LVGL portrait.
-  - [`src/ui/src/ui/screens.c`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/ui/src/ui/screens.c): Updated top-level screen containers to `240x400` across all screens.
-  - [`src/ui/ui.eez-project`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/ui/ui.eez-project): Updated project display width/height and screen dimensions to `240x400`.
-  - [`Tejasvini.ino`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/Tejasvini.ino), [`AGENTS.md`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/AGENTS.md), [`README.md`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/README.md).
 - **Checkpoint Status:** CHECKPOINT #29 (PicoDVI 400×240 Migration Completed & Logged).
+
+---
+
+### Entry #034 — Restored EEZ Studio UI at Verified 240×400 Resolution
+- **Date & Time:** 2026-08-28 00:03:00 IST
+- **Goal:** Re-integrate the full multi-screen EEZ Studio UI project onto the confirmed working 240×400 portrait PicoDVI foundation.
+- **Files Modified:**
+  - [`src/config.h`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/config.h): `SCREEN_WIDTH = 240`, `SCREEN_HEIGHT = 400`.
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/display_manager.cpp): Re-integrated `ui_init()`, `ui_tick()`, `lv_timer_handler()`, and native variable getters/setters (`get_var_status`, `get_var_nav_*`).
+  - [`src/ui/src/ui/screens.c`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/ui/src/ui/screens.c): Configured screen root containers to `240x400` across Main, Profiles, Manual, Info, and separator lines.
+  - [`src/ui/ui.eez-project`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/ui/ui.eez-project): Updated `displayWidth` to `240` and screen widths to `240`.
+  - [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.cpp): Updated coordinate comments and bounding constraints for `240x400`.
+- **Checkpoint Status:** CHECKPOINT #30 (EEZ Studio UI Integration on 240×400 PicoDVI Verified).
+
 
 
 

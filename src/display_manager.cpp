@@ -1,5 +1,8 @@
 #include "display_manager.h"
 #include "touch.h"
+#include "ui/src/ui/ui.h"
+#include "ui/src/ui/vars.h"
+#include <lvgl.h>
 
 // Hardware DVI Display Instance
 static DVIGFX16 display(DVI_RES_400x240p60, picodvi_dvi_cfg, VREG_VOLTAGE_1_25);
@@ -52,9 +55,9 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 }
 
 void display_manager_init() {
-  Serial.println("[Display] Initializing PicoDVI display & LVGL v8.4.0 UI "
+  Serial.println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
                  "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
-  Serial1.println("[Display] Initializing PicoDVI display & LVGL v8.4.0 UI "
+  Serial1.println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
                   "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
 
   // 1. Setup backlight pin (Active LOW)
@@ -66,8 +69,7 @@ void display_manager_init() {
     Serial.println("[Display] ERROR: display.begin() failed!");
     Serial1.println("[Display] ERROR: display.begin() failed!");
   }
-  display.setRotation(DISPLAY_ROTATION); // 270° rotation for Portrait mode
-                                         // (240x400, right-side up)
+  display.setRotation(DISPLAY_ROTATION); // 270° rotation for Portrait mode (240x400)
 
   // 3. Initialize LVGL core
   lv_init();
