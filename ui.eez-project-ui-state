@@ -1,10 +1,8 @@
 {
   "navigation": {
     "selectedUserPageObject": "[ui.eez-project]:/userPages/0",
-    "selectedUserWidgetObject": "[ui.eez-project]:/userWidgets/0",
-    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/0",
-    "selectedEnumObject": "[ui.eez-project]:/variables/enums/0",
-    "selectedStyleObject": "[ui.eez-project]:/lvglStyles/styles/6",
+    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/14",
+    "selectedStyleObject": "[ui.eez-project]:/lvglStyles/styles/7",
     "selectedThemeObject": "[ui.eez-project]:/themes/0",
     "selectedThemeColorObject": "[ui.eez-project]:/colors/4",
     "subnavigationSelectedItems": {
@@ -29,7 +27,7 @@
           },
           {
             "type": "border",
-            "selected": 1,
+            "selected": 0,
             "size": 240,
             "location": "right",
             "children": [
@@ -196,30 +194,17 @@
               "type": "tabset",
               "id": "EDITORS",
               "weight": 47.65625000000001,
-              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
-                  "id": "#4f2160dc-6604-4647-a101-ad1309a82cf2",
-                  "name": "Settings",
-                  "component": "editor",
-                  "config": {
-                    "objectPath": "[ui.eez-project]:/settings",
-                    "subObjectPath": "[ui.eez-project]:/settings",
-                    "permanent": false
-                  },
-                  "icon": "material:settings"
-                },
-                {
-                  "type": "tab",
-                  "id": "#9f8fe7d1-ca9a-4002-9d46-030ca31288ac",
+                  "id": "#65a8ab31-4c02-440c-82d8-9748f19e4cd9",
                   "name": "Main",
                   "component": "editor",
                   "config": {
                     "objectPath": "[ui.eez-project]:/userPages/0",
-                    "permanent": true
+                    "permanent": false
                   },
                   "icon": "svg:page"
                 }
@@ -258,14 +243,6 @@
                       "component": "componentsPalette",
                       "enableClose": false,
                       "icon": "svg:components"
-                    },
-                    {
-                      "type": "tab",
-                      "id": "BREAKPOINTS_PALETTE",
-                      "name": "Breakpoints",
-                      "component": "breakpointsPanel",
-                      "enableClose": false,
-                      "icon": "svg:breakpoints_panel"
                     }
                   ]
                 }
@@ -434,8 +411,7 @@
                       "enableClose": false,
                       "icon": "material:code"
                     }
-                  ],
-                  "active": true
+                  ]
                 },
                 {
                   "type": "tabset",
@@ -478,7 +454,7 @@
               "children": [
                 {
                   "type": "tab",
-                  "id": "#1252c6d5-1599-4dc3-843c-a33cd9278262",
+                  "id": "#925d859a-b992-43b7-a799-b678221c5ffc",
                   "name": "Main",
                   "component": "editor",
                   "config": {
@@ -487,7 +463,8 @@
                   },
                   "icon": "svg:page"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "row",
@@ -1097,13 +1074,33 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "0": {}
+          "0": {
+            "0": {
+              "1": {
+                "1": {}
+              }
+            },
+            "1": {
+              "0": {}
+            },
+            "3": {},
+            "4": {
+              "0": {
+                "0": {}
+              },
+              "2": {
+                "0": {}
+              },
+              "4": {}
+            },
+            "$selected": true
+          }
         }
       },
       "transform": {
         "translate": {
-          "x": -124,
-          "y": -63
+          "x": -40.06714285714284,
+          "y": -141.86428571428576
         },
         "scale": 1
       },
@@ -1121,7 +1118,13 @@
       "3": {},
       "4": {},
       "5": {},
-      "6": {
+      "6": {},
+      "7": {
+        "$selected": true
+      },
+      "8": {},
+      "9": {},
+      "12": {
         "$selected": true
       }
     },
@@ -1137,7 +1140,7 @@
           "x": -120,
           "y": -160
         },
-        "scale": 1
+        "scale": 1.25
       },
       "timeline": {
         "isEditorActive": false,
@@ -1149,14 +1152,16 @@
     "[ui.eez-project]:/userWidgets/1[flow-state]": {
       "selectionFront": {},
       "selectionBack": {
-        "0": {}
+        "0": {
+          "1": {}
+        }
       },
       "transform": {
         "translate": {
           "x": -120,
           "y": -160
         },
-        "scale": 1
+        "scale": 1.25
       },
       "timeline": {
         "isEditorActive": false,
@@ -1167,13 +1172,24 @@
     },
     "[ui.eez-project]:/userPages/1[flow-state]": {
       "selectionFront": {},
-      "selectionBack": {},
+      "selectionBack": {
+        "0": {
+          "0": {
+            "1": {
+              "2": {
+                "0": {},
+                "1": {}
+              }
+            }
+          }
+        }
+      },
       "transform": {
         "translate": {
-          "x": -120,
-          "y": -160
+          "x": -91.66666666666674,
+          "y": -256.6666666666667
         },
-        "scale": 1
+        "scale": 1.25
       },
       "timeline": {
         "isEditorActive": false,
@@ -1208,7 +1224,13 @@
     "[ui.eez-project]:/userPages/3[flow-state]": {
       "selectionFront": {},
       "selectionBack": {
-        "0": {}
+        "0": {
+          "0": {
+            "1": {
+              "1": {}
+            }
+          }
+        }
       },
       "transform": {
         "translate": {
@@ -1251,7 +1273,7 @@
           "x": -120,
           "y": -160
         },
-        "scale": 1
+        "scale": 1.25
       },
       "timeline": {
         "isEditorActive": false,
@@ -1276,7 +1298,7 @@
   "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "PADDING"
+    "BACKGROUND"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,

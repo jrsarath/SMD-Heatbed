@@ -180,7 +180,7 @@ static char g_ui_target_temp[32] = "0";
  * @brief Native variable getter for EEZ Studio UI target temperature label.
  * Returns target temperature formatted as a string (e.g. "270").
  */
-const char *get_var_target_temp() {
+const char *get_var_target_temp_str() {
   int target = get_desired_temp();
   snprintf(g_ui_target_temp, sizeof(g_ui_target_temp), "%d", target);
   return g_ui_target_temp;
@@ -189,7 +189,7 @@ const char *get_var_target_temp() {
 /**
  * @brief Native variable setter for EEZ Studio UI target temperature label.
  */
-void set_var_target_temp(const char *value) {
+void set_var_target_temp_str(const char *value) {
   if (value) {
     strncpy(g_ui_target_temp, value, sizeof(g_ui_target_temp) - 1);
     g_ui_target_temp[sizeof(g_ui_target_temp) - 1] = '\0';
@@ -200,6 +200,22 @@ void set_var_target_temp(const char *value) {
   }
 }
 
+/**
+ * @brief Native variable getter for EEZ Studio UI target temperature numeric
+ * value.
+ */
+int32_t get_var_target_temp_val() { return (int32_t)get_desired_temp(); }
+
+/**
+ * @brief Native variable setter for EEZ Studio UI target temperature numeric
+ * value.
+ */
+void set_var_target_temp_val(int32_t value) {
+  if (value > 0) {
+    set_desired_temp(value);
+  }
+}
+
 // Static current temperature string buffer for UI
 static char g_ui_current_temp[32] = "0";
 
@@ -207,7 +223,7 @@ static char g_ui_current_temp[32] = "0";
  * @brief Native variable getter for EEZ Studio UI current temperature label.
  * Returns measured temperature formatted as a string (e.g. "25").
  */
-const char *get_var_current_temp() {
+const char *get_var_current_temp_str() {
   float current = get_measured_temp();
   int temp_int = (int)(current >= 0 ? (current + 0.5f) : (current - 0.5f));
   snprintf(g_ui_current_temp, sizeof(g_ui_current_temp), "%d", temp_int);
@@ -217,12 +233,27 @@ const char *get_var_current_temp() {
 /**
  * @brief Native variable setter for EEZ Studio UI current temperature label.
  */
-void set_var_current_temp(const char *value) {
+void set_var_current_temp_str(const char *value) {
   if (value) {
     strncpy(g_ui_current_temp, value, sizeof(g_ui_current_temp) - 1);
     g_ui_current_temp[sizeof(g_ui_current_temp) - 1] = '\0';
   }
 }
+
+/**
+ * @brief Native variable getter for EEZ Studio UI current temperature numeric
+ * value (Arc).
+ */
+int32_t get_var_current_temp_val() {
+  float current = get_measured_temp();
+  return (int32_t)(current >= 0 ? (current + 0.5f) : (current - 0.5f));
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI current temperature numeric
+ * value.
+ */
+void set_var_current_temp_val(int32_t value) { (void)value; }
 
 // Static buffers for UI telemetry and profile variables
 static char g_ui_heater_state[16] = "OFF";
@@ -274,7 +305,7 @@ void set_var_heater_status(const char *value) {
  * @brief Native variable getter for EEZ Studio UI output duty cycle percentage
  * label.
  */
-const char *get_var_output_percentage() {
+const char *get_var_output_percentage_str() {
   float duty = get_duty_cycle();
   snprintf(g_ui_output_percentage, sizeof(g_ui_output_percentage), "%d%%",
            (int)(duty + 0.5f));
@@ -285,12 +316,26 @@ const char *get_var_output_percentage() {
  * @brief Native variable setter for EEZ Studio UI output duty cycle percentage
  * label.
  */
-void set_var_output_percentage(const char *value) {
+void set_var_output_percentage_str(const char *value) {
   if (value) {
     strncpy(g_ui_output_percentage, value, sizeof(g_ui_output_percentage) - 1);
     g_ui_output_percentage[sizeof(g_ui_output_percentage) - 1] = '\0';
   }
 }
+
+/**
+ * @brief Native variable getter for EEZ Studio UI output duty cycle numeric
+ * percentage.
+ */
+int32_t get_var_output_percentage_val() {
+  return (int32_t)(get_duty_cycle() + 0.5f);
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI output duty cycle numeric
+ * percentage.
+ */
+void set_var_output_percentage_val(int32_t value) { (void)value; }
 
 /**
  * @brief Native variable getter for EEZ Studio UI profile label.
@@ -304,5 +349,33 @@ void set_var_profile(const char *value) {
   if (value) {
     strncpy(g_ui_profile, value, sizeof(g_ui_profile) - 1);
     g_ui_profile[sizeof(g_ui_profile) - 1] = '\0';
+  }
+}
+
+// Static buffer for UI uptime string
+static char g_ui_uptime[32] = "00:00:00";
+
+/**
+ * @brief Native variable getter for EEZ Studio UI uptime label.
+ * Returns system uptime formatted as "HH:MM:SS" (e.g. "01:23:45").
+ */
+const char *get_var_uptime() {
+  uint32_t total_sec = millis() / 1000UL;
+  uint32_t sec = total_sec % 60UL;
+  uint32_t min = (total_sec / 60UL) % 60UL;
+  uint32_t hr = total_sec / 3600UL;
+
+  snprintf(g_ui_uptime, sizeof(g_ui_uptime), "%02lu:%02lu:%02lu",
+           (unsigned long)hr, (unsigned long)min, (unsigned long)sec);
+  return g_ui_uptime;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI uptime label.
+ */
+void set_var_uptime(const char *value) {
+  if (value) {
+    strncpy(g_ui_uptime, value, sizeof(g_ui_uptime) - 1);
+    g_ui_uptime[sizeof(g_ui_uptime) - 1] = '\0';
   }
 }

@@ -1,7 +1,7 @@
 #ifndef EEZ_LVGL_UI_STYLES_H
 #define EEZ_LVGL_UI_STYLES_H
 
-#include <lvgl.h>
+#include <lvgl/lvgl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,14 +49,10 @@ void add_style_button_primary(lv_obj_t *obj);
 void remove_style_button_primary(lv_obj_t *obj);
 
 // Style: Button Secondary
+lv_style_t *get_style_button_secondary_MAIN_DEFAULT();
+lv_style_t *get_style_button_secondary_MAIN_PRESSED();
 void add_style_button_secondary(lv_obj_t *obj);
 void remove_style_button_secondary(lv_obj_t *obj);
-
-// Style: Button Navigation
-lv_style_t *get_style_button_navigation_MAIN_DEFAULT();
-lv_style_t *get_style_button_navigation_MAIN_CHECKED_PRESSED();
-void add_style_button_navigation(lv_obj_t *obj);
-void remove_style_button_navigation(lv_obj_t *obj);
 
 // Style: Seperator
 lv_style_t *get_style_seperator_MAIN_DEFAULT();

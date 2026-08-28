@@ -48,7 +48,7 @@
 #define REF_STEP 0.05f // Soft-start reference ramping step per cycle (°C)
 
 // NTC Voltage Divider Specifications
-#define R_DIVIDER 2200.0f       // Series resistor value (Ohms)
+#define R_DIVIDER 1000.0f       // Series resistor value (Ohms)
 #define R0_THERMISTOR 100000.0f // Thermistor nominal resistance at T0 (Ohms)
 #define BETA_COEFF 3950.0f      // Thermistor Beta coefficient (K)
 #define T0_KELVIN 298.15f // Nominal reference temperature (25°C in Kelvin)
