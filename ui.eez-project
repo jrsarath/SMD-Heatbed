@@ -1073,8 +1073,8 @@
                                   "type": "LVGLLabelWidget",
                                   "left": 0,
                                   "top": 0,
-                                  "width": 8,
-                                  "height": 16,
+                                  "width": 11,
+                                  "height": 21,
                                   "customInputs": [],
                                   "customOutputs": [],
                                   "style": {
@@ -1101,6 +1101,7 @@
                                   "checkedStateType": "literal",
                                   "disabledStateType": "literal",
                                   "states": "",
+                                  "useStyle": "Text XL",
                                   "localStyles": {
                                     "objID": "9c65649b-8f58-4432-a46a-ab1fa502f13b",
                                     "definition": {
@@ -1173,9 +1174,9 @@
                                   "objID": "dd6e2d86-3fe4-45cb-c649-64521dc2c0b2",
                                   "type": "LVGLLabelWidget",
                                   "left": 0,
-                                  "top": 0,
-                                  "width": 5,
-                                  "height": 16,
+                                  "top": -1,
+                                  "width": 7,
+                                  "height": 21,
                                   "customInputs": [],
                                   "customOutputs": [],
                                   "style": {
@@ -1202,6 +1203,7 @@
                                   "checkedStateType": "literal",
                                   "disabledStateType": "literal",
                                   "states": "",
+                                  "useStyle": "Text XL",
                                   "localStyles": {
                                     "objID": "26a2d86a-ac2c-402e-8a24-4fc4f8373296",
                                     "definition": {
