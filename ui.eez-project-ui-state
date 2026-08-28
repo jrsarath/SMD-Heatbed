@@ -2,10 +2,13 @@
   "navigation": {
     "selectedUserPageObject": "[ui.eez-project]:/userPages/0",
     "selectedActionObject": "[ui.eez-project]:/actions/3",
-    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/18",
+    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/-1",
+    "selectedEnumObject": "[ui.eez-project]:/variables/enums/-1",
     "selectedStyleObject": "[ui.eez-project]:/lvglStyles/styles/8",
     "selectedThemeObject": "[ui.eez-project]:/themes/0",
     "selectedThemeColorObject": "[ui.eez-project]:/colors/4",
+    "selectedFontObject": "[ui.eez-project]:/fonts/2",
+    "selectedGlyphObject": "[ui.eez-project]:/fonts/0/glyphs/2",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -28,7 +31,7 @@
           },
           {
             "type": "border",
-            "selected": 0,
+            "selected": 1,
             "size": 240,
             "location": "right",
             "children": [
@@ -129,7 +132,6 @@
                   "type": "tabset",
                   "id": "#2c11e9b2-0154-45d3-a545-dacd311d617a",
                   "weight": 1,
-                  "selected": 2,
                   "enableClose": false,
                   "children": [
                     {
@@ -196,10 +198,24 @@
               "type": "tabset",
               "id": "EDITORS",
               "weight": 47.65625000000001,
-              "selected": 1,
+              "selected": 2,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
+                {
+                  "type": "tab",
+                  "id": "#03d4f85f-d7dc-4665-934a-884c1e4b2a91",
+                  "name": "FONTAWESOME_14",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[ui.eez-project]:/fonts/1",
+                    "params": {
+                      "forceOpenEditor": true
+                    },
+                    "permanent": false
+                  },
+                  "icon": "material:font_download"
+                },
                 {
                   "type": "tab",
                   "id": "#9ea4e7da-e0d2-4bf5-a487-d164cd16b0e4",
@@ -702,7 +718,8 @@
                   "component": "glyphs",
                   "enableClose": false
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "tabset",
@@ -1093,29 +1110,38 @@
             "0": {
               "1": {
                 "0": {
-                  "0": {}
+                  "0": {},
+                  "1": {}
                 },
                 "1": {}
               }
             },
             "1": {
-              "0": {}
+              "0": {
+                "1": {}
+              }
             },
             "2": {
               "0": {
                 "0": {
-                  "0": {}
+                  "0": {
+                    "1": {
+                      "0": {}
+                    }
+                  }
                 }
+              },
+              "2": {
+                "4": {}
               }
             },
             "3": {
-              "0": {},
-              "2": {}
+              "1": {
+                "1": {}
+              }
             },
             "4": {
-              "0": {
-                "0": {}
-              },
+              "0": {},
               "2": {
                 "0": {}
               },
@@ -1129,8 +1155,8 @@
       },
       "transform": {
         "translate": {
-          "x": -40.06714285714284,
-          "y": -141.86428571428576
+          "x": -120,
+          "y": -200
         },
         "scale": 1
       },
@@ -1330,11 +1356,13 @@
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
     "MISCELLANEOUS",
-    "LAYOUT",
-    "TEXT"
+    "PADDING",
+    "TEXT",
+    "LAYOUT"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
   "flowZoom": 1,
-  "implementationLanguage": "C"
+  "implementationLanguage": "C",
+  "openDialogDefaultPath": "/Users/jrsarath/Downloads/FontAwesome5-Solid+Brands+Regular.woff"
 }
