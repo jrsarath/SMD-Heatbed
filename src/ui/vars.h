@@ -13,20 +13,7 @@ extern "C" {
 // Flow global variables
 
 enum FlowGlobalVariables {
-    FLOW_GLOBAL_VARIABLE_NAV_HOME = 0,
-    FLOW_GLOBAL_VARIABLE_NAV_PROFILES = 1,
-    FLOW_GLOBAL_VARIABLE_NAV_MANUAL = 2,
-    FLOW_GLOBAL_VARIABLE_NAV_INFO = 3,
-    FLOW_GLOBAL_VARIABLE_TARGET_TEMP_STR = 4,
-    FLOW_GLOBAL_VARIABLE_CURRENT_TEMP_STR = 5,
-    FLOW_GLOBAL_VARIABLE_HEATER_STATE = 6,
-    FLOW_GLOBAL_VARIABLE_HEATER_STATUS = 7,
-    FLOW_GLOBAL_VARIABLE_OUTPUT_PERCENTAGE_STR = 8,
-    FLOW_GLOBAL_VARIABLE_PROFILE = 9,
-    FLOW_GLOBAL_VARIABLE_CURRENT_TEMP_VAL = 10,
-    FLOW_GLOBAL_VARIABLE_TARGET_TEMP_VAL = 11,
-    FLOW_GLOBAL_VARIABLE_OUTPUT_PERCENTAGE_VAL = 12,
-    FLOW_GLOBAL_VARIABLE_UPTIME = 13
+    FLOW_GLOBAL_VARIABLE_NONE
 };
 
 // Native global variables
@@ -61,6 +48,14 @@ extern int32_t get_var_output_percentage_val();
 extern void set_var_output_percentage_val(int32_t value);
 extern const char *get_var_uptime();
 extern void set_var_uptime(const char *value);
+extern const char *get_var_heating_button_str();
+extern void set_var_heating_button_str(const char *value);
+extern const char *get_var_ntc_status();
+extern void set_var_ntc_status(const char *value);
+extern const char *get_var_controller();
+extern void set_var_controller(const char *value);
+extern const char *get_var_build();
+extern void set_var_build(const char *value);
 
 #ifdef __cplusplus
 }

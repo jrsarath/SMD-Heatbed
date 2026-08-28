@@ -1,5 +1,6 @@
 #include "display_manager.h"
 #include "touch.h"
+#include "ui/screens.h"
 #include "ui/ui.h"
 #include "ui/vars.h"
 #include <lvgl.h>
@@ -256,16 +257,18 @@ int32_t get_var_current_temp_val() {
 void set_var_current_temp_val(int32_t value) { (void)value; }
 
 // Static buffers for UI telemetry and profile variables
-static char g_ui_heater_state[16] = "OFF";
-static char g_ui_heater_status[32] = "IDLE";
+static char g_ui_heater_state[16] = "STANDBY";
+static char g_ui_heater_status[32] = "Heater is inactive";
 static char g_ui_output_percentage[16] = "0%";
-static char g_ui_profile[32] = "Manual";
+static char g_ui_profile[32] = "MANUAL";
 
 /**
  * @brief Native variable getter for EEZ Studio UI heater state label ("ON" /
  * "OFF").
  */
-const char *get_var_heater_state() { return is_heater_on() ? "ON" : "OFF"; }
+const char *get_var_heater_state() {
+  return is_heater_on() ? "HEATING" : "STANDBY";
+}
 
 /**
  * @brief Native variable setter for EEZ Studio UI heater state label.
@@ -283,12 +286,12 @@ void set_var_heater_state(const char *value) {
 const char *get_var_heater_status() {
   HeatbedStatus st = get_system_status();
   if (st == STATUS_NTC_ERROR) {
-    return "ERROR";
+    return "NTC error";
   }
   if (st == STATUS_HEATING) {
-    return "HEATING";
+    return "Heater is active";
   }
-  return "IDLE";
+  return "Heater at standby";
 }
 
 /**
@@ -377,5 +380,152 @@ void set_var_uptime(const char *value) {
   if (value) {
     strncpy(g_ui_uptime, value, sizeof(g_ui_uptime) - 1);
     g_ui_uptime[sizeof(g_ui_uptime) - 1] = '\0';
+  }
+}
+
+// Static buffer for UI heating button label
+static char g_ui_heating_button_str[32] = "START HEATING";
+
+/**
+ * @brief Native variable getter for EEZ Studio UI heating button label.
+ * Returns "STOP HEATING" if heater is ON, otherwise "START HEATING".
+ */
+const char *get_var_heating_button_str() {
+  if (is_heater_on()) {
+    strncpy(g_ui_heating_button_str, "STOP HEATING",
+            sizeof(g_ui_heating_button_str) - 1);
+  } else {
+    strncpy(g_ui_heating_button_str, "START HEATING",
+            sizeof(g_ui_heating_button_str) - 1);
+  }
+  g_ui_heating_button_str[sizeof(g_ui_heating_button_str) - 1] = '\0';
+  return g_ui_heating_button_str;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI heating button label.
+ */
+void set_var_heating_button_str(const char *value) {
+  if (value) {
+    strncpy(g_ui_heating_button_str, value,
+            sizeof(g_ui_heating_button_str) - 1);
+    g_ui_heating_button_str[sizeof(g_ui_heating_button_str) - 1] = '\0';
+  }
+}
+
+// Static buffer for UI NTC status
+static char g_ui_ntc_status[16] = "OK";
+
+/**
+ * @brief Native variable getter for EEZ Studio UI NTC status label.
+ * Returns "OK" if NTC sensor is normal, "ERROR" if faulty or disconnected.
+ * Also dynamically sets text color: COLOR_RED on error, COLOR_GREEN when OK.
+ */
+const char *get_var_ntc_status() {
+  bool is_err = is_error_state() || (get_system_status() == STATUS_NTC_ERROR);
+  if (is_err) {
+    strncpy(g_ui_ntc_status, "ERROR", sizeof(g_ui_ntc_status) - 1);
+  } else {
+    strncpy(g_ui_ntc_status, "OK", sizeof(g_ui_ntc_status) - 1);
+  }
+  g_ui_ntc_status[sizeof(g_ui_ntc_status) - 1] = '\0';
+
+  if (objects.obj24) {
+    if (is_err) {
+      lv_obj_set_style_text_color(
+          objects.obj24,
+          lv_color_hex(theme_colors[active_theme_index][COLOR_ID_COLOR_RED]),
+          LV_PART_MAIN | LV_STATE_DEFAULT);
+    } else {
+      lv_obj_set_style_text_color(
+          objects.obj24,
+          lv_color_hex(theme_colors[active_theme_index][COLOR_ID_COLOR_GREEN]),
+          LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+  }
+
+  return g_ui_ntc_status;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI NTC status label.
+ */
+void set_var_ntc_status(const char *value) {
+  if (value) {
+    strncpy(g_ui_ntc_status, value, sizeof(g_ui_ntc_status) - 1);
+    g_ui_ntc_status[sizeof(g_ui_ntc_status) - 1] = '\0';
+  }
+}
+
+// Static buffers for UI system info variables
+static char g_ui_controller[32] = "RP2040";
+static char g_ui_build[32] = "";
+
+/**
+ * @brief Helper to convert compile month string ("Jan".."Dec") to MM string ("01".."12").
+ */
+static const char *get_build_month() {
+  const char *date = __DATE__;
+  if (strncmp(date, "Jan", 3) == 0) return "01";
+  if (strncmp(date, "Feb", 3) == 0) return "02";
+  if (strncmp(date, "Mar", 3) == 0) return "03";
+  if (strncmp(date, "Apr", 3) == 0) return "04";
+  if (strncmp(date, "May", 3) == 0) return "05";
+  if (strncmp(date, "Jun", 3) == 0) return "06";
+  if (strncmp(date, "Jul", 3) == 0) return "07";
+  if (strncmp(date, "Aug", 3) == 0) return "08";
+  if (strncmp(date, "Sep", 3) == 0) return "09";
+  if (strncmp(date, "Oct", 3) == 0) return "10";
+  if (strncmp(date, "Nov", 3) == 0) return "11";
+  if (strncmp(date, "Dec", 3) == 0) return "12";
+  return "01";
+}
+
+/**
+ * @brief Native variable getter for EEZ Studio UI controller name label.
+ * Returns the MCU / controller architecture string (e.g. "RP2040").
+ */
+const char *get_var_controller() {
+#if defined(ARDUINO_BOARD)
+  strncpy(g_ui_controller, ARDUINO_BOARD, sizeof(g_ui_controller) - 1);
+#elif defined(PICO_BOARD)
+  strncpy(g_ui_controller, PICO_BOARD, sizeof(g_ui_controller) - 1);
+#else
+  strncpy(g_ui_controller, "RP2040", sizeof(g_ui_controller) - 1);
+#endif
+  g_ui_controller[sizeof(g_ui_controller) - 1] = '\0';
+  return g_ui_controller;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI controller name label.
+ */
+void set_var_controller(const char *value) {
+  if (value) {
+    strncpy(g_ui_controller, value, sizeof(g_ui_controller) - 1);
+    g_ui_controller[sizeof(g_ui_controller) - 1] = '\0';
+  }
+}
+
+/**
+ * @brief Native variable getter for EEZ Studio UI build info label.
+ * Returns formatted version and build date as "v1.0.1 (MM/YYYY)".
+ */
+const char *get_var_build() {
+  if (g_ui_build[0] == '\0') {
+    const char *month = get_build_month();
+    const char *year = &__DATE__[7];
+    snprintf(g_ui_build, sizeof(g_ui_build), "v1.0.1 (%s/%s)", month, year);
+  }
+  return g_ui_build;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI build info label.
+ */
+void set_var_build(const char *value) {
+  if (value) {
+    strncpy(g_ui_build, value, sizeof(g_ui_build) - 1);
+    g_ui_build[sizeof(g_ui_build) - 1] = '\0';
   }
 }

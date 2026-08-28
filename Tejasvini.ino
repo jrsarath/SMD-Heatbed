@@ -55,6 +55,9 @@ void setup() {
  * @brief Main execution loop
  */
 void loop() {
+  // Read inputs (rotary encoder & push-button)
+  input_handler_update();
+
   // Update DVI Display Dashboard & LVGL UI tasks
   display_manager_update();
 

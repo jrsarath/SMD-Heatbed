@@ -2,6 +2,52 @@
 #include "screens.h"
 #include "ui.h"
 #include "vars.h"
+#include <stdint.h>
+
+// External thermal control functions
+extern void set_desired_temp(int temp);
+extern void change_desired_temp(int delta);
+extern void toggle_heater();
+
+/**
+ * @brief Sets the target temperature directly.
+ * @param e LVGL event object carrying the desired temperature in user_data.
+ */
+void action_set_target_temp(lv_event_t *e) {
+  intptr_t target_temp = (intptr_t)lv_event_get_user_data(e);
+  if (target_temp > 0) {
+    set_desired_temp((int)target_temp);
+  }
+}
+
+/**
+ * @brief Increases the target temperature by delta amount.
+ * @param e LVGL event object carrying the increment step (defaults to 1 if 0).
+ */
+void action_increase_target_temp(lv_event_t *e) {
+  intptr_t delta = (intptr_t)lv_event_get_user_data(e);
+  int step = (delta != 0) ? (int)delta : 1;
+  change_desired_temp(step);
+}
+
+/**
+ * @brief Decreases the target temperature by delta amount.
+ * @param e LVGL event object carrying the decrement step (defaults to 1 if 0).
+ */
+void action_decrease_target_temp(lv_event_t *e) {
+  intptr_t delta = (intptr_t)lv_event_get_user_data(e);
+  int step = (delta != 0) ? (int)delta : 1;
+  change_desired_temp(-step);
+}
+
+/**
+ * @brief Toggles heater ON/OFF state.
+ * @param e LVGL event object.
+ */
+void action_toggle_heating(lv_event_t *e) {
+  (void)e;
+  toggle_heater();
+}
 
 /**
  * @brief Handles tab navigation events from the navigation bar widget.
@@ -13,15 +59,6 @@ void action_navigation(lv_event_t *e) {
     switch ((enum ScreensEnum)target_screen) {
     case SCREEN_ID_MAIN:
       set_var_nav_home(true);
-      break;
-      // case SCREEN_ID_PROFILES:
-      //   set_var_nav_profiles(true);
-      //   break;
-      // case SCREEN_ID_MANUAL:
-      //   set_var_nav_manual(true);
-      //   break;
-      // case SCREEN_ID_INFO:
-      //   set_var_nav_info(true);
       break;
     default:
       break;

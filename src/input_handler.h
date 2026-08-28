@@ -24,6 +24,9 @@ int get_encoder_count();
 /**
  * @brief Sets raw encoder count value.
  */
-void set_encoder_count(int count);
+/**
+ * @brief Polling update for rotary encoder and button (called from main loop if timers are disabled).
+ */
+void input_handler_update();
 
 #endif // INPUT_HANDLER_H_

@@ -62,33 +62,32 @@ bool acquisition_isr(struct repeating_timer *t) {
   enca = digitalRead(PIN_ENA);
   encb = digitalRead(PIN_ENB);
 
-  if (enca == 1 && lasta == 0 && encb == 0) enc_count++;
-  if (encb == 1 && lastb == 0 && enca == 0) enc_count--;
+  if (enca == 1 && lasta == 0 && encb == 0) {
+    change_desired_temp(1);
+    enc_count = get_desired_temp();
+    last_enc = enc_count;
+  }
+  if (encb == 1 && lastb == 0 && enca == 0) {
+    change_desired_temp(-1);
+    enc_count = get_desired_temp();
+    last_enc = enc_count;
+  }
   lasta = enca;
   lastb = encb;
-
-  // Sync with desired temperature setpoint when changed
-  if (enc_count != last_enc) {
-    last_enc = enc_count;
-    if (enc_count < MIN_TEMP) enc_count = MIN_TEMP;
-    if (enc_count > MAX_TEMP) enc_count = MAX_TEMP;
-    set_desired_temp(enc_count);
-  } else {
-    int desired = get_desired_temp();
-    if (enc_count != desired) {
-      enc_count = desired;
-      last_enc = enc_count;
-    }
-  }
 
   return true;
 }
 
 int get_encoder_count() {
-  return enc_count;
+  return get_desired_temp();
 }
 
 void set_encoder_count(int count) {
-  enc_count = count;
-  last_enc = count;
+  set_desired_temp(count);
+  enc_count = get_desired_temp();
+  last_enc = enc_count;
+}
+
+void input_handler_update() {
+  acquisition_isr(nullptr);
 }

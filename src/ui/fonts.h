@@ -1,7 +1,7 @@
 #ifndef EEZ_LVGL_UI_FONTS_H
 #define EEZ_LVGL_UI_FONTS_H
 
-#include <lvgl/lvgl.h>
+#include <lvgl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,8 +10,8 @@ extern "C" {
 #ifndef EXT_FONT_DESC_T
 #define EXT_FONT_DESC_T
 typedef struct _ext_font_desc_t {
-    const char *name;
-    const void *font_ptr;
+  const char *name;
+  const void *font_ptr;
 } ext_font_desc_t;
 #endif
 

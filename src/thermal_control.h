@@ -28,6 +28,10 @@ bool regulator_isr(struct repeating_timer *t);
  */
 float measure_temperature();
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Sets the target temperature setpoint.
  * @param temp Desired temperature in °C (clamped to MIN_TEMP .. MAX_TEMP).
@@ -55,6 +59,25 @@ void set_heater(bool state);
  * @brief Gets current measured temperature.
  */
 float get_measured_temp();
+
+/**
+ * @brief Gets current target temperature setpoint.
+ */
+int get_desired_temp();
+
+/**
+ * @brief Checks if heater is currently active.
+ */
+bool is_heater_on();
+
+/**
+ * @brief Checks if thermal safety error state is active.
+ */
+bool is_error_state();
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @brief Gets raw 12-bit ADC reading from NTC thermistor pin.
