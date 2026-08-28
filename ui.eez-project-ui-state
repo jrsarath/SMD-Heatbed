@@ -1,8 +1,9 @@
 {
   "navigation": {
     "selectedUserPageObject": "[ui.eez-project]:/userPages/0",
-    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/14",
-    "selectedStyleObject": "[ui.eez-project]:/lvglStyles/styles/7",
+    "selectedActionObject": "[ui.eez-project]:/actions/3",
+    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/18",
+    "selectedStyleObject": "[ui.eez-project]:/lvglStyles/styles/8",
     "selectedThemeObject": "[ui.eez-project]:/themes/0",
     "selectedThemeColorObject": "[ui.eez-project]:/colors/4",
     "subnavigationSelectedItems": {
@@ -128,6 +129,7 @@
                   "type": "tabset",
                   "id": "#2c11e9b2-0154-45d3-a545-dacd311d617a",
                   "weight": 1,
+                  "selected": 2,
                   "enableClose": false,
                   "children": [
                     {
@@ -194,9 +196,22 @@
               "type": "tabset",
               "id": "EDITORS",
               "weight": 47.65625000000001,
+              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
+                {
+                  "type": "tab",
+                  "id": "#9ea4e7da-e0d2-4bf5-a487-d164cd16b0e4",
+                  "name": "Settings",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[ui.eez-project]:/settings",
+                    "subObjectPath": "[ui.eez-project]:/settings",
+                    "permanent": false
+                  },
+                  "icon": "material:settings"
+                },
                 {
                   "type": "tab",
                   "id": "#65a8ab31-4c02-440c-82d8-9748f19e4cd9",
@@ -1077,13 +1092,26 @@
           "0": {
             "0": {
               "1": {
+                "0": {
+                  "0": {}
+                },
                 "1": {}
               }
             },
             "1": {
               "0": {}
             },
-            "3": {},
+            "2": {
+              "0": {
+                "0": {
+                  "0": {}
+                }
+              }
+            },
+            "3": {
+              "0": {},
+              "2": {}
+            },
             "4": {
               "0": {
                 "0": {}
@@ -1091,9 +1119,11 @@
               "2": {
                 "0": {}
               },
-              "4": {}
+              "4": {
+                "0": {}
+              }
             },
-            "$selected": true
+            "5": {}
           }
         }
       },
@@ -1119,11 +1149,12 @@
       "4": {},
       "5": {},
       "6": {},
-      "7": {
-        "$selected": true
-      },
+      "7": {},
       "8": {},
       "9": {},
+      "10": {
+        "$selected": true
+      },
       "12": {
         "$selected": true
       }
@@ -1298,7 +1329,9 @@
   "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "BACKGROUND"
+    "MISCELLANEOUS",
+    "LAYOUT",
+    "TEXT"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,

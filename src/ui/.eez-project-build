@@ -11,6 +11,9 @@
     "styles.h",
     "ui.c",
     "ui.h",
+    "ui_font_fontawesome_10.c",
+    "ui_font_fontawesome_14.c",
+    "ui_font_fontawesome_20.c",
     "vars.h"
   ]
 }

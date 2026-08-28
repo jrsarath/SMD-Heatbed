@@ -48,21 +48,3 @@ void action_toggle_heating(lv_event_t *e) {
   (void)e;
   toggle_heater();
 }
-
-/**
- * @brief Handles tab navigation events from the navigation bar widget.
- * @param e LVGL event object carrying the target screen ID in user_data.
- */
-void action_navigation(lv_event_t *e) {
-  uintptr_t target_screen = (uintptr_t)lv_event_get_user_data(e);
-  if (target_screen >= _SCREEN_ID_FIRST && target_screen <= _SCREEN_ID_LAST) {
-    switch ((enum ScreensEnum)target_screen) {
-    case SCREEN_ID_MAIN:
-      set_var_nav_home(true);
-      break;
-    default:
-      break;
-    }
-    loadScreen((enum ScreensEnum)target_screen);
-  }
-}

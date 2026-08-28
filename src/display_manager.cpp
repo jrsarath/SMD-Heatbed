@@ -96,6 +96,18 @@ void display_manager_init() {
   // 6. Initialize EEZ Studio UI & load main screen
   ui_init();
 
+  // Offset dropdown list by -65px horizontally for optimal alignment
+  if (objects.obj12) {
+    lv_obj_t *list = lv_dropdown_get_list(objects.obj12);
+    if (list) {
+      lv_obj_set_style_translate_x(list, -20, LV_PART_MAIN);
+      lv_obj_set_style_translate_x(list, -20, LV_PART_MAIN | LV_STATE_SCROLLED);
+
+      lv_obj_set_style_translate_y(list, -16, LV_PART_MAIN);
+      lv_obj_set_style_translate_y(list, -16, LV_PART_MAIN | LV_STATE_SCROLLED);
+    }
+  }
+
   Serial.println("[Display] EEZ Studio UI initialized successfully.");
   Serial1.println("[Display] EEZ Studio UI initialized successfully.");
 }
@@ -340,18 +352,72 @@ int32_t get_var_output_percentage_val() {
  */
 void set_var_output_percentage_val(int32_t value) { (void)value; }
 
-/**
- * @brief Native variable getter for EEZ Studio UI profile label.
- */
-const char *get_var_profile() { return g_ui_profile; }
+// Profile Definitions
+typedef enum {
+  PROFILE_MANUAL = 0,
+  PROFILE_LEAD_FREE = 1,
+  PROFILE_LEADED = 2,
+  PROFILE_LOW_TEMP = 3
+} ReflowProfile;
+
+static ReflowProfile g_selected_profile = PROFILE_MANUAL;
+
+static const char *g_profile_names[] = {"MANUAL", "LEAD FREE", "LEADED",
+                                        "LOW TEMP"};
+
+static const int g_profile_temps[] = {
+    0,   // MANUAL (preserves user setpoint)
+    245, // LEAD FREE (~245°C)
+    215, // LEADED (~215°C)
+    150  // LOW TEMP (~150°C)
+};
 
 /**
- * @brief Native variable setter for EEZ Studio UI profile label.
+ * @brief Native variable getter for EEZ Studio UI profile string label.
+ * Returns the active profile name string (e.g. "MANUAL", "LEAD FREE", "LEADED",
+ * "LOW TEMP").
  */
-void set_var_profile(const char *value) {
+const char *get_var_profile_str() {
+  int idx = (int)g_selected_profile;
+  if (idx >= 0 && idx < 4) {
+    return g_profile_names[idx];
+  }
+  return "MANUAL";
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI profile string label.
+ */
+void set_var_profile_str(const char *value) {
   if (value) {
-    strncpy(g_ui_profile, value, sizeof(g_ui_profile) - 1);
-    g_ui_profile[sizeof(g_ui_profile) - 1] = '\0';
+    for (int i = 0; i < 4; i++) {
+      if (strcmp(value, g_profile_names[i]) == 0) {
+        g_selected_profile = (ReflowProfile)i;
+        if (g_profile_temps[i] > 0) {
+          set_desired_temp(g_profile_temps[i]);
+        }
+        return;
+      }
+    }
+  }
+}
+
+/**
+ * @brief Native variable getter for EEZ Studio UI profile dropdown selected
+ * index.
+ */
+int32_t get_var_profile_index() { return (int32_t)g_selected_profile; }
+
+/**
+ * @brief Native variable setter for EEZ Studio UI profile dropdown selected
+ * index.
+ */
+void set_var_profile_index(int32_t value) {
+  if (value >= 0 && value < 4) {
+    g_selected_profile = (ReflowProfile)value;
+    if (g_profile_temps[value] > 0) {
+      set_desired_temp(g_profile_temps[value]);
+    }
   }
 }
 
@@ -384,7 +450,7 @@ void set_var_uptime(const char *value) {
 }
 
 // Static buffer for UI heating button label
-static char g_ui_heating_button_str[32] = "START HEATING";
+static char g_ui_heating_button_str[32] = "\uf04d  START HEATING";
 
 /**
  * @brief Native variable getter for EEZ Studio UI heating button label.
@@ -392,10 +458,10 @@ static char g_ui_heating_button_str[32] = "START HEATING";
  */
 const char *get_var_heating_button_str() {
   if (is_heater_on()) {
-    strncpy(g_ui_heating_button_str, "STOP HEATING",
+    strncpy(g_ui_heating_button_str, "\uf04d  STOP HEATING",
             sizeof(g_ui_heating_button_str) - 1);
   } else {
-    strncpy(g_ui_heating_button_str, "START HEATING",
+    strncpy(g_ui_heating_button_str, "\uf04b  START HEATING",
             sizeof(g_ui_heating_button_str) - 1);
   }
   g_ui_heating_button_str[sizeof(g_ui_heating_button_str) - 1] = '\0';
@@ -435,12 +501,12 @@ const char *get_var_ntc_status() {
       lv_obj_set_style_text_color(
           objects.obj24,
           lv_color_hex(theme_colors[active_theme_index][COLOR_ID_COLOR_RED]),
-          LV_PART_MAIN | LV_STATE_DEFAULT);
+          LV_PART_MAIN);
     } else {
       lv_obj_set_style_text_color(
           objects.obj24,
           lv_color_hex(theme_colors[active_theme_index][COLOR_ID_COLOR_GREEN]),
-          LV_PART_MAIN | LV_STATE_DEFAULT);
+          LV_PART_MAIN);
     }
   }
 
@@ -462,22 +528,35 @@ static char g_ui_controller[32] = "RP2040";
 static char g_ui_build[32] = "";
 
 /**
- * @brief Helper to convert compile month string ("Jan".."Dec") to MM string ("01".."12").
+ * @brief Helper to convert compile month string ("Jan".."Dec") to MM string
+ * ("01".."12").
  */
 static const char *get_build_month() {
   const char *date = __DATE__;
-  if (strncmp(date, "Jan", 3) == 0) return "01";
-  if (strncmp(date, "Feb", 3) == 0) return "02";
-  if (strncmp(date, "Mar", 3) == 0) return "03";
-  if (strncmp(date, "Apr", 3) == 0) return "04";
-  if (strncmp(date, "May", 3) == 0) return "05";
-  if (strncmp(date, "Jun", 3) == 0) return "06";
-  if (strncmp(date, "Jul", 3) == 0) return "07";
-  if (strncmp(date, "Aug", 3) == 0) return "08";
-  if (strncmp(date, "Sep", 3) == 0) return "09";
-  if (strncmp(date, "Oct", 3) == 0) return "10";
-  if (strncmp(date, "Nov", 3) == 0) return "11";
-  if (strncmp(date, "Dec", 3) == 0) return "12";
+  if (strncmp(date, "Jan", 3) == 0)
+    return "01";
+  if (strncmp(date, "Feb", 3) == 0)
+    return "02";
+  if (strncmp(date, "Mar", 3) == 0)
+    return "03";
+  if (strncmp(date, "Apr", 3) == 0)
+    return "04";
+  if (strncmp(date, "May", 3) == 0)
+    return "05";
+  if (strncmp(date, "Jun", 3) == 0)
+    return "06";
+  if (strncmp(date, "Jul", 3) == 0)
+    return "07";
+  if (strncmp(date, "Aug", 3) == 0)
+    return "08";
+  if (strncmp(date, "Sep", 3) == 0)
+    return "09";
+  if (strncmp(date, "Oct", 3) == 0)
+    return "10";
+  if (strncmp(date, "Nov", 3) == 0)
+    return "11";
+  if (strncmp(date, "Dec", 3) == 0)
+    return "12";
   return "01";
 }
 
@@ -527,5 +606,32 @@ void set_var_build(const char *value) {
   if (value) {
     strncpy(g_ui_build, value, sizeof(g_ui_build) - 1);
     g_ui_build[sizeof(g_ui_build) - 1] = '\0';
+  }
+}
+
+// Static buffer for UI heater icon string
+static char g_ui_heater_icon[16] = "\uf251";
+
+/**
+ * @brief Native variable getter for EEZ Studio UI heater icon.
+ * Returns "\uf3b1" when heater is active, otherwise "\uf251".
+ */
+const char *get_var_heater_icon() {
+  if (is_heater_on()) {
+    strncpy(g_ui_heater_icon, "\uf3b1", sizeof(g_ui_heater_icon) - 1);
+  } else {
+    strncpy(g_ui_heater_icon, "\uf251", sizeof(g_ui_heater_icon) - 1);
+  }
+  g_ui_heater_icon[sizeof(g_ui_heater_icon) - 1] = '\0';
+  return g_ui_heater_icon;
+}
+
+/**
+ * @brief Native variable setter for EEZ Studio UI heater icon.
+ */
+void set_var_heater_icon(const char *value) {
+  if (value) {
+    strncpy(g_ui_heater_icon, value, sizeof(g_ui_heater_icon) - 1);
+    g_ui_heater_icon[sizeof(g_ui_heater_icon) - 1] = '\0';
   }
 }
