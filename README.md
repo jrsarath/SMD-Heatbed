@@ -1,85 +1,211 @@
-# Tejasvini — Open-Source Heatplate Controller Firmware
+# Tejasvini (तेजस्विनी) — Open-Source Heatplate Controller
 
-**Tejasvini (तेजस्विनी)** is an open-source heatplate controller designed for reflow and SMT soldering work. It runs on a **Raspberry Pi Pico (RP2040)** paired with an **Elecrow 4.3" Pico DVI Display** rendering a real-time native DVI status dashboard.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform: RP2040](https://img.shields.io/badge/Platform-Raspberry%20Pi%20Pico%20%28RP2040%29-blue.svg)](https://www.raspberrypi.com/products/raspberry-pi-pico/)
+[![Display: PicoDVI](https://img.shields.io/badge/Display-PicoDVI%20%28400x240%20%2F%20800x480%29-brightgreen.svg)](https://github.com/Wren6991/PicoDVI)
+[![UI: LVGL 8.3](https://img.shields.io/badge/UI-LVGL%208.3%20%2F%20EEZ%20Studio-orange.svg)](https://lvgl.io/)
+
+**Tejasvini** is an open-source, precision heatplate controller firmware engineered for surface-mount (SMD/SMT) reflow soldering, PCB pre-heating, and rework. It runs on the **Raspberry Pi Pico (RP2040)** paired with an **Elecrow 4.3" Pico DVI Display** running a high-resolution native LVGL user interface with touchscreen and rotary encoder controls.
+
+---
+
+## Key Features
+
+* **Dual NTC Thermistor Sensing**: Redundant 100K 3950 NTC thermistors with 32x oversampling, trimmed-mean outlier rejection, and real-time sensor divergence detection.
+* **AC Zero-Cross SSR Drive**: 1000ms time-proportioning slow PWM tailored specifically for AC zero-crossing Solid State Relays (e.g. Fotek SSR-25DA) to avoid half-cycle jitter.
+* **Soft-Start Reference Ramping**: Temperature ramps smoothly towards setpoint at $1.5^\circ\text{C}/\text{s}$ to prevent thermal shock to ceramic SMD components and eliminate overshoot.
+* **Automated 4-Stage Reflow State Machine**:
+  * **Lead-Free (SAC305)**: 245°C peak reflow curve.
+  * **Leaded (Sn63Pb37)**: 215°C peak reflow curve.
+  * **Low-Temperature (Sn42Bi58)**: 150°C peak reflow curve for heat-sensitive components and plastic connectors.
+  * **Manual Mode**: Direct setpoint adjustment (0°C to 270°C).
+* **High-Resolution PicoDVI Dashboard**: Renders a 240x400 portrait UI (400x240 hardware DVI upscaled 2x to 800x480) with real-time temperature dials, duty percentage, stage timer, and status.
+* **Dual Input Interfaces**: Capacitive touchscreen (GT911) with full on-screen control + detented rotary encoder and debounced push-button.
+* **Comprehensive Safety Interlocks**: Fast-trip open/short circuit detection (<100ms), thermal runaway monitoring, 280°C emergency shutdown, pre-heat sensor discrepancy check, and clamped duty cycle (max 40%).
+* **Real-Time Telemetry**: Tagged structured telemetry streamed simultaneously over USB CDC Serial and UART `Serial1` (115200 baud).
 
 ---
 
 ## Hardware Specifications & Bill of Materials (BOM)
-* **MCU:** Raspberry Pi Pico (RP2040 microcontroller)
-* **Heater Element:** 400W PTC Heatplate driven via a 3.3V Logic Solid State Relay (SSR)
-* **Temperature Sensors:** Dual 100K NTC Thermistors in voltage dividers ($R_{\text{divider}} = 100\text{k}\Omega$, $R_0 = 100\text{k}\Omega$, $\beta = 3950$, $T_0 = 298.15\text{K}$)
-* **User Input:** DFRobot Rotary Encoder with integrated push-button & Capacitive Touchscreen (GT911 driver)
-* **Display:** Elecrow CrowPanel RTD2281 4.3" DVI display (400x240 RGB driven via PicoDVI, scaled 2x to 800x480)
-* **Telemetry:** Serial1 UART (TX: GPIO 0, RX: GPIO 1) at 115200 baud
+
+| Component | Specification / Recommendation | Purpose |
+| :--- | :--- | :--- |
+| **Microcontroller** | Raspberry Pi Pico (RP2040, 133MHz, 264KB SRAM, 2MB Flash) | Main controller |
+| **Display Module** | Elecrow CrowPanel 4.3" Pico DVI Display (RTD2281 scaler, 800x480 panel) | Native DVI output & touch |
+| **Touch Controller**| Goodix GT911 Capacitive Touchscreen (I2C) | On-screen user input |
+| **Rotary Encoder** | EC11 detented incremental quadrature encoder with momentary push-button | Manual dial input |
+| **Heating Element** | 400W 220V/110V PTC Aluminum Heatplate (e.g. 100mm $\times$ 100mm) | Soldering hot plate |
+| **Solid State Relay**| 3.3V Logic-compatible Zero-Cross AC SSR (e.g. Fotek SSR-25DA, 25A 250VAC) | Heater power switching |
+| **Temperature Sensors**| $2\times$ 100kΩ NTC Thermistors (Beta = 3950, glass bead cartridge) | Redundant thermal sensing |
+| **Divider Resistors**| $2\times$ 100kΩ 1% 1/4W Metal Film Resistors | Precision ADC voltage dividers |
+| **Thermal Fuse (TCO)**| Non-resettable thermal cut-off fuse rated at 260°C to 280°C | Physical over-temp safety |
+| **Mains Fuse** | 3.15A (for 230V) or 5A (for 110V) fast-acting fuse in IEC inlet socket | Mains over-current safety |
 
 ---
 
 ## Hardware Pinout Configuration
 
-| Signal | GPIO Pin | Function / Description |
-| :--- | :--- | :--- |
-| `PIN_ENA` | GPIO 2 | Rotary Encoder Phase A |
-| `PIN_ENB` | GPIO 3 | Rotary Encoder Phase B |
-| `PIN_EBT` | GPIO 27 | Rotary Encoder Push-Button |
-| `PIN_SSR` | GPIO 22 | Solid State Relay PWM Output (`RP2040_PWM` @ 1000 Hz) |
-| `PIN_NTC1` | GPIO 28 | Primary Analog Input for NTC1 Thermistor divider (ADC2, 12-bit) |
-| `PIN_NTC2` | GPIO 26 | Secondary Analog Input for NTC2 Thermistor divider (ADC0, 12-bit) |
-| `PIN_BACKLIGHT` | GPIO 24 | Display Backlight Control Pin (Active LOW) |
-| `TOUCH_SDA` | GPIO 20 | I2C SDA for GT911 Touch Controller |
-| `TOUCH_SCL` | GPIO 21 | I2C SCL for GT911 Touch Controller |
-| `TOUCH_INT` | GPIO 25 | Touch Controller Interrupt Pin |
-| `TOUCH_RST` | GPIO 29 | Touch Controller Reset Pin |
-| `SERIAL_TX` | GPIO 0 | Telemetry UART TX (`Serial1` @ 115200 baud) |
-| `SERIAL_RX` | GPIO 1 | Telemetry UART RX (`Serial1` @ 115200 baud) |
+The firmware assigns GPIO pins in [`src/config.h`](src/config.h) as follows:
+
+```
+                                  Raspberry Pi Pico
+                                     +---+--+---+
+                       (TX) GPIO 0  -| 1    40 |-  VBUS (5V Input)
+                       (RX) GPIO 1  -| 2    39 |-  VSYS
+              (Encoder A)   GPIO 2  -| 4    38 |-  GND
+              (Encoder B)   GPIO 3  -| 5    37 |-  3V3_EN
+                            ...     -| ...  36 |-  3V3(OUT)
+              (Touch SDA)   GPIO 20 -| 26   34 |-  GPIO 28 (Encoder Button)
+              (Touch SCL)   GPIO 21 -| 27   32 |-  GPIO 27 (ADC1 / NTC2)
+              (SSR Drive)   GPIO 22 -| 29   31 |-  GPIO 26 (ADC0 / NTC1)
+              (Backlight)   GPIO 24 -| 30   30 |-  RUN
+              (Touch INT)   GPIO 25 -| 31   29 |-  GPIO 29 (Touch RST)
+                                     +----------+
+```
+
+| Signal | GPIO Pin | Hardware Function | Notes |
+| :--- | :--- | :--- | :--- |
+| `PIN_ENA` | GPIO 2 | Rotary Encoder Phase A | Internal pullup enabled |
+| `PIN_ENB` | GPIO 3 | Rotary Encoder Phase B | Internal pullup enabled |
+| `PIN_EBT` | GPIO 28 | Rotary Encoder Push-Button | Internal pullup enabled (Active LOW) |
+| `PIN_SSR` | GPIO 22 | Solid State Relay Output | 3.3V logic time-proportioning drive |
+| `PIN_NTC1` | GPIO 26 | Primary NTC Thermistor | RP2040 ADC0 (12-bit), 100kΩ divider |
+| `PIN_NTC2` | GPIO 27 | Secondary NTC Thermistor | RP2040 ADC1 (12-bit), 100kΩ divider |
+| `PIN_BACKLIGHT` | GPIO 24 | Display Backlight Enable | Active LOW |
+| `TOUCH_SDA` | GPIO 20 | GT911 I2C Data | 4.7kΩ pullups required |
+| `TOUCH_SCL` | GPIO 21 | GT911 I2C Clock | 4.7kΩ pullups required |
+| `TOUCH_INT` | GPIO 25 | GT911 Touch Interrupt | Configured in `src/touch.h` |
+| `TOUCH_RST` | GPIO 29 | GT911 Touch Reset | Configured in `src/touch.h` |
+| `SERIAL_TX` | GPIO 0 | Telemetry UART TX (`Serial1`) | 115200 baud |
+| `SERIAL_RX` | GPIO 1 | Telemetry UART RX (`Serial1`) | 115200 baud |
+
+---
+
+## Safety Architecture & Physical Protections
+
+> [!CAUTION]
+> **Mains Voltage & Thermal Fire Warning**:
+> Heating elements can exceed 280°C and cause severe burns, fire, or toxic gas generation. Solid-state relays almost always fail in a **shorted (ON)** state.
+>
+> You MUST install independent physical hardware protections:
+> 1. **Thermal Cut-Off Fuse (TCO)**: A physical bimetallic or chemical thermal fuse rated at 260°C–280°C MUST be clamped directly against the aluminum plate in series with the AC Live wire.
+> 2. **Chassis Earth Grounding**: The metal heatplate MUST be bonded to the AC mains protective earth wire (<0.1Ω to plug ground pin).
+> 3. **Mains Fuse**: Fast-acting fuse sized for plate wattage.
+>
+> See [docs/hardware_and_safety.md](docs/hardware_and_safety.md) for full schematics and electrical requirements.
+
+### Firmware Multi-Tier Safety Checks
+* **Instant Open/Short Detection (<100ms)**: Raw ADC counts outside 50 to 4050 counts or raw temperatures outside -20°C to 300°C trip an immediate emergency shutdown.
+* **Thermal Runaway Monitor**: Detects disconnected sensors or insufficient temperature rise under active heating within 18 seconds (`SAFETY_PERIOD`).
+* **Sensor Divergence Lockout**: Detects detached sensors or uneven plate heating if the dual thermistors disagree by $> 35^\circ\text{C}$ during heating, or $> 15^\circ\text{C}$ before startup.
+* **Duty Cycle Clamping**: SSR output is hard-clamped to 40% (`MAX_DUTY`) to protect the heating element and SSR.
+* **Latching Shutdown (`trigger_safety_shutdown`)**: All safety trips immediately force the SSR GPIO LOW and require explicit user intervention to clear.
 
 ---
 
 ## Firmware Software Architecture
 
-The firmware is structured cleanly into modular C++ components with a minimal main sketch:
+The firmware is structured into modular components operating cooperatively:
 
-```
+```text
 Tejasvini/
-├── Tejasvini.ino             # Main Arduino sketch (minimal, standard setup & loop)
-├── config.h                  # Hardware pinout, thermal constants, timer & safety parameters
-├── touch.h                   # Touch controller abstraction & GT911 driver setup
-├── thermal_control.h / .cpp  # Thermistor ADC math, PI controller, PWM, soft-start, safety checks
-├── input_handler.h / .cpp    # Debounced encoder push-button & quadrature encoder decoding
-├── display_manager.h / .cpp  # Native PicoDVI dashboard renderer (Current & Target Temp, Duty %, Status)
-└── telemetry.h / .cpp        # Serial1 UART telemetry output
+├── Tejasvini.ino             # Main Arduino sketch (setup & cooperative non-blocking loop)
+├── CMakeLists.txt            # CMake build definition
+├── LICENSE                   # MIT License
+├── README.md                 # Project documentation (this file)
+├── CONTRIBUTING.md           # Developer guidelines & safety standards
+├── CODE_OF_CONDUCT.md        # Contributor Covenant Code of Conduct
+├── docs/
+│   ├── architecture.md       # Detailed software architecture & state machines
+│   ├── hardware_and_safety.md# Pinout, NTC voltage divider math, SSR & safety fuses
+│   └── calibration_and_tuning.md # PI loop tuning & sensor calibration
+└── src/
+    ├── config.h              # Hardware pinout, thermal constants & safety parameters
+    ├── display_manager.h/.cpp# PicoDVI display driver, LVGL bridge, reflow state machine
+    ├── input_handler.h/.cpp  # Rotary encoder decoding & button debouncing
+    ├── telemetry.h/.cpp      # USB CDC & UART serial logging
+    ├── thermal_control.h/.cpp# Dual NTC ADC acquisition, PI regulator, SSR PWM, safety
+    ├── touch.h/.cpp          # Touchscreen driver abstraction (GT911)
+    └── ui/                   # EEZ Studio generated LVGL UI screens, styles, and vars
 ```
 
-### Module Descriptions
-- **`config.h`**: Central header containing all `#define` hardware pin definitions, controller gains, safety thresholds, and screen specs.
-- **`thermal_control`**: Implements thermistor temperature reading (Steinhart-Hart equation), PI controller, soft-start reference ramping, SSR PWM control, and thermal runaway safety lockout.
-- **`input_handler`**: Handles rotary encoder quadrature decoding and debounced push-button logic for setpoint control and heater toggling.
-- **`display_manager`**: Renders the 240x400 portrait UI directly on the PicoDVI display (400x240 @ 60Hz scaled 2x to 800x480).
-- **`telemetry`**: Periodically logs formatted status data over `Serial1` for temperature curve tracking.
+---
+
+## Building and Flashing the Firmware
+
+### Option 1: Using `arduino-cli` (Recommended)
+
+1. Install the [Earle F. Philhower RP2040 Core](https://github.com/earlephilhower/arduino-pico).
+2. Install required Arduino libraries (`PicoDVI`, `Adafruit_GFX`, `Adafruit_BusIO`, `lvgl`, `RP2040_PWM`, `RPI_PICO_TimerInterrupt`, `TAMC_GT911`).
+3. Compile the project:
+   ```bash
+   arduino-cli compile \
+     -b rp2040:rp2040:rpipico \
+     --build-property "build.extra_flags=-DLV_LVGL_H_INCLUDE_SIMPLE -DLV_USE_OBJ_NAME=1 -DLV_USE_TRANSLATION=1 -Wall -Wextra" \
+     .
+   ```
+4. Flash to the board:
+   ```bash
+   arduino-cli upload -p /dev/tty.usbmodem* -b rp2040:rp2040:rpipico .
+   ```
+   *(Or hold the **BOOTSEL** button on the Pico while plugging in USB, then copy the compiled `.uf2` file to the `RPI-RP2` drive).*
+
+### Option 2: Using the Arduino IDE 2.x
+
+1. Open `Tejasvini.ino` in Arduino IDE.
+2. Select **Board:** `Raspberry Pi Pico` (under Raspberry Pi RP2040 by Earle Philhower).
+3. Under **Tools**, configure:
+   * **CPU Speed:** 133 MHz (or 200 MHz)
+   * **Flash Size:** 2MB (Sketch: 1984KB, FS: 64KB)
+   * **USB Stack:** Adafruit TinyUSB
+4. Click **Verify** (`Ctrl+R` / `Cmd+R`) and **Upload** (`Ctrl+U` / `Cmd+U`).
 
 ---
 
-## Safety & Ramping Features
-1. **Soft-Start Ramping:** Increments `reference_temp` towards `set_temp` by `REF_STEP` (0.05°C/cycle) to prevent thermal overshoot.
-2. **Duty Cycle Clamping:** SSR duty cycle is strictly clamped between `0%` and `40%` (`MAX_DUTY`) to protect the mains SSR and heatplate.
-3. **Thermal Runaway Safety Check:** If temperature fails to rise by at least `SAFETY_THRESHOLD` (2.0°C) over `SAFETY_PERIOD` (18,000 ms) while active, the controller triggers an **NTC ERROR** state, disables PWM output, and locks out the heater.
+## Operating Instructions
+
+1. **Boot Screen**: Displays the project banner, firmware version, and initializes the DVI dashboard.
+2. **Temperature Adjustment**:
+   * Rotate the rotary encoder dial to increase/decrease target temperature in 1°C steps.
+   * Or tap the on-screen temperature arc/buttons to adjust setpoint.
+3. **Toggle Heating**:
+   * Short-press the encoder knob or tap the **START HEATING** button on the display.
+4. **Reflow Profile Selection**:
+   * Tap the profile dropdown on the dashboard to select **MANUAL**, **LEAD FREE**, **LEADED**, or **LOW TEMP**.
+   * Progress bar indicates current stage progress (0–25% Preheat, 25–50% Soak, 50–75% Reflow Peak, 75–100% Cool).
+5. **Clear Error / Reset Fault**:
+   * Long-press the encoder knob (>1.0 second) to attempt clearing an error state once sensor readings return to valid bounds.
 
 ---
 
-## Build & Upload Instructions
+## Telemetry Stream
 
-### Required Libraries (Arduino IDE)
-1. **Board Package:** Earle F. Philhower RP2040 / Raspberry Pi Pico core.
-2. **Arduino Libraries:**
-   - `PicoDVI`
-   - `RPi_Pico_TimerInterrupt`
-   - `RP2040_PWM`
-   - `TAMC_GT911` (or corresponding touch library configured in `touch.h`)
+Tejasvini streams structured status logs every 1000ms over USB Serial and UART `Serial1` (GPIO 0 TX / GPIO 1 RX @ 115200 baud):
 
-### Upload Steps
-1. Open `Tejasvini.ino` in the Arduino IDE.
-2. Select **Raspberry Pi Pico** (or equivalent RP2040 board) and your USB serial port.
-3. Compile and upload to the board.
-4. Open Serial Monitor on `Serial1` (GPIO 0/1) at **115200 baud** to view real-time telemetry logs.
+```text
+[Telemetry] Temp: 149.8C (T1: 150.1, T2: 149.5, dT: 0.6) | Target: 150C (Ref: 150.0) | Duty: 24.5% | Status: SOAK [LEAD FREE] | ADC: [2480/98.4k, 2475/98.1k] | Heap: 87450B
+```
+
+Send `b` or `?` over the serial monitor to reprint the diagnostic boot banner.
 
 ---
-### Made with ❤️ in Kolkata, India
+
+## Documentation
+
+* [Architecture & State Machines](docs/architecture.md)
+* [Hardware Wiring, Schematics & Safety Fuses](docs/hardware_and_safety.md)
+* [Calibration & Controller Tuning](docs/calibration_and_tuning.md)
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md) before submitting pull requests.
+
+---
+
+## License
+
+This project is open-source under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2025 Sarath "Delta" Singh

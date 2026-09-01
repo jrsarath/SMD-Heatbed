@@ -514,7 +514,7 @@ void set_var_target_temp_str(const char *value) {
     strncpy(g_ui_target_temp, value, sizeof(g_ui_target_temp) - 1);
     g_ui_target_temp[sizeof(g_ui_target_temp) - 1] = '\0';
     int temp = atoi(value);
-    if (temp > 0) {
+    if (temp >= MIN_TEMP && temp <= MAX_TEMP) {
       set_desired_temp(temp);
     }
   }
@@ -531,7 +531,7 @@ int32_t get_var_target_temp_val() { return (int32_t)get_desired_temp(); }
  * value.
  */
 void set_var_target_temp_val(int32_t value) {
-  if (value > 0) {
+  if (value >= MIN_TEMP && value <= MAX_TEMP) {
     set_desired_temp(value);
   }
 }

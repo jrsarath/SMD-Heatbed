@@ -39,6 +39,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief Immediately forces the heater OFF, zeroes PWM duty/integrator, and latches safety error state.
+ * @param reason Human-readable diagnostic description of the fault condition.
+ */
+void trigger_safety_shutdown(const char *reason);
+
+/**
  * @brief Clears safety error state if sensors are currently physically valid.
  */
 void reset_error_state();

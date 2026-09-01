@@ -2,13 +2,11 @@
   "navigation": {
     "selectedUserPageObject": "[ui.eez-project]:/userPages/0",
     "selectedActionObject": "[ui.eez-project]:/actions/3",
-    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/-1",
-    "selectedEnumObject": "[ui.eez-project]:/variables/enums/-1",
+    "selectedGlobalVariableObject": "[ui.eez-project]:/variables/globalVariables/20",
     "selectedStyleObject": "[ui.eez-project]:/lvglStyles/styles/8",
     "selectedThemeObject": "[ui.eez-project]:/themes/0",
     "selectedThemeColorObject": "[ui.eez-project]:/colors/4",
     "selectedFontObject": "[ui.eez-project]:/fonts/2",
-    "selectedGlyphObject": "[ui.eez-project]:/fonts/0/glyphs/2",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -174,7 +172,8 @@
                       "enableClose": false,
                       "icon": "svg:hierarchy"
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -239,8 +238,7 @@
                   },
                   "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "row",
@@ -1108,6 +1106,11 @@
         "0": {
           "0": {
             "0": {
+              "0": {
+                "1": {
+                  "0": {}
+                }
+              },
               "1": {
                 "0": {
                   "0": {},
@@ -1128,16 +1131,23 @@
                     "1": {
                       "0": {}
                     }
-                  }
+                  },
+                  "1": {}
                 }
               },
               "2": {
+                "0": {},
+                "2": {},
                 "4": {}
               }
             },
             "3": {
-              "1": {
+              "0": {
                 "1": {}
+              },
+              "1": {
+                "1": {},
+                "$selected": true
               }
             },
             "4": {
@@ -1155,10 +1165,10 @@
       },
       "transform": {
         "translate": {
-          "x": -120,
-          "y": -200
+          "x": -141.83333333333331,
+          "y": -502.16666666666663
         },
-        "scale": 1
+        "scale": 2
       },
       "timeline": {
         "isEditorActive": false,
@@ -1356,13 +1366,11 @@
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
     "MISCELLANEOUS",
-    "PADDING",
-    "TEXT",
-    "LAYOUT"
+    "TEXT"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 1,
+  "flowZoom": 2,
   "implementationLanguage": "C",
   "openDialogDefaultPath": "/Users/jrsarath/Downloads/FontAwesome5-Solid+Brands+Regular.woff"
 }

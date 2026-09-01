@@ -18,8 +18,8 @@
 #define PIN_ENB 3        // Rotary Encoder Phase B (GPIO 3)
 #define PIN_EBT 28       // Rotary Encoder Push-Button (GPIO 28)
 #define PIN_SSR 22       // Solid State Relay PWM Output (GPIO 22)
-#define PIN_NTC1 26      // Primary NTC Thermistor ADC Input (ADC2, GPIO 26)
-#define PIN_NTC2 27      // Secondary NTC Thermistor ADC Input (ADC0, GPIO 27)
+#define PIN_NTC1 26      // Primary NTC Thermistor ADC Input (ADC0, GPIO 26)
+#define PIN_NTC2 27      // Secondary NTC Thermistor ADC Input (ADC1, GPIO 27)
 #define PIN_NTC PIN_NTC1 // Backward compatibility alias
 #define PIN_BACKLIGHT 24 // Display Backlight Control (Active LOW, GPIO 24)
 
@@ -57,13 +57,18 @@
   100000.0f                // Thermistor nominal resistance at T0 (100k Ohms)
 #define BETA_COEFF 3950.0f // Thermistor Beta coefficient (K)
 #define T0_KELVIN 298.15f  // Nominal reference temperature (25°C in Kelvin)
-#define MATH_E 2.71828f    // Euler's constant
 
 // Dual NTC Sensor Safety Bounds
 #define NTC_MIN_VALID_TEMP                                                     \
   -20.0f // Minimum physically valid sensor reading (°C)
 #define NTC_MAX_VALID_TEMP                                                     \
   300.0f // Maximum physically valid sensor reading (°C)
+#define ADC_MIN_VALID_COUNTS                                                   \
+  50 // Minimum plausible raw 12-bit ADC count (detects open circuit / GND short)
+#define ADC_MAX_VALID_COUNTS                                                   \
+  4050 // Maximum plausible raw 12-bit ADC count (detects 3.3V power short)
+#define MAX_STARTUP_NTC_DIFF                                                   \
+  15.0f // Max allowable temp delta between NTCs before heating can start (°C)
 #define MAX_NTC_DIFF                                                           \
   35.0f // Max allowable temp delta between NTCs during heating (°C)
 #define OVERTEMP_SHUTDOWN                                                      \

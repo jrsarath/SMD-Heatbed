@@ -2,84 +2,68 @@
 #include "display_manager.h"
 #include "telemetry.h"
 
-static volatile int btn_press_time = 0;
-static volatile int last_btn_state = 1;
-static volatile bool btn_short = false;
-static volatile bool btn_long = false;
+static uint32_t btn_press_time = 0;
+static uint8_t last_btn_state = 1;
 
-static volatile int enca = 0;
-static volatile int encb = 0;
-static volatile int lasta = 0;
-static volatile int lastb = 0;
-static volatile int enc_count = 0;
-static volatile int last_enc = 0;
+static int enca = 0;
+static int encb = 0;
+static int lasta = 1;
+static int lastb = 1;
 
 void input_init() {
-  pinMode(PIN_ENA, INPUT);
-  pinMode(PIN_ENB, INPUT);
-  pinMode(PIN_EBT, INPUT);
+  // Configure encoder pins with internal pullup resistors to avoid floating inputs
+  pinMode(PIN_ENA, INPUT_PULLUP);
+  pinMode(PIN_ENB, INPUT_PULLUP);
+  pinMode(PIN_EBT, INPUT_PULLUP);
 
-  // Turn pullup resistors on
-  digitalWrite(PIN_ENA, HIGH);
-  digitalWrite(PIN_ENB, HIGH);
+  lasta = digitalRead(PIN_ENA);
+  lastb = digitalRead(PIN_ENB);
+  last_btn_state = digitalRead(PIN_EBT);
 
-  log_printf("[Input] Rotary encoder & button initialized (ENA: GPIO %d, ENB: GPIO %d, EBT: GPIO %d).",
+  log_printf("[Input] Rotary encoder & button initialized with pullups (ENA: GPIO %d, ENB: GPIO %d, EBT: GPIO %d).",
              PIN_ENA, PIN_ENB, PIN_EBT);
 }
 
 bool acquisition_isr(struct repeating_timer *t) {
   (void)t;
 
-  // Push-Button Reading & Debouncing
+  // 1. Push-Button Reading & Debouncing (Active LOW with internal pullup)
   int current_btn = digitalRead(PIN_EBT);
 
-  // Button pressed (Active LOW)
+  // Button pressed transition (1 -> 0)
   if (current_btn == 0 && last_btn_state == 1) {
     last_btn_state = 0;
     btn_press_time = millis();
   }
-
-  // Button released
-  if (current_btn == 1 && last_btn_state == 0) {
+  // Button released transition (0 -> 1)
+  else if (current_btn == 1 && last_btn_state == 0) {
     last_btn_state = 1;
     uint32_t hold_duration = millis() - btn_press_time;
     if (hold_duration >= BTN_LONG_PRESS) {
-      btn_long = true;
+      log_println("[Input] Encoder button LONG press -> Requesting error state reset.");
+      if (is_error_state()) {
+        reset_error_state();
+      }
     } else if (hold_duration >= BTN_SHORT_PRESS) {
-      btn_short = true;
+      log_println("[Input] Encoder button SHORT press -> Toggling heater / action.");
+      handle_ui_toggle_heating();
     }
   }
 
-  // Handle button actions
-  if (btn_short) {
-    btn_short = false;
-    log_println("[Input] Encoder button SHORT press -> Toggling heater / action.");
-    handle_ui_toggle_heating();
-  }
-
-  if (btn_long) {
-    btn_long = false;
-    log_println("[Input] Encoder button LONG press -> Requesting error state reset.");
-    if (is_error_state()) {
-      reset_error_state();
-    }
-  }
-
-  // Quadrature Encoder Decoding
+  // 2. Quadrature Encoder Decoding (Phase A edge detection)
   enca = digitalRead(PIN_ENA);
   encb = digitalRead(PIN_ENB);
 
-  if (enca == 1 && lasta == 0 && encb == 0) {
-    change_desired_temp(1);
-    enc_count = get_desired_temp();
-    last_enc = enc_count;
+  if (enca != lasta) {
+    if (enca == 1) { // Rising edge on Phase A
+      if (encb == 0) {
+        change_desired_temp(1);
+      } else {
+        change_desired_temp(-1);
+      }
+    }
+    lasta = enca;
   }
-  if (encb == 1 && lastb == 0 && enca == 0) {
-    change_desired_temp(-1);
-    enc_count = get_desired_temp();
-    last_enc = enc_count;
-  }
-  lasta = enca;
   lastb = encb;
 
   return true;
@@ -91,8 +75,6 @@ int get_encoder_count() {
 
 void set_encoder_count(int count) {
   set_desired_temp(count);
-  enc_count = get_desired_temp();
-  last_enc = enc_count;
 }
 
 void input_handler_update() {

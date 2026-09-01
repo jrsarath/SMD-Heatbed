@@ -56,6 +56,29 @@ static float calculate_ntc_temperature(int raw_adc, float &out_resistance) {
 }
 
 /**
+ * @brief Immediately forces the heater OFF, zeroes PWM duty/integrator, and latches safety error state.
+ */
+void trigger_safety_shutdown(const char *reason) {
+  error_state = true;
+  heater = false;
+  duty = 0.0f;
+  acc = 0.0f;
+  reference_temp = measured_temp;
+
+#if SSR_TIME_PROPORTIONING
+  digitalWrite(PIN_SSR, LOW);
+#else
+  if (pwm_ssr) {
+    pwm_ssr->setPWM(PIN_SSR, (float)PWM_FREQUENCY, 0.0f);
+  }
+#endif
+
+  if (reason) {
+    log_printf("[Thermal] EMERGENCY SAFETY SHUTDOWN: %s", reason);
+  }
+}
+
+/**
  * @brief Low-level SSR driver supporting both AC Time-Proportioning and Hardware PWM.
  */
 static void update_ssr_actuation(uint32_t now) {
@@ -109,10 +132,14 @@ void thermal_control_init() {
   window_start_time = millis();
   last_control_time = millis();
 
-  log_printf("[Thermal] Initialized: NTC1=%.1fC (%d ADC, %.0fR), NTC2=%.1fC (%d ADC, %.0fR), SSR Mode=%s",
-             measured_temp1, adc_raw1, measured_resistance1,
-             measured_temp2, adc_raw2, measured_resistance2,
-             SSR_TIME_PROPORTIONING ? "AC Time-Proportioning (1000ms window)" : "Hardware PWM (1000Hz)");
+  if (error_state) {
+    log_printf("[Thermal] WARNING: System booted into SAFETY ERROR state due to invalid initial sensor readings!");
+  } else {
+    log_printf("[Thermal] Initialized: NTC1=%.1fC (%d ADC, %.0fR), NTC2=%.1fC (%d ADC, %.0fR), SSR Mode=%s",
+               measured_temp1, adc_raw1, measured_resistance1,
+               measured_temp2, adc_raw2, measured_resistance2,
+               SSR_TIME_PROPORTIONING ? "AC Time-Proportioning (1000ms window)" : "Hardware PWM (1000Hz)");
+  }
 }
 
 /**
@@ -155,6 +182,10 @@ float measure_temperature() {
   adc_raw1 = read_oversampled_adc(PIN_NTC1);
   adc_raw2 = read_oversampled_adc(PIN_NTC2);
 
+  // 1. Raw electrical ADC bounds check (detects disconnected sensor or power/GND short)
+  bool adc1_valid = (adc_raw1 >= ADC_MIN_VALID_COUNTS && adc_raw1 <= ADC_MAX_VALID_COUNTS);
+  bool adc2_valid = (adc_raw2 >= ADC_MIN_VALID_COUNTS && adc_raw2 <= ADC_MAX_VALID_COUNTS);
+
   float res1 = 0.0f;
   float res2 = 0.0f;
   float raw_t1 = calculate_ntc_temperature(adc_raw1, res1);
@@ -163,8 +194,26 @@ float measure_temperature() {
   measured_resistance1 = res1;
   measured_resistance2 = res2;
 
-  // Ultra-smooth filtering: EMA low-pass (alpha = 0.08) + Physical Slew Limiter
-  // Provides stable, continuous temperature tracking with zero sudden multi-degree jumps
+  // 2. Raw temperature plausibility check before smoothing filter (fast fault trip < 100ms)
+  bool temp1_valid = (raw_t1 >= NTC_MIN_VALID_TEMP && raw_t1 <= NTC_MAX_VALID_TEMP);
+  bool temp2_valid = (raw_t2 >= NTC_MIN_VALID_TEMP && raw_t2 <= NTC_MAX_VALID_TEMP);
+
+  if (!adc1_valid || !adc2_valid || !temp1_valid || !temp2_valid) {
+    char fault_buf[160];
+    snprintf(fault_buf, sizeof(fault_buf),
+             "Sensor out of range! NTC1: %d ADC / %.1fC (%s), NTC2: %d ADC / %.1fC (%s) [ADC: %d..%d, Temp: %.0f..%.0fC]",
+             adc_raw1, raw_t1, (adc1_valid && temp1_valid) ? "OK" : "FAULT",
+             adc_raw2, raw_t2, (adc2_valid && temp2_valid) ? "OK" : "FAULT",
+             ADC_MIN_VALID_COUNTS, ADC_MAX_VALID_COUNTS, NTC_MIN_VALID_TEMP, NTC_MAX_VALID_TEMP);
+    trigger_safety_shutdown(fault_buf);
+
+    measured_temp1 = raw_t1;
+    measured_temp2 = raw_t2;
+    measured_temp = (measured_temp1 + measured_temp2) / 2.0f;
+    return measured_temp;
+  }
+
+  // 3. Ultra-smooth filtering on verified, physically valid raw readings
   if (first_sample) {
     measured_temp1 = raw_t1;
     measured_temp2 = raw_t2;
@@ -188,29 +237,15 @@ float measure_temperature() {
     measured_temp2 += delta2;
   }
 
-  // Sensor physical validity bounds (detect disconnected thermistor / short)
-  bool ntc1_valid = (measured_temp1 >= NTC_MIN_VALID_TEMP && measured_temp1 <= NTC_MAX_VALID_TEMP);
-  bool ntc2_valid = (measured_temp2 >= NTC_MIN_VALID_TEMP && measured_temp2 <= NTC_MAX_VALID_TEMP);
-
-  if (!ntc1_valid || !ntc2_valid) {
-    if (!error_state) {
-      log_printf("[Thermal] ERROR: Sensor out of bounds! NTC1: %.1fC (%s), NTC2: %.1fC (%s) [Valid range: %.1f..%.1fC]",
-                 measured_temp1, ntc1_valid ? "OK" : "INVALID",
-                 measured_temp2, ntc2_valid ? "OK" : "INVALID",
-                 NTC_MIN_VALID_TEMP, NTC_MAX_VALID_TEMP);
-    }
-    error_state = true;
-  }
-
-  // Thermal gradient / sensor divergence check during active heating (debounced)
+  // 4. Sensor divergence check during active heating (debounced over 5 consecutive cycles)
   if (heater && fabsf(measured_temp1 - measured_temp2) > MAX_NTC_DIFF) {
     divergence_fault_count++;
     if (divergence_fault_count >= 5) {
-      if (!error_state) {
-        log_printf("[Thermal] ERROR: Dual NTC divergence fault! Delta: %.1fC > limit: %.1fC (NTC1: %.1fC, NTC2: %.1fC)",
-                   fabsf(measured_temp1 - measured_temp2), MAX_NTC_DIFF, measured_temp1, measured_temp2);
-      }
-      error_state = true;
+      char fault_buf[140];
+      snprintf(fault_buf, sizeof(fault_buf),
+               "Dual NTC divergence fault! Delta: %.1fC > limit: %.1fC (NTC1: %.1fC, NTC2: %.1fC)",
+               fabsf(measured_temp1 - measured_temp2), MAX_NTC_DIFF, measured_temp1, measured_temp2);
+      trigger_safety_shutdown(fault_buf);
     }
   } else {
     if (divergence_fault_count > 0) {
@@ -242,17 +277,13 @@ void thermal_control_update() {
   // Sample sensors
   measure_temperature();
 
-  // Emergency over-temperature shutdown
+  // Emergency over-temperature shutdown (checks filtered and raw)
   if (measured_temp > OVERTEMP_SHUTDOWN || measured_temp1 > OVERTEMP_SHUTDOWN || measured_temp2 > OVERTEMP_SHUTDOWN) {
-    if (!error_state) {
-      log_printf("[Thermal] EMERGENCY: Over-temperature limit (%.1fC) exceeded! Current: %.1fC (NTC1: %.1fC, NTC2: %.1fC). Immediate SSR shutdown!",
-                 OVERTEMP_SHUTDOWN, measured_temp, measured_temp1, measured_temp2);
-    }
-    error_state = true;
-    heater = false;
-    duty = 0.0f;
-    acc = 0.0f;
-    update_ssr_actuation(now);
+    char fault_buf[140];
+    snprintf(fault_buf, sizeof(fault_buf),
+             "Over-temperature limit (%.1fC) exceeded! Current: %.1fC (NTC1: %.1fC, NTC2: %.1fC)",
+             OVERTEMP_SHUTDOWN, measured_temp, measured_temp1, measured_temp2);
+    trigger_safety_shutdown(fault_buf);
     return;
   }
 
@@ -307,18 +338,17 @@ void thermal_control_update() {
       if (now - last_safety_check > SAFETY_PERIOD) {
         last_safety_check = now;
         if ((measured_temp - last_safety_temp) < SAFETY_THRESHOLD) {
-          // Temperature failed to rise sufficiently under active heating -> Thermal Error
-          log_printf("[Thermal] ERROR: Thermal runaway detected! Temp rose only %.1fC (< %.1fC threshold) over %lu s while driving %.1f%% duty. Baseline: %.1fC, Current: %.1fC. SSR shutdown!",
-                     (measured_temp - last_safety_temp), SAFETY_THRESHOLD, (unsigned long)(SAFETY_PERIOD / 1000), duty, last_safety_temp, measured_temp);
-          error_state = true;
-          heater = false;
-          duty = 0.0f;
-          acc = 0.0f;
+          char fault_buf[160];
+          snprintf(fault_buf, sizeof(fault_buf),
+                   "Thermal runaway detected! Temp rose only %.1fC (< %.1fC threshold) over %lu s while driving %.1f%% duty. Baseline: %.1fC, Current: %.1fC.",
+                   (measured_temp - last_safety_temp), SAFETY_THRESHOLD, (unsigned long)(SAFETY_PERIOD / 1000), duty, last_safety_temp, measured_temp);
+          trigger_safety_shutdown(fault_buf);
+          return;
         }
         last_safety_temp = measured_temp;
       }
-    } else {
-      // In steady-state or holding temperature, reset safety baseline timer
+    } else if (duty < 15.0f || (reference_temp - measured_temp) < 5.0f) {
+      // In steady-state or holding temperature with low deficit/power, update baseline timer
       last_safety_check = now;
       last_safety_temp = measured_temp;
     }
@@ -364,15 +394,30 @@ void toggle_heater() {
 
 void set_heater(bool state) {
   if (error_state && state) {
-    log_printf("[Thermal] WARNING: Cannot activate heater while safety error state is active!");
+    log_printf("[Thermal] WARNING: Cannot activate heater while safety error state is active! Clear fault first.");
     return;
   }
 
   if (heater == state) return; // No state change
 
-  heater = state;
-  if (heater) {
+  if (state) {
     measure_temperature();
+    if (error_state) {
+      log_printf("[Thermal] WARNING: Cannot activate heater: sensor error detected during pre-heat check!");
+      return;
+    }
+
+    float delta_startup = fabsf(measured_temp1 - measured_temp2);
+    if (delta_startup > MAX_STARTUP_NTC_DIFF) {
+      char fault_buf[140];
+      snprintf(fault_buf, sizeof(fault_buf),
+               "Dual NTC startup divergence too high (%.1fC > %.1fC limit)! NTC1: %.1fC, NTC2: %.1fC",
+               delta_startup, MAX_STARTUP_NTC_DIFF, measured_temp1, measured_temp2);
+      trigger_safety_shutdown(fault_buf);
+      return;
+    }
+
+    heater = true;
     reference_temp = measured_temp;
     heater_turned_on = millis();
     last_safety_check = millis();
@@ -382,6 +427,7 @@ void set_heater(bool state) {
     log_printf("[Thermal] Heater ACTIVATED -> Target: %dC, Starting Temp: %.1fC (NTC1: %.1fC, NTC2: %.1fC)",
                set_temp, measured_temp, measured_temp1, measured_temp2);
   } else {
+    heater = false;
     duty = 0.0f;
     acc = 0.0f;
     update_ssr_actuation(millis());
@@ -393,12 +439,16 @@ void set_heater(bool state) {
 void reset_error_state() {
   first_sample = true;
   measure_temperature();
-  bool ntc1_valid = (measured_temp1 >= NTC_MIN_VALID_TEMP && measured_temp1 <= NTC_MAX_VALID_TEMP);
-  bool ntc2_valid = (measured_temp2 >= NTC_MIN_VALID_TEMP && measured_temp2 <= NTC_MAX_VALID_TEMP);
+  bool adc1_valid = (adc_raw1 >= ADC_MIN_VALID_COUNTS && adc_raw1 <= ADC_MAX_VALID_COUNTS);
+  bool adc2_valid = (adc_raw2 >= ADC_MIN_VALID_COUNTS && adc_raw2 <= ADC_MAX_VALID_COUNTS);
+  bool ntc1_valid = adc1_valid && (measured_temp1 >= NTC_MIN_VALID_TEMP && measured_temp1 <= NTC_MAX_VALID_TEMP);
+  bool ntc2_valid = adc2_valid && (measured_temp2 >= NTC_MIN_VALID_TEMP && measured_temp2 <= NTC_MAX_VALID_TEMP);
+  bool within_startup_diff = (fabsf(measured_temp1 - measured_temp2) <= MAX_STARTUP_NTC_DIFF);
 
-  if (ntc1_valid && ntc2_valid && measured_temp <= OVERTEMP_SHUTDOWN) {
+  if (ntc1_valid && ntc2_valid && measured_temp <= OVERTEMP_SHUTDOWN && within_startup_diff) {
     error_state = false;
     divergence_fault_count = 0;
+    heater = false;
     acc = 0.0f;
     duty = 0.0f;
     last_safety_check = millis();
@@ -406,7 +456,7 @@ void reset_error_state() {
     log_printf("[Thermal] Safety error state cleared. Sensors valid (NTC1: %.1fC, NTC2: %.1fC, Avg: %.1fC). System in IDLE.",
                measured_temp1, measured_temp2, measured_temp);
   } else {
-    log_printf("[Thermal] WARNING: Cannot clear error state! Sensors still invalid or overtemp (NTC1: %.1fC, NTC2: %.1fC, Avg: %.1fC).",
+    log_printf("[Thermal] WARNING: Cannot clear error state! Sensors still invalid, divergent, or overtemp (NTC1: %.1fC, NTC2: %.1fC, Avg: %.1fC).",
                measured_temp1, measured_temp2, measured_temp);
   }
 }
