@@ -552,35 +552,34 @@ This document serves as a persistent step-by-step implementation log to track co
   - [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.cpp): Updated coordinate comments and bounding constraints for `240x400`.
 - **Checkpoint Status:** CHECKPOINT #30 (EEZ Studio UI Integration on 240×400 PicoDVI Verified).
 
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Entry #035 — Project-Wide Logging Architecture Optimization & Safety Diagnostics
+- **Date & Time:** 2026-09-02 04:35:00 IST
+- **Goal:** Overhaul logging across all subsystems to remove unnecessary/spammy prints, eliminate line-by-line Serial/Serial1 duplication with a centralized dual-stream logger (`log_printf`/`log_println`), remove microsecond heap churn, and add critical thermal safety and reflow stage logs.
+- **Files Modified:**
+  - [`src/telemetry.h`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/telemetry.h) & [`src/telemetry.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/telemetry.cpp):
+    - Added `log_printf(fmt, ...)` and `log_println(msg)` with C linkage support, mirroring output simultaneously to USB CDC (`Serial`) and UART0 (`Serial1`).
+    - Added startup diagnostic banner reporting firmware title, build timestamp, CPU frequency, initial free heap, and baud rate.
+    - Converted `telemetry_update()` from Arduino `String` heap allocations to deterministic stack-allocated `snprintf` buffer formatting with a structured `[Telemetry]` format: controlled temp first, dual NTCs with `dT` divergence, setpoint & ramp ref, SSR duty, status & profile mode, and compact ADC/kΩ hardware diagnostics.
+  - [`src/touch.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/touch.cpp):
+    - Removed un-prefixed raw debug prints (`Serial.println("Tap")`, `DragStart`, `DragMove`, `DragEnd`, `UNKNOWN`).
+    - Added initialization diagnostics in `touch_init()` logging touch controller model (GT911) and GPIO pinouts.
+  - [`src/thermal_control.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/thermal_control.cpp):
+    - Added baseline readings and SSR mode reporting in `thermal_control_init()`.
+    - Added edge-triggered error logging for sensor out-of-bounds, dual NTC divergence faults, emergency over-temperature shutdowns, and thermal runaway events.
+    - Added state feedback for heater activation/deactivation and safety error reset attempts.
+    - Added target temperature setpoint change logging.
+  - [`src/display_manager.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/display_manager.cpp):
+    - Replaced duplicate `Serial`/`Serial1` prints with `log_printf` / `log_println`.
+    - Added success diagnostic on `display.begin()`.
+    - Added full 4-stage reflow profile progression logging (Manual/Profile start, Preheat -> Soak, Soak -> Reflow, Peak dwell begin, Reflow -> Cool, Complete, and User/Safety abort).
+  - [`src/input_handler.cpp`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/src/input_handler.cpp):
+    - Added GPIO pinout logging in `input_init()`.
+    - Added encoder push-button action logging for short press (heater toggle/cancel) and long press (error reset).
+  - [`Tejasvini.ino`](file:///Users/jrsarath/Documents/GitHub/Tejasvini/Tejasvini.ino):
+    - Replaced single-channel `Serial1.println` with `log_println` so setup completion reaches both USB and UART streams.
+- **Checkpoint Status:** CHECKPOINT #31 (Project-Wide Dual-Stream Logging & Safety Diagnostics Verified).
 
 
 

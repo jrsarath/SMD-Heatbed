@@ -29,7 +29,7 @@ void setup() {
   touch_init();
   display_manager_init();
 
-  Serial1.println("Setup completed successfully.");
+  log_println("[System] Setup completed successfully. Entering main execution loop.");
 }
 
 /**

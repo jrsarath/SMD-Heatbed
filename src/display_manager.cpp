@@ -1,4 +1,5 @@
 #include "display_manager.h"
+#include "telemetry.h"
 #include "touch.h"
 #include "ui/screens.h"
 #include "ui/ui.h"
@@ -151,12 +152,18 @@ static void update_profile_and_progress() {
       const ProfileStageConfig &cfg =
           g_profile_configs[(int)g_selected_profile];
       set_desired_temp(cfg.preheat_temp);
+      log_printf("[Profile] Started %s profile -> Stage PREHEAT (Target: %dC)",
+                 g_profile_names[(int)g_selected_profile], cfg.preheat_temp);
+    } else {
+      log_printf("[Profile] Started MANUAL mode (Target: %dC, Start Temp: %.1fC)",
+                 get_desired_temp(), current_temp);
     }
   }
 
   // Detect heater stop event (user aborted heating)
   if (!heater_active && g_last_heater_state) {
     if (g_reflow_stage != STAGE_COOL && g_reflow_stage != STAGE_DONE) {
+      log_println("[Profile] Heating stopped by user. Returning to IDLE.");
       g_reflow_stage = STAGE_IDLE;
       g_ui_progress = 0;
     }
@@ -187,6 +194,9 @@ static void update_profile_and_progress() {
 
   // --- 4-STAGE REFLOW PROFILES (0 - 1000, 250 PER STAGE) ---
   if (is_error_state()) {
+    if (g_reflow_stage != STAGE_IDLE) {
+      log_println("[Profile] Reflow aborted due to thermal safety error! Returning to IDLE.");
+    }
     g_reflow_stage = STAGE_IDLE;
     g_ui_progress = 0;
     return;
@@ -215,6 +225,8 @@ static void update_profile_and_progress() {
       g_stage_start_time = millis();
       g_stage_start_temp = current_temp;
       set_desired_temp(cfg.soak_temp);
+      log_printf("[Profile] PREHEAT complete (%.1fC). Entering SOAK stage (Target: %dC, Duration: %lus)",
+                 current_temp, cfg.soak_temp, (unsigned long)cfg.soak_time_s);
     }
     break;
   }
@@ -237,6 +249,8 @@ static void update_profile_and_progress() {
       g_stage_start_temp = current_temp;
       g_peak_reached_temp = 0.0f;
       set_desired_temp(cfg.peak_temp);
+      log_printf("[Profile] SOAK complete (%lus). Entering REFLOW stage (Peak Target: %dC)",
+                 (unsigned long)cfg.soak_time_s, cfg.peak_temp);
     }
     break;
   }
@@ -248,6 +262,8 @@ static void update_profile_and_progress() {
         g_peak_reached_temp = current_temp;
         g_stage_start_time = millis();
         g_ui_progress = 675;
+        log_printf("[Profile] REFLOW peak reached (%.1fC). Starting %lus dwell...",
+                   current_temp, (unsigned long)cfg.peak_dwell_s);
       } else {
         float span = (float)cfg.peak_temp - g_stage_start_temp;
         float p =
@@ -275,6 +291,8 @@ static void update_profile_and_progress() {
         g_stage_start_time = millis();
         g_stage_start_temp = current_temp;
         set_desired_temp(cfg.cool_temp);
+        log_printf("[Profile] REFLOW dwell complete. Heater OFF. Entering COOL stage (Target: %dC)",
+                   cfg.cool_temp);
       }
     }
     break;
@@ -300,8 +318,8 @@ static void update_profile_and_progress() {
       if (objects.obj14) {
         lv_bar_set_value(objects.obj14, 0, LV_ANIM_OFF);
       }
-      Serial.println("[Profile] Reflow profile finished all stages. Heater OFF, returned to IDLE.");
-      Serial1.println("[Profile] Reflow profile finished all stages. Heater OFF, returned to IDLE.");
+      log_printf("[Profile] Cooled to safe temperature (%.1fC <= %dC). Reflow profile complete! System IDLE.",
+                 current_temp, cfg.cool_temp);
     }
     break;
   }
@@ -315,10 +333,8 @@ static void update_profile_and_progress() {
 }
 
 void display_manager_init() {
-  Serial.println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
-                 "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
-  Serial1.println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
-                  "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
+  log_println("[Display] Initializing PicoDVI display & EEZ Studio LVGL UI "
+              "(Portrait 240x400, 400x240 DVI @ 60Hz)...");
 
   // 1. Setup backlight pin (Active LOW)
   pinMode(PIN_BACKLIGHT, OUTPUT);
@@ -326,8 +342,9 @@ void display_manager_init() {
 
   // 2. Initialize PicoDVI hardware display
   if (!display.begin()) {
-    Serial.println("[Display] ERROR: display.begin() failed!");
-    Serial1.println("[Display] ERROR: display.begin() failed!");
+    log_println("[Display] ERROR: display.begin() failed!");
+  } else {
+    log_println("[Display] PicoDVI display initialized successfully.");
   }
   display.setRotation(
       DISPLAY_ROTATION); // 270° rotation for Portrait mode (240x400)
@@ -382,8 +399,7 @@ void display_manager_init() {
         LV_PART_MAIN);
   }
 
-  Serial.println("[Display] EEZ Studio UI initialized successfully.");
-  Serial1.println("[Display] EEZ Studio UI initialized successfully.");
+  log_println("[Display] EEZ Studio UI initialized successfully.");
 }
 
 void display_manager_update(bool force_redraw) {
@@ -769,11 +785,14 @@ void set_var_stage_time(const char *value) {
 
 /**
  * @brief Native variable getter for EEZ Studio UI stage_target label.
- * Returns profile's target stage time, "N/A" when manual and IDLE.
+ * Returns profile's target stage time, "N/A" when manual, "IDLE" when IDLE.
  */
 const char *get_var_stage_target() {
-  if (g_selected_profile == PROFILE_MANUAL || g_reflow_stage == STAGE_IDLE) {
+  if (g_selected_profile == PROFILE_MANUAL) {
     return "N/A";
+  }
+  if (g_reflow_stage == STAGE_IDLE) {
+    return "IDLE";
   }
   const ProfileStageConfig &cfg = g_profile_configs[(int)g_selected_profile];
   uint32_t target_s = 0;
@@ -791,7 +810,7 @@ const char *get_var_stage_target() {
     target_s = cfg.cool_time_s;
     break;
   default:
-    return "N/A";
+    return "IDLE";
   }
   format_duration(g_ui_stage_target, sizeof(g_ui_stage_target), target_s);
   return g_ui_stage_target;
@@ -1016,7 +1035,7 @@ const char *get_var_build() {
   if (g_ui_build[0] == '\0') {
     const char *month = get_build_month();
     const char *year = &__DATE__[7];
-    snprintf(g_ui_build, sizeof(g_ui_build), "v1.0.1 (%s/%s)", month, year);
+    snprintf(g_ui_build, sizeof(g_ui_build), "%s (%s/%s)", FIRMWARE_VERSION, month, year);
   }
   return g_ui_build;
 }
@@ -1091,9 +1110,6 @@ extern "C" void handle_ui_cycle_profile() {
   int next_profile = ((int)g_selected_profile + 1) % 4;
   set_var_profile_index(next_profile);
 
-  Serial.print("[Profile] Cycled to: ");
-  Serial.println(g_profile_names[next_profile]);
-  Serial1.print("[Profile] Cycled to: ");
-  Serial1.println(g_profile_names[next_profile]);
+  log_printf("[Profile] Cycled to: %s", g_profile_names[next_profile]);
 }
 

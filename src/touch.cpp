@@ -1,5 +1,6 @@
 #include "touch.h"
 #include "config.h"
+#include "telemetry.h"
 
 int touch_last_x = 0;
 int touch_last_y = 0;
@@ -57,28 +58,20 @@ void touch(TPoint p, TEvent e) {
 
   switch (e) {
   case TEvent::Tap:
-    Serial.println("Tap");
     touch_touched_flag = true;
     touch_released_flag = true;
     break;
 
   case TEvent::DragStart:
-    Serial.println("DragStart");
-    touch_touched_flag = true;
-    break;
-
   case TEvent::DragMove:
-    Serial.println("DragMove");
     touch_touched_flag = true;
     break;
 
   case TEvent::DragEnd:
-    Serial.println("DragEnd");
     touch_released_flag = true;
     break;
 
   default:
-    Serial.println("UNKNOWN");
     break;
   }
 }
@@ -92,16 +85,14 @@ void touch_init() {
 
   ts.begin();
   ts.registerTouchHandler(touch);
+  log_printf("[Touch] FT6X36 capacitive touch initialized.");
 
 #elif defined(TOUCH_GT911)
 
-  // Wire.setSDA(TOUCH_GT911_SDA);
-  // Wire.setSCL(TOUCH_GT911_SCL);
-  // Wire.begin();
-  // Wire1.begin(TOUCH_GT911_SDA, TOUCH_GT911_SCL);
-
   ts.begin();
   ts.setRotation(TOUCH_GT911_ROTATION);
+  log_printf("[Touch] GT911 capacitive touch initialized (SDA: %d, SCL: %d, INT: %d, RST: %d).",
+             TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST);
 
 #elif defined(TOUCH_XPT2046)
 
@@ -110,6 +101,7 @@ void touch_init() {
 
   ts.begin();
   ts.setRotation(TOUCH_XPT2046_ROTATION);
+  log_printf("[Touch] XPT2046 resistive touch initialized.");
 
 #endif
 }

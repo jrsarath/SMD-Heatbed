@@ -4,6 +4,14 @@
 #include <Arduino.h>
 
 /*******************************************************************************
+ * Firmware Metadata
+ ******************************************************************************/
+#define FIRMWARE_NAME "Tejasvini"
+#define FIRMWARE_VERSION "v1.0.1"
+#define FIRMWARE_AUTHOR "Sarath \"Delta\" Singh"
+#define FIRMWARE_GITHUB "https://github.com/jrsarath/Tejasvini"
+
+/*******************************************************************************
  * Hardware Pinout Configuration
  ******************************************************************************/
 #define PIN_ENA 2        // Rotary Encoder Phase A (GPIO 2)

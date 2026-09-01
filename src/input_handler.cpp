@@ -1,5 +1,6 @@
 #include "input_handler.h"
 #include "display_manager.h"
+#include "telemetry.h"
 
 static volatile int btn_press_time = 0;
 static volatile int last_btn_state = 1;
@@ -21,6 +22,9 @@ void input_init() {
   // Turn pullup resistors on
   digitalWrite(PIN_ENA, HIGH);
   digitalWrite(PIN_ENB, HIGH);
+
+  log_printf("[Input] Rotary encoder & button initialized (ENA: GPIO %d, ENB: GPIO %d, EBT: GPIO %d).",
+             PIN_ENA, PIN_ENB, PIN_EBT);
 }
 
 bool acquisition_isr(struct repeating_timer *t) {
@@ -49,11 +53,13 @@ bool acquisition_isr(struct repeating_timer *t) {
   // Handle button actions
   if (btn_short) {
     btn_short = false;
+    log_println("[Input] Encoder button SHORT press -> Toggling heater / action.");
     handle_ui_toggle_heating();
   }
 
   if (btn_long) {
     btn_long = false;
+    log_println("[Input] Encoder button LONG press -> Requesting error state reset.");
     if (is_error_state()) {
       reset_error_state();
     }
