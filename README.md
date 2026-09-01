@@ -208,4 +208,5 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and ou
 
 This project is open-source under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
-Copyright (c) 2025 Sarath "Delta" Singh
+Copyright (c) 2026 Sarath "Delta" Singh
+Made with <3 in Kolkata, India
