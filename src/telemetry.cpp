@@ -18,8 +18,7 @@ void telemetry_update() {
   }
   last_telemetry_time = now;
 
-  // Sample NTC temperature (guarantees update even if timer ISR is inactive)
-  measure_temperature();
+  // Telemetry reads the continuously filtered temperatures updated by thermal_control_update()
 
   float meas = get_measured_temp();
   float temp1 = get_measured_temp_ntc1();

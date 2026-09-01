@@ -33,21 +33,15 @@
 #define DISPLAY_ROTATION 3 // Display Rotation 90 * 3 = 270° (Portrait)
 
 /*******************************************************************************
- * Aspect Ratio Compensation
- * 400x240 matches 800x480 panel with 1:1 pixel aspect ratio (2x integer scale).
- * Set to 0 since no 4:3 anamorphic stretch compensation is needed.
- ******************************************************************************/
-#define DISPLAY_ASPECT_COMPENSATION 0
-#define DISPLAY_ASPECT_SCALE_NUM 1
-#define DISPLAY_ASPECT_SCALE_DEN 1
-#define DISPLAY_ASPECT_X_OFFSET 0
-
-/*******************************************************************************
  * Temperature & Controller Parameters
  ******************************************************************************/
-#define MIN_TEMP 0     // Minimum allowable setpoint (°C)
-#define MAX_TEMP 250   // Maximum allowable setpoint (°C)
-#define REF_STEP 0.05f // Soft-start reference ramping step per cycle (°C)
+#define MIN_TEMP 0   // Minimum allowable setpoint (°C)
+#define MAX_TEMP 270 // Maximum allowable setpoint (°C)
+#define CONTROL_PERIOD_MS                                                      \
+  100 // Thermal control loop update interval (ms, 10 Hz)
+#define RAMP_RATE_DEG_PER_SEC                                                  \
+  1.5f                 // Soft-start reference ramping rate (°C/second)
+#define REF_STEP 0.05f // Backward compatibility alias
 
 // Dual NTC Voltage Divider Specifications
 #define R_DIVIDER 100000.0f // Series divider resistor value (100k Ohms)
@@ -64,14 +58,21 @@
   300.0f // Maximum physically valid sensor reading (°C)
 #define MAX_NTC_DIFF                                                           \
   35.0f // Max allowable temp delta between NTCs during heating (°C)
+#define OVERTEMP_SHUTDOWN                                                      \
+  280.0f // Absolute emergency thermal shutdown limit (°C)
 
-// PI Controller Constants
-#define KP_GAIN 0.2f     // Proportional gain
-#define KI_GAIN 0.00001f // Integral gain
+// PI Controller Constants (Calibrated for seconds-based delta-time integration)
+#define KP_GAIN 1.5f  // Proportional gain
+#define KI_GAIN 0.02f // Integral gain
 
-// PWM & Duty Cycle Limits
-#define PWM_FREQUENCY 1000 // SSR PWM Frequency (Hz)
-#define MIN_DUTY 0.0f      // Minimum duty cycle (%)
+// SSR Actuation & Duty Cycle Limits
+#define SSR_TIME_PROPORTIONING                                                 \
+  1 // 1: Time-proportioning (Slow PWM for AC mains SSR), 0: Hardware PWM
+#define SSR_WINDOW_MS                                                          \
+  1000 // Time-proportioning cycle window in milliseconds (1 second)
+#define PWM_FREQUENCY                                                          \
+  1000 // Hardware PWM Frequency in Hz (used if SSR_TIME_PROPORTIONING is 0)
+#define MIN_DUTY 0.0f // Minimum duty cycle (%)
 #define MAX_DUTY                                                               \
   40.0f // Maximum duty cycle (%) — Safety clamped to protect mains SSR
 

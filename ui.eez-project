@@ -258,6 +258,14 @@
         "defaultValue": "0",
         "persistent": false,
         "native": false
+      },
+      {
+        "objID": "b80be5e1-89e8-4b7e-838e-d4fe4b1a28d1",
+        "name": "progress",
+        "type": "integer",
+        "defaultValue": "0",
+        "persistent": false,
+        "native": false
       }
     ],
     "structures": [],
@@ -987,7 +995,17 @@
                       "disabledStateType": "literal",
                       "states": "",
                       "localStyles": {
-                        "objID": "b916f591-22a1-4397-9a08-d2d30d23b608"
+                        "objID": "b916f591-22a1-4397-9a08-d2d30d23b608",
+                        "definition": {
+                          "MAIN": {
+                            "DEFAULT": {
+                              "pad_bottom": 2,
+                              "pad_left": 2,
+                              "pad_right": 2,
+                              "pad_top": 2
+                            }
+                          }
+                        }
                       },
                       "group": "",
                       "groupIndex": 0
@@ -2621,13 +2639,13 @@
                                   "max": 100,
                                   "maxType": "literal",
                                   "mode": "NORMAL",
-                                  "value": 25,
-                                  "valueType": "literal",
-                                  "previewValue": "25",
+                                  "value": "progress",
+                                  "valueType": "expression",
+                                  "previewValue": "35",
                                   "valueStart": 0,
                                   "valueStartType": "literal",
                                   "previewValueStart": "0",
-                                  "enableAnimation": false
+                                  "enableAnimation": true
                                 },
                                 {
                                   "objID": "1039025d-887f-402c-e033-478fe7fc09ad",

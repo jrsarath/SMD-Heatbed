@@ -14,7 +14,8 @@ extern "C" {
 
 enum FlowGlobalVariables {
     FLOW_GLOBAL_VARIABLE_HEATER_ICON = 0,
-    FLOW_GLOBAL_VARIABLE_PROFILE_INDEX = 1
+    FLOW_GLOBAL_VARIABLE_PROFILE_INDEX = 1,
+    FLOW_GLOBAL_VARIABLE_PROGRESS = 2
 };
 
 // Native global variables
@@ -53,6 +54,8 @@ extern const char *get_var_heater_icon();
 extern void set_var_heater_icon(const char *value);
 extern int32_t get_var_profile_index();
 extern void set_var_profile_index(int32_t value);
+extern int32_t get_var_progress();
+extern void set_var_progress(int32_t value);
 
 #ifdef __cplusplus
 }

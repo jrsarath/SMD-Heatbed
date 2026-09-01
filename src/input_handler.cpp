@@ -54,7 +54,7 @@ bool acquisition_isr(struct repeating_timer *t) {
   if (btn_long) {
     btn_long = false;
     if (is_error_state()) {
-      // Re-enable controller from error state if desired
+      reset_error_state();
     }
   }
 

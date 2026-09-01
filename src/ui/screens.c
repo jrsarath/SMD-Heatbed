@@ -87,14 +87,14 @@ void create_screen_main() {
                             lv_obj_t *obj = lv_obj_create(parent_obj);
                             lv_obj_set_pos(obj, 0, 0);
                             lv_obj_set_size(obj, LV_PCT(50), LV_PCT(100));
-                            lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-                            lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-                            lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-                            lv_obj_set_style_pad_bottom(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+                            lv_obj_set_style_pad_bottom(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_pad_left(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_pad_right(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_pad_top(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
                             {
                                 lv_obj_t *parent_obj = obj;
                                 {
@@ -707,7 +707,6 @@ void create_screen_main() {
                                                     objects.obj14 = obj;
                                                     lv_obj_set_pos(obj, 24, 282);
                                                     lv_obj_set_size(obj, LV_PCT(100), 5);
-                                                    lv_bar_set_value(obj, 25, LV_ANIM_OFF);
                                                     lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                                                     lv_obj_set_style_bg_color(obj, lv_color_hex(theme_colors[active_theme_index][3]), LV_PART_MAIN | LV_STATE_DEFAULT);
                                                     lv_obj_set_style_bg_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -943,7 +942,7 @@ void create_screen_main() {
                                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                                             add_style_text_xs(obj);
                                             lv_obj_set_style_text_color(obj, lv_color_hex(theme_colors[active_theme_index][7]), LV_PART_MAIN | LV_STATE_DEFAULT);
-                                            lv_label_set_text_static(obj, "STAGE TIME");
+                                            lv_label_set_text_static(obj, "PROFILE TIME");
                                         }
                                         {
                                             lv_obj_t *obj = lv_label_create(parent_obj);
@@ -1550,6 +1549,15 @@ void tick_screen_main() {
                 lv_dropdown_set_selected(objects.obj12, new_val);
                 tick_value_change_obj = NULL;
             }
+        }
+    }
+    {
+        int32_t new_val = get_var_progress();
+        int32_t cur_val = lv_bar_get_value(objects.obj14);
+        if (new_val != cur_val) {
+            tick_value_change_obj = objects.obj14;
+            lv_bar_set_value(objects.obj14, new_val, LV_ANIM_ON);
+            tick_value_change_obj = NULL;
         }
     }
     {

@@ -18,7 +18,13 @@ enum HeatbedStatus {
 void thermal_control_init();
 
 /**
- * @brief ISR callback for PI thermal regulation (called by hardware timer).
+ * @brief Periodically updates thermal control loop, soft-start ramping, and SSR actuation.
+ * Should be called continuously from loop().
+ */
+void thermal_control_update();
+
+/**
+ * @brief ISR callback for PI thermal regulation (backward-compatibility wrapper).
  */
 bool regulator_isr(struct repeating_timer *t);
 
@@ -31,6 +37,11 @@ float measure_temperature();
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Clears safety error state if sensors are currently physically valid.
+ */
+void reset_error_state();
 
 /**
  * @brief Sets the target temperature setpoint.
