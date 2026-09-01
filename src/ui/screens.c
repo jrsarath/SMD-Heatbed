@@ -465,6 +465,7 @@ void create_screen_main() {
                                     lv_obj_set_pos(obj, 0, 0);
                                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                                     lv_obj_set_style_text_font(obj, &ui_font_fontawesome_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+                                    lv_obj_set_style_pad_top(obj, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
                                     lv_label_set_text(obj, "");
                                 }
                                 {
@@ -841,7 +842,7 @@ void create_screen_main() {
                                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                                             add_style_text_sm(obj);
                                             lv_obj_set_style_text_color(obj, lv_color_hex(theme_colors[active_theme_index][4]), LV_PART_MAIN | LV_STATE_DEFAULT);
-                                            lv_label_set_text_static(obj, "PROFILE");
+                                            lv_label_set_text(obj, "");
                                         }
                                     }
                                 }
@@ -896,7 +897,7 @@ void create_screen_main() {
                                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                                             add_style_text_sm(obj);
                                             lv_obj_set_style_text_color(obj, lv_color_hex(theme_colors[active_theme_index][4]), LV_PART_MAIN | LV_STATE_DEFAULT);
-                                            lv_label_set_text_static(obj, "PROFILE");
+                                            lv_label_set_text(obj, "");
                                         }
                                     }
                                 }
@@ -951,7 +952,7 @@ void create_screen_main() {
                                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                                             add_style_text_sm(obj);
                                             lv_obj_set_style_text_color(obj, lv_color_hex(theme_colors[active_theme_index][4]), LV_PART_MAIN | LV_STATE_DEFAULT);
-                                            lv_label_set_text_static(obj, "PROFILE");
+                                            lv_label_set_text(obj, "");
                                         }
                                     }
                                 }
@@ -1050,6 +1051,7 @@ void create_screen_main() {
                             lv_obj_t *obj = lv_btn_create(parent_obj);
                             lv_obj_set_pos(obj, 0, 0);
                             lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
+                            lv_obj_add_event_cb(obj, action_cycle_profile, LV_EVENT_PRESSED, (void *)0);
                             add_style_button_secondary(obj);
                             lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_flex_flow(obj, LV_FLEX_FLOW_ROW, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1557,6 +1559,33 @@ void tick_screen_main() {
         if (new_val != cur_val) {
             tick_value_change_obj = objects.obj14;
             lv_bar_set_value(objects.obj14, new_val, LV_ANIM_ON);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        const char *new_val = get_var_stage_time();
+        const char *cur_val = lv_label_get_text(objects.obj17);
+        if (strcmp(new_val, cur_val) != 0) {
+            tick_value_change_obj = objects.obj17;
+            lv_label_set_text(objects.obj17, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        const char *new_val = get_var_stage_target();
+        const char *cur_val = lv_label_get_text(objects.obj20);
+        if (strcmp(new_val, cur_val) != 0) {
+            tick_value_change_obj = objects.obj20;
+            lv_label_set_text(objects.obj20, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        const char *new_val = get_var_profile_time();
+        const char *cur_val = lv_label_get_text(objects.obj23);
+        if (strcmp(new_val, cur_val) != 0) {
+            tick_value_change_obj = objects.obj23;
+            lv_label_set_text(objects.obj23, new_val);
             tick_value_change_obj = NULL;
         }
     }

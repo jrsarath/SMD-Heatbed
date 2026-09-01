@@ -266,6 +266,33 @@
         "defaultValue": "0",
         "persistent": false,
         "native": false
+      },
+      {
+        "objID": "094a2ecf-b5cf-4596-aaf6-3b3ea364d0dc",
+        "name": "stage_time",
+        "type": "string",
+        "size": null,
+        "defaultValue": "\"\"",
+        "persistent": false,
+        "native": false
+      },
+      {
+        "objID": "c1053628-3548-4d0c-a255-7c5cf275f458",
+        "name": "stage_target",
+        "type": "string",
+        "size": null,
+        "defaultValue": "\"\"",
+        "persistent": false,
+        "native": false
+      },
+      {
+        "objID": "f077d802-5d1d-42cf-a92d-35a89c5207c1",
+        "name": "profile_time",
+        "type": "string",
+        "size": null,
+        "defaultValue": "\"\"",
+        "persistent": false,
+        "native": false
       }
     ],
     "structures": [],
@@ -311,6 +338,15 @@
       "userProperties": [],
       "name": "toggle_heating",
       "implementationType": "native"
+    },
+    {
+      "objID": "ee48e7b9-968b-40a8-d23a-def544c04944",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "componentGroups": [],
+      "userProperties": [],
+      "name": "cycle_profile"
     }
   ],
   "userPages": [
@@ -1774,7 +1810,7 @@
                           "left": 0,
                           "top": 0,
                           "width": 18,
-                          "height": 21,
+                          "height": 24,
                           "customInputs": [],
                           "customOutputs": [],
                           "style": {
@@ -1805,7 +1841,8 @@
                             "definition": {
                               "MAIN": {
                                 "DEFAULT": {
-                                  "text_font": "FONTAWESOME_20"
+                                  "text_font": "FONTAWESOME_20",
+                                  "pad_top": 3
                                 }
                               }
                             }
@@ -3139,7 +3176,7 @@
                               "type": "LVGLLabelWidget",
                               "left": 0,
                               "top": 0,
-                              "width": 44,
+                              "width": 19,
                               "height": 11,
                               "customInputs": [],
                               "customOutputs": [],
@@ -3179,10 +3216,11 @@
                               },
                               "group": "",
                               "groupIndex": 0,
-                              "text": "PROFILE",
-                              "textType": "literal",
+                              "text": "stage_time",
+                              "textType": "expression",
                               "longMode": "WRAP",
                               "recolor": false,
+                              "previewValue": "1:30",
                               "useStaticText": true
                             }
                           ],
@@ -3346,7 +3384,7 @@
                               "type": "LVGLLabelWidget",
                               "left": 0,
                               "top": 0,
-                              "width": 44,
+                              "width": 24,
                               "height": 11,
                               "customInputs": [],
                               "customOutputs": [],
@@ -3386,10 +3424,11 @@
                               },
                               "group": "",
                               "groupIndex": 0,
-                              "text": "PROFILE",
-                              "textType": "literal",
+                              "text": "stage_target",
+                              "textType": "expression",
                               "longMode": "WRAP",
                               "recolor": false,
+                              "previewValue": "90°C",
                               "useStaticText": true
                             }
                           ],
@@ -3553,7 +3592,7 @@
                               "type": "LVGLLabelWidget",
                               "left": 0,
                               "top": 0,
-                              "width": 44,
+                              "width": 22,
                               "height": 11,
                               "customInputs": [],
                               "customOutputs": [],
@@ -3593,10 +3632,11 @@
                               },
                               "group": "",
                               "groupIndex": 0,
-                              "text": "PROFILE",
-                              "textType": "literal",
+                              "text": "profile_time",
+                              "textType": "expression",
                               "longMode": "WRAP",
                               "recolor": false,
+                              "previewValue": "2:40",
                               "useStaticText": true
                             }
                           ],
@@ -3998,7 +4038,15 @@
                         "childStyles": []
                       },
                       "timeline": [],
-                      "eventHandlers": [],
+                      "eventHandlers": [
+                        {
+                          "objID": "3da4f1d8-0284-40dc-9732-9d3c4a8cb33e",
+                          "eventName": "PRESSED",
+                          "handlerType": "action",
+                          "action": "cycle_profile",
+                          "userData": 0
+                        }
+                      ],
                       "leftUnit": "px",
                       "topUnit": "px",
                       "widthUnit": "%",

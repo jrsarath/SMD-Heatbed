@@ -11,6 +11,7 @@ extern void action_set_target_temp(lv_event_t * e);
 extern void action_increase_target_temp(lv_event_t * e);
 extern void action_decrease_target_temp(lv_event_t * e);
 extern void action_toggle_heating(lv_event_t * e);
+extern void action_cycle_profile(lv_event_t * e);
 
 #ifdef __cplusplus
 }

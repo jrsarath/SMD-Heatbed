@@ -1,4 +1,5 @@
 #include "input_handler.h"
+#include "display_manager.h"
 
 static volatile int btn_press_time = 0;
 static volatile int last_btn_state = 1;
@@ -48,7 +49,7 @@ bool acquisition_isr(struct repeating_timer *t) {
   // Handle button actions
   if (btn_short) {
     btn_short = false;
-    toggle_heater();
+    handle_ui_toggle_heating();
   }
 
   if (btn_long) {

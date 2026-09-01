@@ -40,11 +40,25 @@ void action_decrease_target_temp(lv_event_t *e) {
   change_desired_temp(-step);
 }
 
+extern void handle_ui_toggle_heating();
+extern void handle_ui_cycle_profile();
+
 /**
- * @brief Toggles heater ON/OFF state.
+ * @brief Toggles heater ON/OFF state or cancels active reflow stage.
  * @param e LVGL event object.
  */
 void action_toggle_heating(lv_event_t *e) {
   (void)e;
-  toggle_heater();
+  handle_ui_toggle_heating();
 }
+
+/**
+ * @brief Cycles to the next reflow profile (stops heating first).
+ * @param e LVGL event object.
+ */
+void action_cycle_profile(lv_event_t *e) {
+  (void)e;
+  handle_ui_cycle_profile();
+}
+
+
