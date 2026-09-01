@@ -11,7 +11,7 @@ This document provides developer guidelines, architectural rules, hardware speci
 ### Key Hardware Specifications
 * **MCU:** Raspberry Pi Pico (RP2040 microcontroller)
 * **Heater Element:** 400W PTC Heatplate driven via a 3.3V Logic Solid State Relay (SSR)
-* **Temperature Sensor:** 100K NTC Thermistor in a voltage divider ($R = 2.2\text{k}\Omega$, $R_0 = 100\text{k}\Omega$, $\beta = 3950$, $T_0 = 298.15\text{K}$)
+* **Temperature Sensors:** Dual 100K NTC Thermistors in voltage dividers ($R_{\text{divider}} = 100\text{k}\Omega$, $R_0 = 100\text{k}\Omega$, $\beta = 3950$, $T_0 = 298.15\text{K}$)
 * **User Input:** DFRobot Rotary Encoder with integrated push-button & Capacitive Touchscreen (GT911 driver)
 * **Display:** 400x240 RGB display output driven via PicoDVI (`DVIGFX16`, 2x scaled to 800x480 on Elecrow CrowPanel RTD2281)
 * **Telemetry:** Serial1 UART (TX: GPIO 0, RX: GPIO 1) at 115200 baud
@@ -61,7 +61,8 @@ Tejasvini/
 | `PIN_ENB` | GPIO 3 | Rotary Encoder Phase B |
 | `PIN_EBT` | GPIO 27 | Rotary Encoder Push-Button |
 | `PIN_SSR` | GPIO 22 | Solid State Relay PWM Output (`RP2040_PWM` @ 1000 Hz) |
-| `PIN_NTC` | GPIO 28 | Analog Input for NTC Thermistor divider (ADC2, 12-bit) |
+| `PIN_NTC1` | GPIO 28 | Primary Analog Input for NTC1 Thermistor divider (ADC2, 12-bit) |
+| `PIN_NTC2` | GPIO 26 | Secondary Analog Input for NTC2 Thermistor divider (ADC0, 12-bit) |
 | `PIN_BACKLIGHT` | GPIO 24 | Display Backlight Control Pin (Active LOW) |
 | `TOUCH_SDA` | GPIO 20 | I2C SDA for GT911 Touch Controller |
 | `TOUCH_SCL` | GPIO 21 | I2C SCL for GT911 Touch Controller |

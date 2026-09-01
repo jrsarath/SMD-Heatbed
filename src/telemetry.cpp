@@ -22,8 +22,12 @@ void telemetry_update() {
   measure_temperature();
 
   float meas = get_measured_temp();
-  int raw_adc = get_raw_adc();
-  float res = get_measured_resistance();
+  float temp1 = get_measured_temp_ntc1();
+  float temp2 = get_measured_temp_ntc2();
+  int raw_adc1 = get_raw_adc_ntc1();
+  int raw_adc2 = get_raw_adc_ntc2();
+  float res1 = get_measured_resistance_ntc1();
+  float res2 = get_measured_resistance_ntc2();
   int set = get_desired_temp();
   float ref = get_reference_temp();
   float duty = get_duty_cycle();
@@ -35,13 +39,10 @@ void telemetry_update() {
   else if (status == STATUS_NTC_ERROR)
     status_str = "NTC_ERROR";
 
-  String logLine = "NTC ADC: " + String(raw_adc) +
-                   ", Res: " + String(res, 1) + " Ohm" +
-                   ", Temp: " + String(meas, 1) + " C" +
-                   ", Ref: " + String(ref, 1) + " C" +
-                   ", Target: " + String(set) + " C" +
-                   ", Duty: " + String(duty, 1) + "%" +
-                   ", Status: " + String(status_str) +
+  String logLine = "NTC1: " + String(temp1, 1) + "C (ADC:" + String(raw_adc1) + ", " + String(res1, 0) + "R) | " +
+                   "NTC2: " + String(temp2, 1) + "C (ADC:" + String(raw_adc2) + ", " + String(res2, 0) + "R) | " +
+                   "Avg: " + String(meas, 1) + "C, Ref: " + String(ref, 1) + "C, Target: " + String(set) + "C, " +
+                   "Duty: " + String(duty, 1) + "%, Status: " + String(status_str) +
                    ", Heap: " + String(rp2040.getFreeHeap()) + "B";
   Serial.println(logLine);
   Serial1.println(logLine);

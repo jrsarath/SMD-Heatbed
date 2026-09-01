@@ -4,9 +4,9 @@
  *
  * Board:   Raspberry Pi Pico (RP2040)
  * Display: Elecrow CrowPanel RTD2281 4.3" Pico DVI Display (400x240 / 800x480
- * Scaled) Sensor:  100K NTC Thermistor (ADC2, GPIO 28) Output:  3.3V Logic
- * Solid State Relay PWM (GPIO 22) Input:   Rotary Encoder with Push-Button &
- * Touchscreen (GT911)
+ * Scaled) Sensor:  Dual 100K NTC Thermistors (NTC1: ADC2/GPIO 28, NTC2:
+ * ADC0/GPIO 26) with 100K Dividers Output:  3.3V Logic Solid State Relay PWM
+ * (GPIO 22) Input:   Rotary Encoder with Push-Button & Touchscreen (GT911)
  ******************************************************************************/
 
 #include "src/config.h"

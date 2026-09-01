@@ -8,9 +8,11 @@
  ******************************************************************************/
 #define PIN_ENA 2        // Rotary Encoder Phase A (GPIO 2)
 #define PIN_ENB 3        // Rotary Encoder Phase B (GPIO 3)
-#define PIN_EBT 27       // Rotary Encoder Push-Button (GPIO 27)
+#define PIN_EBT 28       // Rotary Encoder Push-Button (GPIO 28)
 #define PIN_SSR 22       // Solid State Relay PWM Output (GPIO 22)
-#define PIN_NTC 28       // NTC Thermistor ADC Input (ADC2, GPIO 28)
+#define PIN_NTC1 26      // Primary NTC Thermistor ADC Input (ADC2, GPIO 26)
+#define PIN_NTC2 27      // Secondary NTC Thermistor ADC Input (ADC0, GPIO 27)
+#define PIN_NTC PIN_NTC1 // Backward compatibility alias
 #define PIN_BACKLIGHT 24 // Display Backlight Control (Active LOW, GPIO 24)
 
 #define SERIAL_TX 0 // Telemetry UART TX (GPIO 0)
@@ -47,12 +49,21 @@
 #define MAX_TEMP 250   // Maximum allowable setpoint (°C)
 #define REF_STEP 0.05f // Soft-start reference ramping step per cycle (°C)
 
-// NTC Voltage Divider Specifications
-#define R_DIVIDER 1000.0f       // Series resistor value (Ohms)
-#define R0_THERMISTOR 100000.0f // Thermistor nominal resistance at T0 (Ohms)
-#define BETA_COEFF 3950.0f      // Thermistor Beta coefficient (K)
-#define T0_KELVIN 298.15f // Nominal reference temperature (25°C in Kelvin)
-#define MATH_E 2.71828f   // Euler's constant
+// Dual NTC Voltage Divider Specifications
+#define R_DIVIDER 100000.0f // Series divider resistor value (100k Ohms)
+#define R0_THERMISTOR                                                          \
+  100000.0f                // Thermistor nominal resistance at T0 (100k Ohms)
+#define BETA_COEFF 3950.0f // Thermistor Beta coefficient (K)
+#define T0_KELVIN 298.15f  // Nominal reference temperature (25°C in Kelvin)
+#define MATH_E 2.71828f    // Euler's constant
+
+// Dual NTC Sensor Safety Bounds
+#define NTC_MIN_VALID_TEMP                                                     \
+  -20.0f // Minimum physically valid sensor reading (°C)
+#define NTC_MAX_VALID_TEMP                                                     \
+  300.0f // Maximum physically valid sensor reading (°C)
+#define MAX_NTC_DIFF                                                           \
+  35.0f // Max allowable temp delta between NTCs during heating (°C)
 
 // PI Controller Constants
 #define KP_GAIN 0.2f     // Proportional gain

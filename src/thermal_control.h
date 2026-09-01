@@ -23,8 +23,8 @@ void thermal_control_init();
 bool regulator_isr(struct repeating_timer *t);
 
 /**
- * @brief Measures temperature from the NTC thermistor ADC.
- * @return Temperature in degrees Celsius.
+ * @brief Measures temperatures from both NTC thermistor ADCs and updates control states.
+ * @return Average/composite temperature in degrees Celsius.
  */
 float measure_temperature();
 
@@ -56,9 +56,24 @@ void toggle_heater();
 void set_heater(bool state);
 
 /**
- * @brief Gets current measured temperature.
+ * @brief Gets current measured composite/average temperature.
  */
 float get_measured_temp();
+
+/**
+ * @brief Gets current temperature measured by primary NTC (NTC1).
+ */
+float get_measured_temp_ntc1();
+
+/**
+ * @brief Gets current temperature measured by secondary NTC (NTC2).
+ */
+float get_measured_temp_ntc2();
+
+/**
+ * @brief Gets absolute difference between NTC1 and NTC2 temperatures.
+ */
+float get_ntc_delta();
 
 /**
  * @brief Gets current target temperature setpoint.
@@ -80,19 +95,34 @@ bool is_error_state();
 #endif
 
 /**
- * @brief Gets raw 12-bit ADC reading from NTC thermistor pin.
+ * @brief Gets raw 12-bit ADC reading from primary NTC thermistor pin (PIN_NTC1).
  */
 int get_raw_adc();
 
 /**
- * @brief Gets calculated thermistor resistance in Ohms.
+ * @brief Gets raw 12-bit ADC reading from primary NTC thermistor pin (PIN_NTC1).
+ */
+int get_raw_adc_ntc1();
+
+/**
+ * @brief Gets raw 12-bit ADC reading from secondary NTC thermistor pin (PIN_NTC2).
+ */
+int get_raw_adc_ntc2();
+
+/**
+ * @brief Gets calculated primary thermistor resistance in Ohms.
  */
 float get_measured_resistance();
 
 /**
- * @brief Gets current target temperature setpoint.
+ * @brief Gets calculated primary thermistor resistance in Ohms (NTC1).
  */
-int get_desired_temp();
+float get_measured_resistance_ntc1();
+
+/**
+ * @brief Gets calculated secondary thermistor resistance in Ohms (NTC2).
+ */
+float get_measured_resistance_ntc2();
 
 /**
  * @brief Gets current reference temperature (soft-start ramp).
@@ -103,16 +133,6 @@ float get_reference_temp();
  * @brief Gets current PWM duty cycle (0.0 .. 100.0 %).
  */
 float get_duty_cycle();
-
-/**
- * @brief Checks if heater is currently active.
- */
-bool is_heater_on();
-
-/**
- * @brief Checks if thermal safety error state is active.
- */
-bool is_error_state();
 
 /**
  * @brief Gets the current high-level status of the heatbed.

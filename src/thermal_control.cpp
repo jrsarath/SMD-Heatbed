@@ -1,4 +1,5 @@
 #include "thermal_control.h"
+#include <math.h>
 
 // Global hardware instances
 static RP2040_PWM* pwm_ssr = nullptr;
@@ -6,9 +7,13 @@ static RP2040_PWM* pwm_ssr = nullptr;
 // Internal state variables (volatile for ISR safe access)
 static volatile int set_temp = 0;
 static volatile float reference_temp = 0.0f;
-static volatile float measured_temp = 0.0f;
-static volatile float measured_resistance = 0.0f;
-static volatile int adc_raw = 0;
+static volatile float measured_temp = 0.0f;     // Composite (average) temperature
+static volatile float measured_temp1 = 0.0f;    // NTC 1 temperature
+static volatile float measured_temp2 = 0.0f;    // NTC 2 temperature
+static volatile float measured_resistance1 = 0.0f;
+static volatile float measured_resistance2 = 0.0f;
+static volatile int adc_raw1 = 0;
+static volatile int adc_raw2 = 0;
 
 static volatile float duty = 0.0f;
 static volatile float acc = 0.0f;
@@ -21,9 +26,30 @@ static volatile float last_safety_temp = 0.0f;
 static volatile uint32_t last_safety_check = 0;
 static volatile bool error_state = false;
 
+/**
+ * @brief Computes thermistor resistance and Steinhart-Hart/Beta temperature from raw ADC.
+ */
+static float calculate_ntc_temperature(int raw_adc, float &out_resistance) {
+  if (raw_adc <= 0) raw_adc = 1;
+  if (raw_adc >= 4095) raw_adc = 4094;
+
+  // Voltage divider resistance calculation
+  float resistance = R_DIVIDER * (4086.0f / (float)raw_adc - 1.0f);
+  if (resistance <= 0.0f) resistance = 0.001f;
+  out_resistance = resistance;
+
+  // Steinhart-Hart / Beta equation for NTC thermistor
+  float term = resistance / (R0_THERMISTOR * powf(MATH_E, -BETA_COEFF / T0_KELVIN));
+  if (term <= 0.00001f) term = 0.00001f;
+  float temp_c = (BETA_COEFF / logf(term)) - 273.15f;
+
+  return temp_c;
+}
+
 void thermal_control_init() {
   pinMode(PIN_SSR, OUTPUT);
-  pinMode(PIN_NTC, INPUT);
+  pinMode(PIN_NTC1, INPUT);
+  pinMode(PIN_NTC2, INPUT);
   analogReadResolution(12);
 
   // Initialize RP2040 PWM driver for SSR
@@ -34,16 +60,34 @@ void thermal_control_init() {
 }
 
 float measure_temperature() {
-  adc_raw = analogRead(PIN_NTC);
-  if (adc_raw <= 0) adc_raw = 1; // Protect against division by zero
+  adc_raw1 = analogRead(PIN_NTC1);
+  adc_raw2 = analogRead(PIN_NTC2);
 
-  // Voltage divider resistance calculation
-  measured_resistance = R_DIVIDER * (4086.0f / (float)adc_raw - 1.0f);
-  if (measured_resistance <= 0.0f) measured_resistance = 0.001f;
+  float res1 = 0.0f;
+  float res2 = 0.0f;
+  float temp1 = calculate_ntc_temperature(adc_raw1, res1);
+  float temp2 = calculate_ntc_temperature(adc_raw2, res2);
 
-  // Steinhart-Hart / Beta equation for NTC thermistor
-  float term = measured_resistance / (R0_THERMISTOR * powf(MATH_E, -BETA_COEFF / T0_KELVIN));
-  measured_temp = (BETA_COEFF / logf(term)) - 273.15f;
+  measured_resistance1 = res1;
+  measured_resistance2 = res2;
+  measured_temp1 = temp1;
+  measured_temp2 = temp2;
+
+  // Sensor physical validity bounds (detect disconnected thermistor / short)
+  bool ntc1_valid = (temp1 >= NTC_MIN_VALID_TEMP && temp1 <= NTC_MAX_VALID_TEMP);
+  bool ntc2_valid = (temp2 >= NTC_MIN_VALID_TEMP && temp2 <= NTC_MAX_VALID_TEMP);
+
+  if (!ntc1_valid || !ntc2_valid) {
+    error_state = true;
+  }
+
+  // Thermal gradient / sensor divergence check during active heating
+  if (heater && fabsf(temp1 - temp2) > MAX_NTC_DIFF) {
+    error_state = true;
+  }
+
+  // Composite controlled temperature (average of both NTCs)
+  measured_temp = (temp1 + temp2) / 2.0f;
 
   return measured_temp;
 }
@@ -153,12 +197,40 @@ float get_measured_temp() {
   return measured_temp;
 }
 
+float get_measured_temp_ntc1() {
+  return measured_temp1;
+}
+
+float get_measured_temp_ntc2() {
+  return measured_temp2;
+}
+
+float get_ntc_delta() {
+  return fabsf(measured_temp1 - measured_temp2);
+}
+
 int get_raw_adc() {
-  return adc_raw;
+  return adc_raw1;
+}
+
+int get_raw_adc_ntc1() {
+  return adc_raw1;
+}
+
+int get_raw_adc_ntc2() {
+  return adc_raw2;
 }
 
 float get_measured_resistance() {
-  return measured_resistance;
+  return measured_resistance1;
+}
+
+float get_measured_resistance_ntc1() {
+  return measured_resistance1;
+}
+
+float get_measured_resistance_ntc2() {
+  return measured_resistance2;
 }
 
 int get_desired_temp() {
@@ -186,3 +258,4 @@ HeatbedStatus get_system_status() {
   if (heater) return STATUS_HEATING;
   return STATUS_IDLE;
 }
+
