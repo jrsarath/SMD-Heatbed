@@ -31,7 +31,7 @@ Tejasvini/
 ├── AGENTS.md                 # Developer & AI agent architectural guide (this file)
 ├── ui.eez-project            # EEZ Studio LVGL project source file
 ├── assets/                   # Hardware assets & 3D models
-│   └── 3d files/             # Ready-to-print STL models (chassis, display frame, plates)
+│   └── 3d files/             # 3D printable STL enclosure models & aluminum plate CAD reference
 ├── docs/                     # Technical documentation & schematics
 │   ├── architecture.md       # Detailed software architecture & state machines
 │   ├── hardware_and_safety.md# Pinout, NTC voltage divider math, SSR & safety fuses
