@@ -118,3 +118,40 @@ GND     ────────────────────────
 Zero-crossing AC solid-state relays only switch on and off when the AC line voltage passes through 0V (every 10ms at 50Hz, or 8.33ms at 60Hz).
 * Applying a 1000 Hz PWM signal to an AC zero-cross SSR results in random, irregular half-cycle conduction, extreme flicker, and unpredictable power delivery.
 * Tejasvini uses **Time-Proportioning PWM** over a 1000ms window (`SSR_WINDOW_MS 1000`). At 25% duty, the relay conducts for 250ms (12.5 complete AC cycles at 50Hz) and remains OFF for 750ms.
+
+---
+
+## 5. Mechanical Enclosure & 3D Printed Parts
+
+The physical enclosure is designed for modularity, thermal isolation, and compact desktop footprint. Ready-to-print STL files are located in [`assets/3d files/`](../assets/3d%20files/).
+
+### 5.1 3D Model Manifest
+
+| File Name | Functional Description | Print Recommendation |
+| :--- | :--- | :--- |
+| [`Frame - Main.stl`](../assets/3d%20files/Frame%20-%20Main.stl) | Main structural chassis. Houses the Raspberry Pi Pico, solid-state relay, AC terminal block, and power distribution. | PETG / ABS / ASA, 35% infill, 4 perimeters |
+| [`Frame - Display.stl`](../assets/3d%20files/Frame%20-%20Display.stl) | Angled front display bezel. Secures the Elecrow 4.3" CrowPanel RTD2281 DVI screen and GT911 touch panel. | PETG / ABS / PLA, 25% infill, 3 perimeters |
+| [`Display Bottom Plate.stl`](../assets/3d%20files/Display%20Bottom%20Plate.stl) | Rear/bottom cover plate for the display module housing, protecting display PCB and encoder wiring. | PETG / ABS / PLA, 25% infill, 3 perimeters |
+| [`Heating Plate.stl`](../assets/3d%20files/Heating%20Plate.stl) | Sub-chassis bed carrier plate. Supports the aluminum PTC heating element and thermal fuse bracket. | **ABS / ASA / PC**, 40% infill, 5 perimeters |
+| [`Top Plate.stl`](../assets/3d%20files/Top%20Plate.stl) | Top cosmetic deck plate surrounding the heating zone, providing a smooth, flush exterior interface. | **ABS / ASA / PC**, 40% infill, 4 perimeters |
+
+### 5.2 Assembly & Thermal Isolation
+Because the aluminum heatplate operates at temperatures up to 250°C, direct contact between the metal plate and thermoplastic components will cause warping or melting:
+
+1. **Thermal Standoffs**:
+   - Mount the aluminum heatplate to `Heating Plate.stl` using M3 brass standoffs (minimum 10mm to 15mm height) to establish a convective air gap.
+   - Place heat-resistant silicone grommets or ceramic washers between the screw heads and the plate mounting holes.
+2. **Thermal Fuse Mounting**:
+   - The 260°C–280°C thermal cut-off fuse (TCO) should be mounted directly to the underside of the aluminum heatplate with a metal retaining clip or high-temperature silicone adhesive, ensuring intimate thermal contact.
+3. **Internal Airflow**:
+   - The main frame features ventilation slots to promote natural convection around the SSR heatsink and the Raspberry Pi Pico.
+
+### 5.3 Filament Material Guide
+
+| Filament Material | Glass Transition ($T_g$) | Heat Deflection (HDT @ 0.45MPa) | Suitability for Tejasvini |
+| :--- | :--- | :--- | :--- |
+| **PLA** | ~55°C – 60°C | ~55°C | **Only for Display Bezel**. Never use near the heater plate. |
+| **PETG** | ~80°C – 85°C | ~70°C – 75°C | Excellent for Main Frame & Display housing. |
+| **ABS / ASA** | ~105°C | ~95°C – 100°C | **Recommended** for Heating Plate mount and Top Plate. |
+| **PC (Polycarbonate)** | ~145°C – 150°C | ~135°C – 140°C | **Best performance** for high-temperature continuous operation. |
+

@@ -81,6 +81,24 @@ The firmware assigns GPIO pins in [`src/config.h`](src/config.h) as follows:
 
 ---
 
+## Enclosure & 3D Printed Hardware
+
+Tejasvini includes ready-to-print 3D models located in [`assets/3d files/`](assets/3d%20files/) for building a complete desktop workstation enclosure:
+
+| Model File | Part Description | Recommended Material | Print Settings |
+| :--- | :--- | :--- | :--- |
+| [`Frame - Main.stl`](assets/3d%20files/Frame%20-%20Main.stl) | Main chassis housing RP2040, SSR, power supply & wiring | PETG / ABS / ASA | 35% Infill, 4 walls |
+| [`Frame - Display.stl`](assets/3d%20files/Frame%20-%20Display.stl) | Front bezel securing the 4.3" Pico DVI display & GT911 touch | PETG / ABS / PLA | 25% Infill, 3 walls |
+| [`Display Bottom Plate.stl`](assets/3d%20files/Display%20Bottom%20Plate.stl) | Rear protective backing plate for the display module | PETG / ABS / PLA | 25% Infill, 3 walls |
+| [`Heating Plate.stl`](assets/3d%20files/Heating%20Plate.stl) | Heatplate carrier base & mechanical mounting bracket | **ABS / ASA / PC** *(High HDT)* | 40% Infill, 5 walls |
+| [`Top Plate.stl`](assets/3d%20files/Top%20Plate.stl) | Top deck plate surrounding the heatplate surface | **ABS / ASA / PC** *(High HDT)* | 40% Infill, 4 walls |
+
+> [!IMPORTANT]
+> **Thermal Standoffs & Material Selection**:
+> For components adjacent to the heatplate (`Heating Plate.stl` and `Top Plate.stl`), use materials with a high Heat Deflection Temperature (HDT) such as **ABS, ASA, or Polycarbonate (PC)**. Standard PLA softens around 55°C–60°C and must **not** be used near the heater. Always install silicone washers, ceramic washers, or brass/PTFE standoffs to thermally isolate the 200°C+ aluminum plate from printed surfaces.
+
+---
+
 ## Safety Architecture & Physical Protections
 
 > [!CAUTION]
@@ -115,6 +133,8 @@ Tejasvini/
 ├── README.md                 # Project documentation (this file)
 ├── CONTRIBUTING.md           # Developer guidelines & safety standards
 ├── CODE_OF_CONDUCT.md        # Contributor Covenant Code of Conduct
+├── assets/
+│   └── 3d files/             # Ready-to-print STL enclosure & mounting models
 ├── docs/
 │   ├── architecture.md       # Detailed software architecture & state machines
 │   ├── hardware_and_safety.md# Pinout, NTC voltage divider math, SSR & safety fuses
