@@ -81,21 +81,27 @@ The firmware assigns GPIO pins in [`src/config.h`](src/config.h) as follows:
 
 ---
 
-## Enclosure & 3D Printed Hardware
+## Enclosure & 3D Hardware Models
 
-Tejasvini includes ready-to-print 3D models located in [`assets/3d files/`](assets/3d%20files/) for building a complete desktop workstation enclosure:
+Tejasvini includes CAD & 3D models in [`assets/3d files/`](assets/3d%20files/) for building a complete desktop workstation enclosure:
 
+### 3D Printable Enclosure Parts
 | Model File | Part Description | Recommended Material | Print Settings |
 | :--- | :--- | :--- | :--- |
 | [`Frame - Main.stl`](assets/3d%20files/Frame%20-%20Main.stl) | Main chassis housing RP2040, SSR, power supply & wiring | PETG / ABS / ASA | 35% Infill, 4 walls |
 | [`Frame - Display.stl`](assets/3d%20files/Frame%20-%20Display.stl) | Front bezel securing the 4.3" Pico DVI display & GT911 touch | PETG / ABS / PLA | 25% Infill, 3 walls |
 | [`Display Bottom Plate.stl`](assets/3d%20files/Display%20Bottom%20Plate.stl) | Rear protective backing plate for the display module | PETG / ABS / PLA | 25% Infill, 3 walls |
-| [`Heating Plate.stl`](assets/3d%20files/Heating%20Plate.stl) | Heatplate carrier base & mechanical mounting bracket | **ABS / ASA / PC** *(High HDT)* | 40% Infill, 5 walls |
 | [`Top Plate.stl`](assets/3d%20files/Top%20Plate.stl) | Top deck plate surrounding the heatplate surface | **ABS / ASA / PC** *(High HDT)* | 40% Infill, 4 walls |
+
+### Physical Hardware Reference (Do NOT 3D Print)
+| Model File | Part Description | Material | Notes |
+| :--- | :--- | :--- | :--- |
+| [`Heating Plate.stl`](assets/3d%20files/Heating%20Plate.stl) | **Heatplate CAD Reference** | **Aluminium** | **Visualization & fit checks only.** Must be fabricated from aluminum (sheet / CNC machined block). Do **not** 3D print this part. |
 
 > [!IMPORTANT]
 > **Thermal Standoffs & Material Selection**:
-> For components adjacent to the heatplate (`Heating Plate.stl` and `Top Plate.stl`), use materials with a high Heat Deflection Temperature (HDT) such as **ABS, ASA, or Polycarbonate (PC)**. Standard PLA softens around 55°C–60°C and must **not** be used near the heater. Always install silicone washers, ceramic washers, or brass/PTFE standoffs to thermally isolate the 200°C+ aluminum plate from printed surfaces.
+> * **Heating Plate Material**: The heating surface (`Heating Plate.stl`) MUST be made of **aluminium** to conduct heat and withstand reflow temperatures up to 250°C.
+> * **Enclosure Plastic**: For printed components near the heatplate (`Top Plate.stl`), use materials with a high Heat Deflection Temperature (HDT) such as **ABS, ASA, or Polycarbonate (PC)**. Standard PLA softens around 55°C–60°C and must **not** be used near the heater. Always install silicone washers, ceramic washers, or brass/PTFE standoffs to thermally isolate the 200°C+ aluminum plate from printed enclosure surfaces.
 
 ---
 
