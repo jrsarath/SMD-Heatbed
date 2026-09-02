@@ -121,29 +121,36 @@ Zero-crossing AC solid-state relays only switch on and off when the AC line volt
 
 ---
 
-## 5. Mechanical Enclosure & 3D Printed Parts
+## 5. Mechanical Enclosure & 3D Hardware Models
 
-The physical enclosure is designed for modularity, thermal isolation, and compact desktop footprint. Ready-to-print STL files are located in [`assets/3d files/`](../assets/3d%20files/).
+CAD & 3D models for Tejasvini are located in [`assets/3d files/`](../assets/3d%20files/).
 
 ### 5.1 3D Model Manifest
 
+#### 3D Printable Parts
 | File Name | Functional Description | Print Recommendation |
 | :--- | :--- | :--- |
 | [`Frame - Main.stl`](../assets/3d%20files/Frame%20-%20Main.stl) | Main structural chassis. Houses the Raspberry Pi Pico, solid-state relay, AC terminal block, and power distribution. | PETG / ABS / ASA, 35% infill, 4 perimeters |
 | [`Frame - Display.stl`](../assets/3d%20files/Frame%20-%20Display.stl) | Angled front display bezel. Secures the Elecrow 4.3" CrowPanel RTD2281 DVI screen and GT911 touch panel. | PETG / ABS / PLA, 25% infill, 3 perimeters |
 | [`Display Bottom Plate.stl`](../assets/3d%20files/Display%20Bottom%20Plate.stl) | Rear/bottom cover plate for the display module housing, protecting display PCB and encoder wiring. | PETG / ABS / PLA, 25% infill, 3 perimeters |
-| [`Heating Plate.stl`](../assets/3d%20files/Heating%20Plate.stl) | Sub-chassis bed carrier plate. Supports the aluminum PTC heating element and thermal fuse bracket. | **ABS / ASA / PC**, 40% infill, 5 perimeters |
 | [`Top Plate.stl`](../assets/3d%20files/Top%20Plate.stl) | Top cosmetic deck plate surrounding the heating zone, providing a smooth, flush exterior interface. | **ABS / ASA / PC**, 40% infill, 4 perimeters |
+
+#### Physical Hardware Reference (Do NOT 3D Print)
+| File Name | Functional Description | Material | Notes |
+| :--- | :--- | :--- | :--- |
+| [`Heating Plate.stl`](../assets/3d%20files/Heating%20Plate.stl) | Physical heating plate reference model. | **Aluminium** | **Visualization only.** Must be fabricated from aluminum (sheet / CNC machined plate). Never 3D print. |
 
 ### 5.2 Assembly & Thermal Isolation
 Because the aluminum heatplate operates at temperatures up to 250°C, direct contact between the metal plate and thermoplastic components will cause warping or melting:
 
-1. **Thermal Standoffs**:
-   - Mount the aluminum heatplate to `Heating Plate.stl` using M3 brass standoffs (minimum 10mm to 15mm height) to establish a convective air gap.
-   - Place heat-resistant silicone grommets or ceramic washers between the screw heads and the plate mounting holes.
-2. **Thermal Fuse Mounting**:
+1. **Aluminium Plate Construction**:
+   - The actual heating surface represented by `Heating Plate.stl` **must be made of aluminum** for optimal thermal conductivity and heat distribution across the PCB work area.
+2. **Thermal Standoffs**:
+   - Mount the aluminum heating plate to the chassis using M3 brass standoffs (minimum 10mm to 15mm height) to establish a convective air gap above the electronics.
+   - Place heat-resistant silicone grommets or ceramic washers between the screw heads and the plate mounting holes to prevent conductive heat transfer into the printed `Top Plate.stl` or chassis.
+3. **Thermal Fuse Mounting**:
    - The 260°C–280°C thermal cut-off fuse (TCO) should be mounted directly to the underside of the aluminum heatplate with a metal retaining clip or high-temperature silicone adhesive, ensuring intimate thermal contact.
-3. **Internal Airflow**:
+4. **Internal Airflow**:
    - The main frame features ventilation slots to promote natural convection around the SSR heatsink and the Raspberry Pi Pico.
 
 ### 5.3 Filament Material Guide
