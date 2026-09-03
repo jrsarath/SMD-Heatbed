@@ -29,7 +29,6 @@
           },
           {
             "type": "border",
-            "selected": 1,
             "size": 240,
             "location": "right",
             "children": [
@@ -77,7 +76,6 @@
           },
           {
             "type": "border",
-            "selected": 0,
             "location": "bottom",
             "children": [
               {
@@ -247,7 +245,7 @@
                 {
                   "type": "tabset",
                   "id": "#c3fe2ed2-3463-4a54-b40c-4ccc5de7f6a4",
-                  "weight": 2,
+                  "weight": 1.8909348441926346,
                   "children": [
                     {
                       "type": "tab",
@@ -257,13 +255,12 @@
                       "enableClose": false,
                       "icon": "svg:properties"
                     }
-                  ],
-                  "active": true
+                  ]
                 },
                 {
                   "type": "tabset",
                   "id": "#8f0339b2-87c9-4de5-9eb3-fea16c61f6d6",
-                  "weight": 1,
+                  "weight": 1.1090651558073654,
                   "children": [
                     {
                       "type": "tab",
@@ -273,7 +270,8 @@
                       "enableClose": false,
                       "icon": "svg:components"
                     }
-                  ]
+                  ],
+                  "active": true
                 }
               ]
             }
@@ -1121,9 +1119,7 @@
             },
             "1": {
               "0": {
-                "1": {
-                  "$selected": true
-                }
+                "1": {}
               }
             },
             "2": {
@@ -1161,15 +1157,18 @@
               }
             },
             "5": {}
+          },
+          "1": {
+            "$selected": true
           }
         }
       },
       "transform": {
         "translate": {
-          "x": -151.83333333333331,
-          "y": -468.16666666666663
+          "x": -118.1583333333333,
+          "y": -191.2166666666667
         },
-        "scale": 2
+        "scale": 1
       },
       "timeline": {
         "isEditorActive": false,
@@ -1371,7 +1370,7 @@
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 2,
+  "flowZoom": 1,
   "implementationLanguage": "C",
   "openDialogDefaultPath": "/Users/jrsarath/Downloads/FontAwesome5-Solid+Brands+Regular.woff"
 }
